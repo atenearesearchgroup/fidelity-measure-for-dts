@@ -10,7 +10,7 @@ from algorithm.lift_case_study import LiftCaseStudy
 from algorithm.needleman_wunsch_tolerance import NeedlemanWunschTolerance
 from process_results.alignment_graphic import generate_graphic
 from process_results.distance_measure import measure_distance
-from process_results.process_results import generate_gap_info_graphic
+from process_results.process_results import generate_statistical_info_graphic
 
 if __name__ == "__main__":
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
             # --- GAP AND PERCENTAGE MATCHED COMPARISON ---
             file_writer.close()
-            generate_gap_info_graphic(output_dir_filename)
+            generate_statistical_info_graphic(output_dir_filename)
 
 
 

@@ -1,44 +1,48 @@
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import pandas as pd
-import seaborn as sns
 
 
-def generate_gap_info_graphic(path: str = None):
-    # Uncomment to call from Java
+def generate_statistical_info_graphic(x_axis_var: str, path: str):
+    # Get dataframe from csv file
     alignment = pd.read_csv(path)
 
-    # Set a custom figure size
-    plt.figure(figsize=(15, 6))
-    plt.subplots_adjust(bottom=0.15)
+    # Create traces
+    fig = make_subplots(rows=5, cols=1, shared_xaxes=True)
 
-    # Style for the line plot
-    sns.set_theme(style="darkgrid")
-    sns.set(font_scale=1.90)
+    # Gap length
+    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['gap_length_mean'],
+                             mode='lines+markers',
+                             error_y=dict(
+                                 type='data',
+                                 symmetric=True,
+                                 array=alignment['gap_length_std']
+                             ),
+                             name='Gap Mean Length'),
+                  row=1, col=1)
 
-    fig, axs = plt.subplots(2, 1, sharex='all', figsize=(15, 6))
+    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['gap_individual'],
+                             mode='lines+markers',
+                             name='Number of individual gaps'
+                             ),
+                  row=2, col=1)
 
-    # Plot line plot using dataframe columns
-    ax = sns.lineplot(ax=axs[0], data=alignment, label="PT", x="gap", y="%matched", marker='o')
-    sns.lineplot(ax=axs[1], data=alignment, label="PT", x="gap", y="frechet", marker='o', alpha=0.5)
+    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['gap_groups'],
+                             mode='lines+markers',
+                             name='Number of groups of gaps'
+                             ),
+                  row=2, col=1)
 
-    ax.ticklabel_format(style='plain', axis='both')
+    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['%matched'],
+                             mode='lines+markers',
+                             name='% of matched points'
+                             ),
+                  row=3, col=1)
 
-    # Limit the x-axis size for better visualization
-    ax.set_title("Alignment result")
-    # ax.set(xlim=(alignment[pt_al_timestamp][0] - 4, alignment[pt_al_timestamp].max()))
-    ax.set_xlabel("Gap")
+    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['frechet'],
+                             mode='lines+markers',
+                             name='Frèchet distance'
+                             ),
+                  row=4, col=1)
 
-    # Limit the y-axis size for better visualization
-    # min = alignment[pt_al_distance].to_numpy()
-    # ax.set(ylim=(np.amin(min[min > 0]) - 2, alignment[pt_al_distance].max() + 2))
-    ax.set_ylabel("% matched points")
-
-    # ax.legend()
-
-    # Show the graphic
-    if path is None:
-        plt.show()
-    else:
-        plt.savefig(path.replace(".csv", ".pdf"))
-
-    plt.close()
+    fig.show()
