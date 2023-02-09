@@ -36,7 +36,8 @@ if __name__ == "__main__":
     param_interest = "accel(m/s2)"
 
     # Headers for the analysis file
-    headers = ["init_gap", "gap", "low", "%matched", "frechet", "mean", "std"]
+    headers = ["init_gap_cost", "gap_cost", "low", "%matched", "frechet", "match_mean", "match_std", "%mismatch", "gap_groups",
+               "gap_individual", "gap_length_mean", "gap_length_std" ]
 
     for i in range(len(pt_files)):
         for pt_file in fu.list_directory_files(pt_path, ".csv", pt_files[i]):
@@ -78,9 +79,11 @@ if __name__ == "__main__":
                                          output_path=output_dir_filename_gap)
 
                         # --- DISTANCE ANALYSIS ---
-                        percentage_matched, frechet, euclidean, std = measure_distance(alignment_df, dt_trace, pt_trace,
+                        statistical_values = measure_distance(alignment_df, dt_trace, pt_trace,
                                                                                        [param_interest])
-                        writer.writerow([init_gap, continue_gap, low, percentage_matched, frechet, euclidean, std])
+                        row = [init_gap, continue_gap, low]
+                        row.extend(statistical_values)
+                        writer.writerow(row)
 
             # --- GAP AND PERCENTAGE MATCHED COMPARISON ---
             file_writer.close()
