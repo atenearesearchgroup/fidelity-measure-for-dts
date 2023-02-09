@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 class CaseStudyBase(ABC):
 
+    # TODO: Weighted equals function
     def snap_equals(self, dt_snapshot: dict, pt_snapshot: dict, tolerance: dict, timestamp_label: str, low:int=5) -> float:
         dt_low = self._is_low_complexity(dt_snapshot)
         pt_low = self._is_low_complexity(pt_snapshot)
