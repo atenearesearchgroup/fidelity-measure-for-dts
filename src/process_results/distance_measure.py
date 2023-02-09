@@ -43,7 +43,7 @@ def measure_distance(alignment: pd.DataFrame,
                 mismatch_counter += 1  # Increase mismatch counter
 
     # ALIGNMENT MATCHES
-    percentage_matched = len(snapshots_pt[0]) / max(len(pt_trace[pt_trace != ' ']),
+    percentage_matched = len(snapshots_pt[0]) / min(len(pt_trace[pt_trace != ' ']),
                                                     len(dt_trace[dt_trace != ' '])) * 100
     print(f"Number of matched ({len(snapshots_dt[0])},{len(snapshots_pt[0])}) "
           f"- Total ({len(dt_trace[dt_trace != ' '])},{len(pt_trace[pt_trace != ' '])})"
@@ -73,7 +73,7 @@ def measure_distance(alignment: pd.DataFrame,
         # print(f"Manhattan distance: {np.mean(manhattan)} StDev: {np.std(manhattan)}")
 
     # ALIGNMENT MISMATCHES
-    percentage_mismatched = mismatch_counter / max(len(pt_trace[pt_trace != ' ']),
+    percentage_mismatched = mismatch_counter / min(len(pt_trace[pt_trace != ' ']),
                                                    len(dt_trace[dt_trace != ' '])) * 100
     print(f"Number of mismatches {mismatch_counter} "
           f"- {percentage_mismatched:.2f} % of mismatches")
@@ -89,5 +89,8 @@ def measure_distance(alignment: pd.DataFrame,
           f"- Mean length {gap_mean_length:.2f} - Std {gap_std_length:.2f} "
           f"- Max length {np.max(gap_length)} - Min length {np.min(gap_length)}")
 
+    # F-Score
+    fscore = 2*((percentage_matched/100*(1-frechet_euclidean))/(percentage_matched/100+(1-frechet_euclidean)))
+
     return [percentage_matched, frechet_euclidean, euclidean_mean, euclidean_std, percentage_mismatched, \
-        gap_number, gap_total_numer, gap_mean_length, gap_std_length]
+        gap_number, gap_total_numer, gap_mean_length, gap_std_length, fscore]

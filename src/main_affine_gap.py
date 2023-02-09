@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Headers for the analysis file
     headers = ["init_gap_cost", "gap_cost", "low", "%matched", "frechet", "match_mean", "match_std", "%mismatch", "gap_groups",
-               "gap_individual", "gap_length_mean", "gap_length_std" ]
+               "gap_individual", "gap_length_mean", "gap_length_std", "f-score" ]
 
     for i in range(len(pt_files)):
         for pt_file in fu.list_directory_files(pt_path, ".csv", pt_files[i]):

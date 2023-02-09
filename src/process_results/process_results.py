@@ -45,4 +45,10 @@ def generate_statistical_info_graphic(x_axis_var: str, path: str):
                              ),
                   row=4, col=1)
 
+    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['f-score'],
+                             mode='lines+markers',
+                             name='F-Score'
+                             ),
+                  row=5, col=1)
+
     fig.show()
