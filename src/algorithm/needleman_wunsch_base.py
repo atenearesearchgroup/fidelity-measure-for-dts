@@ -13,13 +13,15 @@ class NeedlemanWunschBase(ABC):
                  case_study: CaseStudyBase,
                  timestamp_label: str = "timestamp(s)",
                  initiate_gap: float = -0.2,
-                 continue_gap: float = 0):
+                 continue_gap: float = 0,
+                 tolerance: dict = None):
         self._dt_trace = dt_trace
         self._pt_trace = pt_trace
         self._case_study = case_study
         self._table = np.zeros((len(dt_trace), len(pt_trace), 2))
         self._timestamp_label = timestamp_label
         self._initiate_gap = initiate_gap
+        self._tolerance = tolerance
 
 
     def build_result(self) -> pd.DataFrame:

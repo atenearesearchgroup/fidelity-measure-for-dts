@@ -36,27 +36,31 @@ if __name__ == "__main__":
     param_interest = "accel(m/s2)"
 
     # Headers for the analysis file
-    headers = ["init_gap_cost", "gap_cost", "low", "%matched", "frechet", "match_mean", "match_std", "%mismatch", "gap_groups",
-               "gap_individual", "gap_length_mean", "gap_length_std", "f-score" ]
+    headers = ["init_gap_cost", "gap_cost", "low", "tolerance", "%matched", "frechet", "match_mean", "match_std", "%mismatch", "gap_groups",
+               "gap_individual", "gap_length_mean", "gap_length_std"]
 
-    for i in range(len(pt_files)):
-        for pt_file in fu.list_directory_files(pt_path, ".csv", pt_files[i]):
-            # Combining the two filenames for the aligned output
-            output_filename = dt_file[i][:dt_file[i].index(".csv")] + pt_file[:pt_file.index(".csv")]
-            output_dir_filename = output_directory + output_filename  + ".csv"
+    # Tolerance ranges
+    for tol in np.arange(60,  66, 6):
+        tolerance = {timestamp_label: tol,
+                     param_interest: tol}
+        for i in range(len(pt_files)):
+            for pt_file in fu.list_directory_files(pt_path, ".csv", pt_files[i]):
+                # Combining the two filenames for the aligned output
+                output_filename = dt_file[i][:dt_file[i].index(".csv")] + pt_file[:pt_file.index(".csv")] + "-{:.2f}".format(tol)
+                output_dir_filename = output_directory + output_filename  + ".csv"
 
-            # Analysis file for different gap values initialization
-            file_writer, writer = cu.get_writer(output_dir_filename, ",", 'w')
-            writer.writerow(headers)
+                # Analysis file for different gap values initialization
+                file_writer, writer = cu.get_writer(output_dir_filename, ",", 'w')
+                writer.writerow(headers)
 
-            # DT and PT traces in dict
-            dt_trace = pd.read_csv(dt_path + dt_file[i])
-            pt_trace = pd.read_csv(pt_path + pt_file)
+                # DT and PT traces in dict
+                dt_trace = pd.read_csv(dt_path + dt_file[i])
+                pt_trace = pd.read_csv(pt_path + pt_file)
 
-            # You could try with different values of gap
-            for init_gap in np.arange(0, 0.05, 0.05):
-                for continue_gap in np.arange(-0.1, -0.05, 0.05):
-                    for low in np.arange(10, 15, 5):
+                # You could try with different values of gap
+                for init_gap in np.arange(-1.0, -0.5, 0.5):
+                    continue_gap = init_gap/10
+                    for low in np.arange(100, 105, 5):
                         output_dir_filename_gap = output_directory + output_filename + "-{:.2f}".format(init_gap) + "-{:.2f}".format(continue_gap) + "-{:.2f}".format(low)  +".csv"
 
                         # --- CALCULATE ALIGNMENT - MAIN ALGORITHM ---
@@ -67,7 +71,9 @@ if __name__ == "__main__":
                                                        LiftCaseStudy(),
                                                        initiate_gap=init_gap,
                                                        continue_gap=continue_gap,
-                                                       low=low)
+                                                       low=low,
+                                                       tolerance=tolerance)
+
                         alignment_df = ndw.calculate_alignment()
 
                         print(f"--- Init gap {init_gap}, Continue gap {continue_gap} : {(time.time() - start_time):2f} seconds ---")
@@ -81,13 +87,13 @@ if __name__ == "__main__":
                         # --- DISTANCE ANALYSIS ---
                         statistical_values = measure_distance(alignment_df, dt_trace, pt_trace,
                                                                                        [param_interest])
-                        row = [init_gap, continue_gap, low]
+                        row = [init_gap, continue_gap, low, tol]
                         row.extend(statistical_values)
                         writer.writerow(row)
 
-            # --- GAP AND PERCENTAGE MATCHED COMPARISON ---
-            file_writer.close()
-            generate_statistical_info_graphic('gap_cost', output_dir_filename)
+                # --- GAP AND PERCENTAGE MATCHED COMPARISON ---
+                file_writer.close()
+                generate_statistical_info_graphic('tolerance', output_dir_filename)
 
 
 

@@ -15,8 +15,9 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
                  timestamp_label: str = "timestamp(s)",
                  initiate_gap: float = -0.2,
                  continue_gap: float = 0,
+                 tolerance: dict = None,
                  low: int = 5):
-        super().__init__(dt_trace, pt_trace, case_study, timestamp_label, initiate_gap=initiate_gap)
+        super().__init__(dt_trace, pt_trace, case_study, timestamp_label, initiate_gap=initiate_gap, tolerance=tolerance)
         self._continue_gap = continue_gap
         self._low = low
 
@@ -65,7 +66,8 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         mismatch : 2
         match : 3
         """
-        dt_tolerance = self._dt_trace[0]
+        if self._tolerance is None:
+            self._tolerance = self._dt_trace[0]
 
         dt_index = len(self._dt_trace)  # - 1
         pt_index = len(self._pt_trace)  # - 1
@@ -86,7 +88,7 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
 
                 equals_value = self._case_study.snap_equals(self._dt_trace[i],
                                                  self._pt_trace[j],
-                                                 dt_tolerance, self._timestamp_label,
+                                                 self._tolerance, self._timestamp_label,
                                                             self._low)
 
                 sub = self._table[i - 1, j - 1, 1] + equals_value

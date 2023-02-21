@@ -18,7 +18,8 @@ class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
         mismatch : 2
         match : 3
         """
-        dt_tolerance = self._dt_trace[0]
+        if self._tolerance is None:
+            self._tolerance = self._dt_trace[0]
 
         dt_index = len(self._dt_trace)  # - 1
         pt_index = len(self._pt_trace)  # - 1
@@ -37,7 +38,7 @@ class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
             for j in range(1, pt_index):
                 equals_value = self._case_study.snap_equals(self._dt_trace[i],  # [i - 1]
                                                 self._pt_trace[j],  # [j - 1]
-                                                dt_tolerance,
+                                                self._tolerance,
                                                 self._timestamp_label)
 
                 sub = self._table[i - 1, j - 1, 1] + equals_value  # Match/Mismatch

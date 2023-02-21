@@ -30,7 +30,7 @@ def generate_graphic(alignment: pd.DataFrame,
 
     # Plot line plot using dataframe columns
     # ------------ Physical Twin trajectory
-    if parameter_of_interest == parameter_of_interest:
+    if parameter_of_interest == 'temperature(degrees)':
         # Difference of -3 to provide better visualization
         selected_pt[parameter_of_interest] = selected_pt[parameter_of_interest].apply(lambda x: x - 3)
     sns.lineplot(data=selected_pt.loc[1:], label="PT", x=timestamp_label, y=parameter_of_interest,
