@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
 
 import util.float_util as fu
-from algorithm.case_study import CaseStudyBase
+from algorithm.system import SystemBase
 from algorithm.needleman_wunsch_base import NeedlemanWunschBase
 
 class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
 
     def __init__(self, dt_trace: list,
                  pt_trace: list,
-                 case_study: CaseStudyBase,
+                 case_study: SystemBase,
                  timestamp_label: str = "timestamp(s)",
                  initiate_gap: float = -0.2,
                  continue_gap: float = 0,

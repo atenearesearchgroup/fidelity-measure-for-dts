@@ -6,11 +6,11 @@ import pandas as pd
 
 import util.file_util as fu
 import util.csv_util as cu
-from algorithm.lift_case_study import LiftCaseStudy
+from evaluation.lift import Lift
 from algorithm.needleman_wunsch_tolerance import NeedlemanWunschTolerance
-from process_results.alignment_graphic import generate_graphic
-from process_results.distance_measure import measure_distance
-from process_results.process_results import generate_statistical_info_graphic
+from result_analysis.alignment_graphic import generate_alignment_graphic
+from result_analysis.measure_distance import measure_distance
+from result_analysis.statistical_graphics import generate_statistical_info_graphic
 
 if __name__ == "__main__":
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
                 ndw = NeedlemanWunschTolerance(dt_trace.to_dict('records'),
                                                pt_trace.to_dict('records'),
-                                               LiftCaseStudy(),
+                                               Lift(),
                                                initiate_gap=gap)
                 alignment_df = ndw.calculate_alignment()
 
@@ -66,8 +66,8 @@ if __name__ == "__main__":
                 alignment_df.to_csv(output_dir_filename_gap, index=False, encoding='utf-8', sep=',')
 
                 # --- GRAPHIC GENERATION ---
-                generate_graphic(alignment_df, dt_trace, pt_trace, param_interest, timestamp_label,
-                                 output_path=output_dir_filename_gap)
+                generate_alignment_graphic(alignment_df, dt_trace, pt_trace, param_interest, timestamp_label,
+                                           output_path=output_dir_filename_gap)
 
                 # --- DISTANCE ANALYSIS ---
                 percentage_matched, frechet, euclidean, std = measure_distance(alignment_df, dt_trace, pt_trace,
