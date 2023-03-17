@@ -43,13 +43,13 @@ def measure_distance(alignment: pd.DataFrame,
                 mismatch_counter += 1  # Increase mismatch counter
 
     # ALIGNMENT MATCHES
-    percentage_matched = len(snapshots_pt[0]) / min(len(pt_trace[pt_trace != ' ']),
+    percentage_matched = len(snapshots_pt[0]) / max(len(pt_trace[pt_trace != ' ']),
                                                     len(dt_trace[dt_trace != ' '])) * 100
     print(f"Number of matched ({len(snapshots_dt[0])},{len(snapshots_pt[0])}) "
           f"- Total ({len(dt_trace[dt_trace != ' '])},{len(pt_trace[pt_trace != ' '])})"
           f"- {percentage_matched:.2f} % of matched")
 
-    if snapshots_dt:
+    if snapshots_dt[0] and snapshots_pt[0]:
         snapshots_dt_output = np.zeros((len(snapshots_dt[0]), len(parameters)))
         snapshots_pt_output = np.zeros((len(snapshots_pt[0]), len(parameters)))
         for i in range(len(parameters)):
@@ -79,18 +79,22 @@ def measure_distance(alignment: pd.DataFrame,
           f"- {percentage_mismatched:.2f} % of mismatches")
 
     # ALIGNMENT GAPS
-    gap_number = len(gap_length)
-    gap_total_numer = np.sum(gap_length)
-    gap_mean_length = np.mean(gap_length)
-    gap_std_length = np.std(gap_length)
-    percentage_gaps = 100 - percentage_matched - percentage_mismatched
-    print(f"Number of gaps: groups {gap_number}, individual {gap_total_numer} "
-          f"- Percentage: {percentage_gaps:.2f} %\n"
-          f"- Mean length {gap_mean_length:.2f} - Std {gap_std_length:.2f} "
-          f"- Max length {np.max(gap_length)} - Min length {np.min(gap_length)}")
+    if gap_length:
+        gap_number = len(gap_length)
+        gap_total_numer = np.sum(gap_length)
+        gap_mean_length = np.mean(gap_length)
+        gap_std_length = np.std(gap_length)
+        percentage_gaps = 100 - percentage_matched - percentage_mismatched
 
-    # F-Score
-    fscore = 2*((percentage_matched/100*(1-frechet_euclidean))/(percentage_matched/100+(1-frechet_euclidean)))
+        print(f"Number of gaps: groups {gap_number}, individual {gap_total_numer} "
+              f"- Percentage: {percentage_gaps:.2f} %\n"
+              f"- Mean length {gap_mean_length:.2f} - Std {gap_std_length:.2f} "
+              f"- Max length {np.max(gap_length)} - Min length {np.min(gap_length)}")
+    else:
+        gap_number = 0
+        gap_total_numer = 0
+        gap_mean_length = 0
+        gap_std_length = 0
 
     return [percentage_matched, frechet_euclidean, euclidean_mean, euclidean_std, percentage_mismatched, \
-        gap_number, gap_total_numer, gap_mean_length, gap_std_length, fscore]
+        gap_number, gap_total_numer, gap_mean_length, gap_std_length]
