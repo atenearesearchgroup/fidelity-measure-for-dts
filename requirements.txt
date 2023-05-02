@@ -7,3 +7,4 @@ similaritymeasures==0.4.4
 setuptools==65.5.0
 Cython==0.29.32
 plotly~=5.13.0
+kaleido==0.1.0.post1

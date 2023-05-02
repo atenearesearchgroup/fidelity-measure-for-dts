@@ -11,7 +11,7 @@ def list_directory_files(dir: str, extension: str):
 
 
 def list_directory_files(dir: str, extension: str, pattern: str):
-    """It returns a list with all the files of a given extension."""
+    """It returns a list with all the files of a given extension and starts with pattern."""
     result = []
     for file in os.listdir(dir):
         if file.endswith(extension) and file.startswith(pattern):

@@ -1,10 +1,15 @@
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.graph_objs import Figure
 from plotly.subplots import make_subplots
 
+import util.file_util as fu
 
-def generate_paralell_behavior_graphic(x_axis_var: str, x_axis_title: str, y_axis_var: str, y_axis_title: str, pt_path: str,
-                      dt_path: str):
+
+def generate_paralell_behavior_graphic(x_axis_var: str, x_axis_title: str, y_axis_var: str, y_axis_title: str,
+                                       pt_path: str,
+                                       dt_path: str):
     """
     Generates two graphics sharing the x-axis with the trajectories of the PT and DT
     :param y_axis_title:
@@ -159,7 +164,7 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
 
     fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling['%matched'],
                              mode='lines+markers',
-                             name='Low-fidelity',
+                             name='Anomaly',
                              line=dict(color='#636EFA'),
                              marker=dict(color='#636EFA'),
                              fill='tonexty'
@@ -225,47 +230,45 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
     # fig.write_html(path.replace(".csv", "") + "_" + x_axis_var + ".html")
 
 
-def generate_statistical_info_stairs(x_axis_var: str, path: str):
+def generate_statistical_info_stairs(x_axis_var: str, alignment_df: pd.DataFrame,
+                                     fig: Figure = make_subplots(rows=3, cols=1, shared_xaxes=True,
+                                                                 vertical_spacing=0.0)):
     """
     Generates a scatter plot with the %of matched points, the frechet and the euclidean distance for
     a given alignment
+    :param alignment_df:
+    :param fig:
     :param x_axis_var:
     :param path:
     :return:
     """
-    # Get dataframe from csv file
-    alignment = pd.read_csv(path, index_col=False)
-
-    # Create traces
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.0)
-
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['%matched'],
-                             mode='lines+markers',
-                             name='High-fidelity',
-                             line=dict(color='#FF7F0E'),
-                             marker=dict(color='#FF7F0E')
+    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df['%matched'],
+                             mode='lines',
+                             # line=dict(
+                             # color='#898989',
+                             # width=0.5),
                              ),
                   row=1, col=1)
 
     fig['layout']['yaxis']['title'] = "%matched points"
     fig['layout']['yaxis']['range'] = [0, 100]
 
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['frechet'],
-                             mode='lines+markers',
-                             line=dict(color='#FF7F0E'),
-                             marker=dict(color='#FF7F0E'),
-                             showlegend=False
+    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df['frechet'],
+                             mode='lines',
+                             showlegend=False,
+                             # line=dict(color='#898989',
+                             #          width=0.5),
                              ),
                   row=2, col=1)
 
     fig['layout']['yaxis2']['title'] = "Fréchet (m/s2)"
     fig['layout']['yaxis2']['range'] = [0, 0.5]
 
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['match_mean'],
-                             mode='lines+markers',
-                             line=dict(color='#FF7F0E'),
-                             marker=dict(color='#FF7F0E'),
-                             showlegend=False
+    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df['match_mean'],
+                             mode='lines',
+                             showlegend=False,
+                             # line=dict(color='#898989',
+                             #          width=0.5),
                              ),
                   row=3, col=1)
 
@@ -277,12 +280,94 @@ def generate_statistical_info_stairs(x_axis_var: str, path: str):
     fig.update_xaxes(ticksuffix=" ", title_standoff=0)
     fig.update_layout(showlegend=False)
 
-    #fig.update_layout(legend=dict(
-    #    yanchor="top",
-    #    y=0.99,
-    #    xanchor="left",
-    #    x=0.01
-    #))
+    fig.show()
+    # fig.write_html(path.replace(".csv", "") + "_" + x_axis_var + ".html")
+
+
+def generate_statistical_info_stairs_variability(x_axis_var: str, path: str, starting_pattern: str):
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.0)
+
+    variability_df = pd.DataFrame()
+    for align_file in fu.list_directory_files(path, ".csv", starting_pattern):
+        alignment = pd.read_csv(path + "/" + align_file, index_col=False)
+
+        # Add data to the plot
+        # generate_statistical_info_stairs(x_axis_var, alignment, fig)
+
+        for _, row in alignment.iterrows():
+            variability_df = variability_df.append(
+                {'tolerance': row['tolerance'], '%matched': row['%matched'], 'frechet': row['frechet'],
+                 'match_mean': row['match_mean']}, ignore_index=True)
+
+    rows = variability_df.drop_duplicates(['tolerance'])['tolerance']
+    result_df = pd.DataFrame()
+    for row in rows:
+        mean = np.mean(variability_df.loc[variability_df['tolerance'] == row])
+        std = np.std(variability_df.loc[variability_df['tolerance'] == row])
+        result_df = result_df.append({'tolerance': row,
+                                      '%matched_mean': mean['%matched'],
+                                      '%matched_std': std['%matched'],
+                                      'frechet_mean': mean['frechet'],
+                                      'frechet_std': std['frechet'],
+                                      'euc_mean': mean['match_mean'],
+                                      'euc_std': std['match_mean']}, ignore_index=True)
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['%matched_mean'],
+                             mode='lines+markers',
+                             ),
+                  row=1, col=1)
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['%matched_mean'] + result_df['%matched_std'],
+                             mode='lines',
+                             line=dict(width=0.1),
+                             name='upper bound'))
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['%matched_mean'] - result_df['%matched_std'],
+                             mode='lines',
+                             line=dict(width=0.1),
+                             fill='tonexty',
+                             name='lower bound'))
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['frechet_mean'],
+                             mode='lines+markers',
+                             showlegend=False
+                             ),
+                  row=2, col=1)
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['frechet_mean'] + result_df['frechet_std'],
+                             mode='lines',
+                             line=dict(width=0.1),
+                             name='upper bound'),
+                  row=2, col=1)
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['frechet_mean'] - result_df['frechet_std'],
+                             mode='lines',
+                             line=dict(width=0.1),
+                             fill='tonexty',
+                             name='lower bound'),
+                  row=2, col=1)
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['euc_mean'],
+                             mode='lines+markers',
+                             showlegend=False
+                             ),
+                  row=3, col=1)
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['euc_mean'] + result_df['euc_std'],
+                             mode='lines',
+                             line=dict(width=0.1),
+                             name='upper bound'),
+                  row=3, col=1)
+
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['euc_mean'] - result_df['euc_std'],
+                             mode='lines',
+                             line=dict(width=0.1),
+                             fill='tonexty',
+                             name='lower bound'),
+                  row=3, col=1)
+
+    for align_file in fu.list_directory_files(path, ".csv", starting_pattern):
+        alignment = pd.read_csv(path + "/" + align_file, index_col=False)
+        generate_statistical_info_stairs(x_axis_var, alignment, fig)
 
     fig.show()
-    fig.write_html(path.replace(".csv", "") + "_" + x_axis_var + ".html")
