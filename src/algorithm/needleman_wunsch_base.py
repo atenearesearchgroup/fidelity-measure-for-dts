@@ -3,26 +3,30 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
-from algorithm.system import SystemBase
+from systems_config.system import SystemBase
 
 
 class NeedlemanWunschBase(ABC):
 
     def __init__(self, dt_trace: list,
                  pt_trace: list,
-                 case_study: SystemBase,
+                 system: SystemBase,
                  timestamp_label: str = "timestamp(s)",
                  initiate_gap: float = -0.2,
                  continue_gap: float = 0,
-                 tolerance: dict = None):
+                 mad: dict = None):
+        # Traces to align
         self._dt_trace = dt_trace
         self._pt_trace = pt_trace
-        self._case_study = case_study
+        # System information
+        self._system = system
+        # Alignment table to calculate alignment
         self._table = np.zeros((len(dt_trace), len(pt_trace), 2))
+        # Configuration
         self._timestamp_label = timestamp_label
         self._initiate_gap = initiate_gap
-        self._tolerance = tolerance
-
+        self._mad = mad
+        #
 
     def build_result(self) -> pd.DataFrame:
         dt_size = len(self._table) - 1

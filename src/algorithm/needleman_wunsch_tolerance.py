@@ -1,10 +1,8 @@
 from abc import ABC
 
 import numpy as np
-import pandas as pd
 
 import util.float_util as fu
-
 from algorithm.needleman_wunsch_base import NeedlemanWunschBase
 
 
@@ -18,8 +16,8 @@ class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
         mismatch : 2
         match : 3
         """
-        if self._tolerance is None:
-            self._tolerance = self._dt_trace[0]
+        if self._mad is None:
+            self._mad = self._dt_trace[0]
 
         dt_index = len(self._dt_trace)  # - 1
         pt_index = len(self._pt_trace)  # - 1
@@ -36,10 +34,10 @@ class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
             self._table[i, 0, 1] = self._table[i - 1, 0, 1] + self._initiate_gap
 
             for j in range(1, pt_index):
-                equals_value = self._case_study.snap_equals(self._dt_trace[i],  # [i - 1]
-                                                self._pt_trace[j],  # [j - 1]
-                                                self._tolerance,
-                                                self._timestamp_label)
+                equals_value = self._system.snap_equals(self._dt_trace[i],  # [i - 1]
+                                                        self._pt_trace[j],  # [j - 1]
+                                                        self._mad,
+                                                        self._timestamp_label)
 
                 sub = self._table[i - 1, j - 1, 1] + equals_value  # Match/Mismatch
                 ins = self._table[i, j - 1, 1] + self._initiate_gap  # Insertion

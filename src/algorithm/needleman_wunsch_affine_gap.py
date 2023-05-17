@@ -1,23 +1,23 @@
 from abc import ABC
 
 import numpy as np
-import pandas as pd
 
 import util.float_util as fu
-from algorithm.system import SystemBase
 from algorithm.needleman_wunsch_base import NeedlemanWunschBase
+from systems_config.system import SystemBase
+
 
 class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
 
     def __init__(self, dt_trace: list,
                  pt_trace: list,
-                 case_study: SystemBase,
+                 system: SystemBase,
                  timestamp_label: str = "timestamp(s)",
                  initiate_gap: float = -0.2,
                  continue_gap: float = 0,
-                 tolerance: dict = None,
+                 mad: dict = None,
                  low: int = 5):
-        super().__init__(dt_trace, pt_trace, case_study, timestamp_label, initiate_gap=initiate_gap, tolerance=tolerance)
+        super().__init__(dt_trace, pt_trace, system, timestamp_label, initiate_gap=initiate_gap, mad=mad)
         self._continue_gap = continue_gap
         self._low = low
 
@@ -66,7 +66,7 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         mismatch : 2
         match : 3
         """
-        if self._tolerance is None:
+        if self._mad is None:
             self._tolerance = self._dt_trace[0]
 
         dt_index = len(self._dt_trace)  # - 1
@@ -80,16 +80,16 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         for j in range(1, pt_index):
             for i in range(1, dt_index):
                 self._deletion_table[i][j] = \
-                        max((self._initiate_gap + self._continue_gap + self._table[i - 1][j][1]),
-                            (self._continue_gap + self._deletion_table[i - 1][j]),)
+                    max((self._initiate_gap + self._continue_gap + self._table[i - 1][j][1]),
+                        (self._continue_gap + self._deletion_table[i - 1][j]), )
                 self._insert_table[i][j] = \
-                        max((self._initiate_gap + self._continue_gap + self._table[i][j - 1][1]),
-                            (self._continue_gap + self._insert_table[i][j - 1]))
+                    max((self._initiate_gap + self._continue_gap + self._table[i][j - 1][1]),
+                        (self._continue_gap + self._insert_table[i][j - 1]))
 
-                equals_value = self._case_study.snap_equals(self._dt_trace[i],
-                                                 self._pt_trace[j],
-                                                 self._tolerance, self._timestamp_label,
-                                                            self._low)
+                equals_value = self._system.snap_equals(self._dt_trace[i],
+                                                        self._pt_trace[j],
+                                                        self._tolerance, self._timestamp_label,
+                                                        self._low)
 
                 sub = self._table[i - 1, j - 1, 1] + equals_value
 

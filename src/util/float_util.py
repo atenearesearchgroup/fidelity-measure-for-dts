@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def max_tolerance(v1: float, v2: float, v3: float, equals_value: float, tolerance: float = 0.0001) -> (float, int):
     """Comparison of three floats considering a certain tolerance.
         Returns
@@ -18,3 +21,8 @@ def max_tolerance(v1: float, v2: float, v3: float, equals_value: float, toleranc
         max_value = v2
         max_index = 1
     return max_value, max_index
+
+
+def get_input_values_list(*args):
+    input_params = np.meshgrid(*args, indexing='ij')
+    return np.column_stack([grid.flatten() for grid in input_params])

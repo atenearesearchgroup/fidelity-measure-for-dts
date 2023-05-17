@@ -3,10 +3,10 @@ import time
 
 import numpy as np
 import pandas as pd
+from cps_configuration.lift import Lift
 
-import util.file_util as fu
 import util.csv_util as cu
-from evaluation.lift import Lift
+import util.file_util as fu
 from algorithm.needleman_wunsch_tolerance import NeedlemanWunschTolerance
 from result_analysis.alignment_graphic import generate_alignment_graphic
 from result_analysis.measure_distance import measure_distance

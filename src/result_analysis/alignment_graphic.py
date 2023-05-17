@@ -33,7 +33,7 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
 
     # Style for the line plot
     sns.set_theme(style="darkgrid")
-    sns.set(font_scale=1.90)
+    sns.set(font_scale=3)
 
     # Plot line plot using dataframe columns
     # ------------ Physical Twin trajectory
@@ -97,9 +97,9 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
     fig.update_xaxes(ticksuffix=" ", title_standoff=0)
 
     fig.update_layout(
-        #xaxis_range=[0, 64],  # x axis range
+        # xaxis_range=[0, 64],  # x axis range
         font=dict(
-            size=12),  # Figure font
+            size=18),  # Figure font
         legend=dict(  # Legend position
             yanchor="top",
             y=0.99,
@@ -107,7 +107,8 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
             x=0.01
         ))
 
-    annotation_text = f"<b>MAD:</b> {tolerance:.2f}<br><b>Gap:</b> ({open_gap:.1f}, {continue_gap:.1f})"
+    annotation_text = f"<b>MáxDist:</b> {tolerance:.2f}" \
+        # f"<br><b>Gap:</b> ({open_gap:.1f}, {continue_gap:.1f})"
     fig.add_annotation(text=annotation_text,
                        align='left',
                        xref="paper", yref="paper",
@@ -115,7 +116,9 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
                        x=0.01, y=0.87,
                        showarrow=False,
                        borderpad=3,
-                       font=dict(size=10))
+                       # font=dict(size=10)
+                       )
 
-    fig.show()
-    fig.write_html(output_path.replace(".csv", "") + ".html")
+    # fig.show()
+    # fig.write_html(output_path.replace(".csv", ".html"))
+    fig.write_image(output_path.replace(".csv", ".pdf"), format="pdf", width=1750, height=800)
