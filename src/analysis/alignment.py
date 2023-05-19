@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ class Alignment:
     MATCH_OPERATION = 'Match'
     MISMATCH_OPERATION = 'Mismatch'
 
-    def __init__(self, alignment: pd.Dataframe,
+    def __init__(self, alignment: pd.DataFrame,
                  dt_trace: pd.DataFrame,
                  pt_trace: pd.DataFrame,
                  system: SystemBase,
@@ -28,70 +28,90 @@ class Alignment:
         self._alignment = alignment
         # Relevant columns
         self._selected_params = selected_params
+        # Matched snapshots
+        condition = self._alignment['operation'] == self.MATCH_OPERATION
+        self._matched_dt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT)
+        self._matched_pt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_PT)
+        # Gaps
+        self._gaps = self._count_gaps()
 
     @property
     def percentage_matched_snapshots(self) -> float:
-        return self._calculate_percentage(self.MATCH_OPERATION)
+        return self._calculate_percentage(self._matched_dt_snapshots.to_numpy())
 
     @property
     def percentage_mismatched_snapshots(self) -> float:
-        return self._calculate_percentage(self.MISMATCH_OPERATION)
+        condition = self._alignment['operation'] == self.MISMATCH_OPERATION
+        mismatched_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT).to_numpy()
+        return self._calculate_percentage(mismatched_snapshots)
 
     @property
     def percentage_gaps(self) -> float:
         return 100 - self.percentage_matched_snapshots - self.percentage_mismatched_snapshots
 
     @property
-    def frechet_distances(self) -> tuple[float, float]:
-        condition = self._alignment['operation'] == self.MATCH_OPERATION
-        matched_dt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT).to_numpy()
-        matched_pt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_PT).to_numpy()
+    def frechet(self) -> dict:
+        if not (self._matched_dt_snapshots.empty and self._matched_pt_snapshots.empty):
+            frechet_euclidean = similaritymeasures.frechet_dist(self._matched_dt_snapshots.to_numpy(),
+                                                                self._matched_pt_snapshots.to_numpy(), 2)
+            frechet_manhattan = similaritymeasures.frechet_dist(self._matched_dt_snapshots.to_numpy(),
+                                                                self._matched_pt_snapshots.to_numpy(), 1)
+        else:
+            frechet_euclidean = 0
+            frechet_manhattan = 0
 
-        frechet_euclidean = similaritymeasures.frechet_dist(matched_dt_snapshots, matched_pt_snapshots, 2)
-        frechet_manhattan = similaritymeasures.frechet_dist(matched_dt_snapshots, matched_pt_snapshots, 1)
-
-        return frechet_euclidean, frechet_manhattan
+        return {'euclidean': frechet_euclidean, 'manhattan': frechet_manhattan}
 
     @property
-    def p2p_mean_distances(self) -> tuple[Tuple[float, float, float], Tuple[float, float, float]]:
-        condition = self._alignment['operation'] == self.MATCH_OPERATION
-        matched_dt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT).to_numpy()
-        matched_pt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_PT).to_numpy()
+    def p2p_mean(self) -> dict:
+        p2p_euclidean = self._calculate_p2p_distance(self._matched_dt_snapshots,
+                                                     self._matched_pt_snapshots)
+        p2p_manhattan = self._calculate_p2p_distance(self._matched_dt_snapshots,
+                                                     self._matched_pt_snapshots,
+                                                     'cityblock')
 
-        p2p_euclidean = self._calculate_p2p_distance(matched_dt_snapshots, matched_pt_snapshots, 'euclidean')
-        p2p_manhattan = self._calculate_p2p_distance(matched_dt_snapshots, matched_pt_snapshots, 'cityblock')
-
-        return p2p_euclidean, p2p_manhattan
+        return {'euclidean': p2p_euclidean, 'manhattan': p2p_manhattan}
 
     @property
     def number_of_gaps(self) -> int:
-        return int(np.sum(self._count_gaps()))
+        return int(np.sum(self._gaps))
 
     @property
     def number_of_groups_of_gaps(self) -> int:
-        return len(self._count_gaps())
+        return len(self._gaps)
 
     @property
-    def mean_length_gaps(self) -> Tuple[float, float]:
-        return float(np.mean(self._count_gaps())), float(np.std(self._count_gaps()))
+    def mean_length_gaps(self) -> dict:
+        if self._gaps:
+            return {'mean': float(np.mean(self._gaps)), 'std': float(np.std(self._gaps))}
+        else:
+            return {'mean': 0, 'std': 0}
 
-    def _calculate_p2p_distance(self, dt_matched_snapshots: np.ndarray, pt_matched_snapshots: np.ndarray,
-                                metric: str = 'euclidean') -> Tuple[float, float, float]:
+    @staticmethod
+    def _calculate_p2p_distance(matched_pt_snapshots: pd.DataFrame,
+                                matched_dt_snapshots: pd.DataFrame,
+                                metric: str = 'euclidean') -> dict:
         distance_func = {
             'euclidean': euclidean,
             'cityblock': cityblock
         }
         if metric not in distance_func:
             raise ValueError('Invalid distance metric')
+        matched_pt_snapshots = matched_pt_snapshots.to_numpy()
+        matched_dt_snapshots = matched_dt_snapshots.to_numpy()
+        result = [distance_func[metric](matched_dt_snapshots[i], matched_pt_snapshots[i]) for i in
+                  range(len(matched_dt_snapshots))]
 
-        result = [distance_func[metric](dt_matched_snapshots[i], pt_matched_snapshots[i]) for i in
-                  range(len(dt_matched_snapshots))]
+        if result:
+            return {'mean': float(np.mean(result, axis=0)),
+                    'std': float(np.std(result, axis=0)),
+                    'max': float(np.max(result, axis=0))}
+        else:
+            return {'mean': 0,
+                    'std': 0,
+                    'max': 0}
 
-        return float(np.mean(result, axis=0)), float(np.std(result, axis=0)), float(np.max(result, axis=0))
-
-    def _calculate_percentage(self, operation: str) -> float:
-        condition = self._alignment['operation'] == operation
-        matched_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT
+    def _calculate_percentage(self, matched_snapshots: np.ndarray) -> float:
         total_snapshots = max(
             self._pt_trace[self._pt_trace != ' '].shape[0],
             self._dt_trace[self._dt_trace != ' '].shape[0]
@@ -104,22 +124,6 @@ class Alignment:
         matched_trace.columns = matched_trace.columns.str.replace(prefix, '')
         return matched_trace
 
-    def _calculate_gaps(self) -> Tuple[int, int, float, float]:
-        gap_lengths = self._count_gaps()
-
-        if gap_lengths:
-            gap_number = len(gap_lengths)
-            gap_total_numer = np.sum(gap_lengths)
-            gap_mean_length = np.mean(gap_lengths)
-            gap_std_length = np.std(gap_lengths)
-        else:
-            gap_number = 0
-            gap_total_numer = 0
-            gap_mean_length = 0.0
-            gap_std_length = 0.0
-
-        return gap_number, gap_total_numer, gap_mean_length, gap_std_length
-
     def _count_gaps(self) -> List[int]:
         gap_cont = 0
         gap_lengths = []
@@ -131,3 +135,4 @@ class Alignment:
                     gap_lengths.append(gap_cont)  # Add gap length
                     gap_cont = 0  # Reset counter
         return gap_lengths
+
