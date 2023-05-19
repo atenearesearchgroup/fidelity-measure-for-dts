@@ -20,13 +20,12 @@ class NeedlemanWunschBase(ABC):
         self._pt_trace = pt_trace
         # System information
         self._system = system
-        # Alignment table to calculate alignment
-        self._table = np.zeros((len(dt_trace), len(pt_trace), 2))
         # Configuration
         self._timestamp_label = timestamp_label
         self._initiate_gap = initiate_gap
         self._mad = mad
-        #
+        # Alignment table to calculate alignment
+        self._table = np.zeros((len(dt_trace), len(pt_trace), 2))
 
     def build_result(self) -> pd.DataFrame:
         dt_size = len(self._table) - 1

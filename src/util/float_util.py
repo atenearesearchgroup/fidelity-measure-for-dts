@@ -1,4 +1,4 @@
-import numpy as np
+import itertools
 
 
 def max_tolerance(v1: float, v2: float, v3: float, equals_value: float, tolerance: float = 0.0001) -> (float, int):
@@ -23,6 +23,9 @@ def max_tolerance(v1: float, v2: float, v3: float, equals_value: float, toleranc
     return max_value, max_index
 
 
-def get_input_values_list(*args):
-    input_params = np.meshgrid(*args, indexing='ij')
-    return np.column_stack([grid.flatten() for grid in input_params])
+def get_input_values_list(*args, factor: float):
+    combinations = []
+    for elements in itertools.product(*args):
+        if elements[3] * factor - 0.1 <= elements[2] <= elements[3] * factor + 0.1:
+            combinations.append(elements)
+    return combinations

@@ -11,7 +11,7 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
                                pt_trace: pd.DataFrame,
                                parameter_of_interest: str,
                                timestamp_label: str,
-                               tolerance: float,
+                               mad: float,
                                open_gap: float,
                                continue_gap: float,
                                output_path: str = None):
@@ -107,7 +107,7 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
             x=0.01
         ))
 
-    annotation_text = f"<b>MáxDist:</b> {tolerance:.2f}" \
+    annotation_text = f"<b>MáxDist:</b> {mad:.2f}" \
         # f"<br><b>Gap:</b> ({open_gap:.1f}, {continue_gap:.1f})"
     fig.add_annotation(text=annotation_text,
                        align='left',

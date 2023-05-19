@@ -18,14 +18,14 @@ labels:
 
 ranges:
   mad:
-    start: 0.15
+    start: 0.02
     step: 0.02
-    end: 0.16
+    end: 0.09
   low:
     start: 200
     step: 10
     end: 205
   init_gap:
-    start: 0.0
+    start: -1.0
     step: 0.5
-    end: 1.1
+    end: 0.0

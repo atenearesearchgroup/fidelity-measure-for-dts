@@ -2,9 +2,9 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-import similaritymeasures
 from scipy.spatial.distance import cityblock, euclidean
 
+from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan
 from systems_config.system import SystemBase
 
 
@@ -52,10 +52,10 @@ class Alignment:
     @property
     def frechet(self) -> dict:
         if not (self._matched_dt_snapshots.empty and self._matched_pt_snapshots.empty):
-            frechet_euclidean = similaritymeasures.frechet_dist(self._matched_dt_snapshots.to_numpy(),
-                                                                self._matched_pt_snapshots.to_numpy(), 2)
-            frechet_manhattan = similaritymeasures.frechet_dist(self._matched_dt_snapshots.to_numpy(),
-                                                                self._matched_pt_snapshots.to_numpy(), 1)
+            frechet_euclidean = FastDiscreteFrechetMatrix(euclidean).distance(self._matched_dt_snapshots.to_numpy(),
+                                                                              self._matched_pt_snapshots.to_numpy())
+            frechet_manhattan = FastDiscreteFrechetMatrix(manhattan).distance(self._matched_dt_snapshots.to_numpy(),
+                                                                              self._matched_pt_snapshots.to_numpy())
         else:
             frechet_euclidean = 0
             frechet_manhattan = 0
@@ -135,4 +135,3 @@ class Alignment:
                     gap_lengths.append(gap_cont)  # Add gap length
                     gap_cont = 0  # Reset counter
         return gap_lengths
-
