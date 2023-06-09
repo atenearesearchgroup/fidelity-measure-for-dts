@@ -26,6 +26,5 @@ def max_tolerance(v1: float, v2: float, v3: float, equals_value: float, toleranc
 def get_input_values_list(*args, factor: float):
     combinations = []
     for elements in itertools.product(*args):
-        if elements[3] * factor - 0.1 <= elements[2] <= elements[3] * factor + 0.1:
-            combinations.append(elements)
+        combinations.append(elements)
     return combinations
