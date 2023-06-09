@@ -8,6 +8,7 @@ import yaml
 
 import util.file_util as fu
 from algorithm.needleman_wunsch_affine_gap import NeedlemanWunschAffineGap
+from analysis.alignment import Alignment
 from analysis.alignment_lca import AlignmentLCA
 from result_analysis.alignment_graphic import generate_alignment_graphic
 from systems_config.lift import Lift
@@ -24,11 +25,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--figures", help="It processes the alignment and generates figures as image files")
     args = parser.parse_args()
+    # args.figures = True
 
     current_directory = os.path.join(os.getcwd(), "")
 
     # Read the YAML file
-    with open(current_directory + 'config/lift.yaml', 'r') as file:
+    with open(current_directory + 'config/incubator.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
     # FILE PATHS
@@ -71,10 +73,18 @@ if __name__ == "__main__":
         ranges['init_gap']['step']
     )
     factor = 11
-    continue_gap = init_gap / factor
+    continue_gap = np.arange(
+        ranges['cont_gap']['start'],
+        ranges['cont_gap']['end'],
+        ranges['cont_gap']['step']
+    )
+    # = init_gap / factor
 
     input_values = get_input_values_list(max_acceptable_dist, low, init_gap, continue_gap, factor=factor)
-    methods = fu.get_property_methods(AlignmentLCA)
+    if config['system'] == 'Lift':
+        methods = fu.get_property_methods(AlignmentLCA)
+    else:
+        methods = fu.get_property_methods(Alignment)
 
     # Iterate over Physical Twin Files against Digital Twins'
     for i in range(len(pt_files)):
@@ -82,7 +92,7 @@ if __name__ == "__main__":
             # Unique filename combining both in format : <fileAfileB>
             output_filename = os.path.splitext(dt_file[i])[0] + os.path.splitext(pt_file)[0]
             # Output directory combined with filename and extension : path/to/output/fileAfileB.csv
-            output_dir_filename = f"{output_directory}{output_filename}.csv"
+            output_dir_filename = f"{output_directory}/results/{output_filename}.csv"
 
             # DT and PT traces in dict
             dt_trace = pd.read_csv(dt_path + dt_file[i])
@@ -102,8 +112,8 @@ if __name__ == "__main__":
 
                 config_output_dir_filename = f"{output_directory}{output_filename}-({input_dict[INIT_GAP]:.2f}," \
                                              f"{input_dict[CONT_GAP]:.2f})" \
-                                             f"-{input_dict[LOW]}" \
-                                             f"-{input_dict[MAD][param_interest]}.csv"
+                                             f"-{input_dict[LOW]:.2f}" \
+                                             f"-{input_dict[MAD][param_interest]:.2f}.csv"
 
                 # --- CALCULATE ALIGNMENT - MAIN ALGORITHM ---
                 if config['system'] == 'Lift':
@@ -122,8 +132,9 @@ if __name__ == "__main__":
                 alignment_df = ndw.calculate_alignment()
 
                 print(f"--- SCENARIO: {output_filename} ---")
-                print(f"--- Init gap {input_dict[INIT_GAP]:.2f}, Continue gap {input_dict[CONT_GAP]:.2f} : "
-                      f"{(time.time() - start_time):.2f} seconds ---")
+                print(
+                    f"--- Mad {input_dict[MAD][param_interest]}, Init gap {input_dict[INIT_GAP]:.2f}, Continue gap {input_dict[CONT_GAP]:.2f} : "
+                    f"{(time.time() - start_time):.2f} seconds ---")
 
                 alignment_df.to_csv(config_output_dir_filename, index=False, encoding='utf-8', sep=',')
 
@@ -135,7 +146,10 @@ if __name__ == "__main__":
                                                open_gap=input_dict[INIT_GAP], continue_gap=input_dict[CONT_GAP])
 
                 # --- DISTANCE ANALYSIS ---
-                alignment_results = AlignmentLCA(alignment_df, dt_trace, pt_trace, cps, [param_interest])
+                if config['system'] == 'Lift':
+                    alignment_results = AlignmentLCA(alignment_df, dt_trace, pt_trace, cps, [param_interest])
+                else:
+                    alignment_results = Alignment(alignment_df, dt_trace, pt_trace, cps, [param_interest])
                 statistical_values = fu.get_property_values(alignment_results, methods)
                 concatenated_dict = {**fu.flatten_dictionary(input_dict),
                                      **fu.flatten_dictionary(statistical_values)}

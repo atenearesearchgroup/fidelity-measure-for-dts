@@ -6,10 +6,17 @@ from plotly.subplots import make_subplots
 
 import util.file_util as fu
 
+# RELEVANT STRINGS
+MAD = 'mad_'
+MATCHED_SNAPSHOTS = 'percentage_matched_snapshots'
+FRECHET = 'frechet_euclidean'
+P2P_EUCLIDEAN = 'p2p_mean_lca_euclidean_mean'
+
 
 def generate_parallel_behavior_graphic(x_axis_var: str, x_axis_title: str, y_axis_var: str, y_axis_title: str,
                                        pt_path: str,
-                                       dt_path: str):
+                                       dt_path: str,
+                                       t_path: str):
     """
     Generates two graphics sharing the x-axis with the trajectories of the PT and DT
     :param y_axis_title:
@@ -21,7 +28,7 @@ def generate_parallel_behavior_graphic(x_axis_var: str, x_axis_title: str, y_axi
     :return:
     """
     # Create subplots
-    fig = make_subplots(rows=2,
+    fig = make_subplots(rows=3,
                         cols=1,
                         shared_xaxes=True,
                         vertical_spacing=0.02)
@@ -34,11 +41,11 @@ def generate_parallel_behavior_graphic(x_axis_var: str, x_axis_title: str, y_axi
                              mode='lines+markers',
                              name='PT Trajectory',
                              marker=dict(
-                                 size=3,
-                                 line_width=0.5
+                                 size=6,
+                                 line_width=0
                              ),
                              line=dict(
-                                 width=1
+                                 width=2
                              )),
                   row=1, col=1)
     fig['layout']['yaxis']['title'] = y_axis_title
@@ -49,17 +56,35 @@ def generate_parallel_behavior_graphic(x_axis_var: str, x_axis_title: str, y_axi
     # Plot DT trace
     fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment[y_axis_var],
                              mode='lines+markers',
-                             name='DT Trajectory',
+                             name='2-parameter model trajectory',
                              marker=dict(
-                                 size=3,
-                                 line_width=0.5
+                                 size=6,
+                                 line_width=0
                              ),
                              line=dict(
-                                 width=1
+                                 width=2
                              )),
                   row=2, col=1)
     fig['layout']['yaxis2']['title'] = y_axis_title
-    fig['layout']['xaxis2']['title'] = x_axis_title
+    # fig['layout']['xaxis2']['title'] = x_axis_title
+
+    ### DIGITAL TWIN ###
+    # Get DT dataframe from csv file
+    alignment = pd.read_csv(t_path)
+    # Plot DT trace
+    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment[y_axis_var],
+                             mode='lines+markers',
+                             name='4-parameter model trajectory',
+                             marker=dict(
+                                 size=6,
+                                 line_width=0
+                             ),
+                             line=dict(
+                                 width=2
+                             )),
+                  row=3, col=1)
+    fig['layout']['yaxis3']['title'] = y_axis_title
+    fig['layout']['xaxis3']['title'] = x_axis_title
 
     # Distance between titles and axes to 0
     fig.update_yaxes(ticksuffix=" ", title_standoff=0)
@@ -81,64 +106,6 @@ def generate_parallel_behavior_graphic(x_axis_var: str, x_axis_title: str, y_axi
     return fig
 
 
-def generate_statistical_info_graphic(x_axis_var: str, path: str):
-    """
-    Generates four scatter plots with shared x of all the statistical information of a trace
-    :param x_axis_var:
-    :param path:
-    :return:
-    """
-    # Get dataframe from csv file
-    alignment = pd.read_csv(path)
-
-    # Create traces
-    fig = make_subplots(rows=4, cols=1, shared_xaxes=True)
-
-    # Gap length
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['gap_length_mean'],
-                             mode='lines+markers',
-                             error_y=dict(
-                                 type='data',
-                                 symmetric=True,
-                                 array=alignment['gap_length_std']
-                             ),
-                             name='Gap Mean Length'),
-                  row=1, col=1)
-
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['gap_individual'],
-                             mode='lines+markers',
-                             name='Number of individual gaps'
-                             ),
-                  row=2, col=1)
-
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['gap_groups'],
-                             mode='lines+markers',
-                             name='Number of groups of gaps'
-                             ),
-                  row=2, col=1)
-
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['%matched'],
-                             mode='lines+markers',
-                             name='% of matched points'
-                             ),
-                  row=3, col=1)
-
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['%mismatch'],
-                             mode='lines+markers',
-                             name='% of mismatches'
-                             ),
-                  row=3, col=1)
-
-    fig.add_trace(go.Scatter(x=alignment[x_axis_var], y=alignment['frechet'],
-                             mode='lines+markers',
-                             name='Frèchet distance'
-                             ),
-                  row=4, col=1)
-
-    fig.show()
-    fig.write_html(path.replace(".csv", "") + "_" + x_axis_var + ".html")
-
-
 def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: str, low_fid_path: str):
     """
     Generates scatter plot comparing the statistical values of %matches points, frechet and euclidean distance of
@@ -155,7 +122,7 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
     # Create traces
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.0)
 
-    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align['%matched'],
+    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align[MATCHED_SNAPSHOTS],
                              mode='lines+markers',
                              name='High-fidelity',
                              line=dict(color='#FF7F0E'),
@@ -163,19 +130,19 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
                              ),
                   row=1, col=1)
 
-    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling['%matched'],
+    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling[MATCHED_SNAPSHOTS],
                              mode='lines+markers',
-                             name='Anomaly',
+                             name='Low-fidelity',
                              line=dict(color='#636EFA'),
                              marker=dict(color='#636EFA'),
                              fill='tonexty'
                              ),
                   row=1, col=1)
 
-    fig['layout']['yaxis']['title'] = "%matched points"
+    fig['layout']['yaxis']['title'] = "%matched snapshots"
     fig['layout']['yaxis']['range'] = [0, 100]
 
-    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align['frechet'],
+    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align[FRECHET],
                              mode='lines+markers',
                              line=dict(color='#FF7F0E'),
                              marker=dict(color='#FF7F0E'),
@@ -183,7 +150,7 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
                              ),
                   row=2, col=1)
 
-    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling['frechet'],
+    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling[FRECHET],
                              mode='lines+markers',
                              line=dict(color='#636EFA'),
                              marker=dict(color='#636EFA'),
@@ -195,7 +162,7 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
     fig['layout']['yaxis2']['title'] = "Fréchet (m/s2)"
     fig['layout']['yaxis2']['range'] = [0, 0.2]
 
-    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align['match_mean'],
+    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align[P2P_EUCLIDEAN],
                              mode='lines+markers',
                              line=dict(color='#FF7F0E'),
                              marker=dict(color='#FF7F0E'),
@@ -203,7 +170,7 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
                              ),
                   row=3, col=1)
 
-    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling['match_mean'],
+    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling[P2P_EUCLIDEAN],
                              mode='lines+markers',
                              line=dict(color='#636EFA'),
                              marker=dict(color='#636EFA'),
@@ -212,7 +179,7 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str, high_fid_path: 
                              ),
                   row=3, col=1)
 
-    fig['layout']['yaxis3']['title'] = "Eucl. mean (m/s2)"
+    fig['layout']['yaxis3']['title'] = "Eucl. avg (m/s2)"
     fig['layout']['xaxis3']['title'] = "Maximum acceptable distance (m/s2)"
     fig['layout']['yaxis3']['range'] = [0, 0.03]
 
@@ -247,7 +214,7 @@ def generate_statistical_info_stairs_comparison_lca(x_axis_var: str, high_fid_pa
     # Create traces
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.0)
 
-    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align['%matched_out_lca'],
+    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align[MATCHED_SNAPSHOTS],
                              mode='lines+markers',
                              name='High-fidelity',
                              line=dict(color='#FF7F0E'),
@@ -255,9 +222,9 @@ def generate_statistical_info_stairs_comparison_lca(x_axis_var: str, high_fid_pa
                              ),
                   row=1, col=1)
 
-    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling['%matched_out_lca'],
+    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling[MATCHED_SNAPSHOTS],
                              mode='lines+markers',
-                             name='Anomaly',
+                             name='Low-fidelity',
                              line=dict(color='#636EFA'),
                              marker=dict(color='#636EFA'),
                              fill='tonexty'
@@ -267,7 +234,7 @@ def generate_statistical_info_stairs_comparison_lca(x_axis_var: str, high_fid_pa
     fig['layout']['yaxis']['title'] = "%matched points"
     fig['layout']['yaxis']['range'] = [0, 100]
 
-    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align['frechet_out_lca'],
+    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align[FRECHET],
                              mode='lines+markers',
                              line=dict(color='#FF7F0E'),
                              marker=dict(color='#FF7F0E'),
@@ -275,7 +242,7 @@ def generate_statistical_info_stairs_comparison_lca(x_axis_var: str, high_fid_pa
                              ),
                   row=2, col=1)
 
-    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling['frechet_out_lca'],
+    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling[FRECHET],
                              mode='lines+markers',
                              line=dict(color='#636EFA'),
                              marker=dict(color='#636EFA'),
@@ -287,7 +254,7 @@ def generate_statistical_info_stairs_comparison_lca(x_axis_var: str, high_fid_pa
     fig['layout']['yaxis2']['title'] = "Fréchet (m/s2)"
     fig['layout']['yaxis2']['range'] = [0, 0.2]
 
-    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align['match_mean_out_lca'],
+    fig.add_trace(go.Scatter(x=high_fid_align[x_axis_var], y=high_fid_align[P2P_EUCLIDEAN],
                              mode='lines+markers',
                              line=dict(color='#FF7F0E'),
                              marker=dict(color='#FF7F0E'),
@@ -295,7 +262,7 @@ def generate_statistical_info_stairs_comparison_lca(x_axis_var: str, high_fid_pa
                              ),
                   row=3, col=1)
 
-    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling['match_mean_out_lca'],
+    fig.add_trace(go.Scatter(x=low_fid_aling[x_axis_var], y=low_fid_aling[P2P_EUCLIDEAN],
                              mode='lines+markers',
                              line=dict(color='#636EFA'),
                              marker=dict(color='#636EFA'),
@@ -304,7 +271,7 @@ def generate_statistical_info_stairs_comparison_lca(x_axis_var: str, high_fid_pa
                              ),
                   row=3, col=1)
 
-    fig['layout']['yaxis3']['title'] = "Eucl. mean (m/s2)"
+    fig['layout']['yaxis3']['title'] = "Eucl. Avg. (m/s2)"
     fig['layout']['xaxis3']['title'] = "Maximum acceptable distance (m/s2)"
     fig['layout']['yaxis3']['range'] = [0, 0.03]
 
@@ -336,7 +303,7 @@ def generate_statistical_info_stairs(x_axis_var: str, alignment_df: pd.DataFrame
     :param path:
     :return:
     """
-    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df['%matched'],
+    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df[MATCHED_SNAPSHOTS],
                              mode='lines',
                              line=dict(
                                  color='#898989',
@@ -347,7 +314,7 @@ def generate_statistical_info_stairs(x_axis_var: str, alignment_df: pd.DataFrame
     fig['layout']['yaxis']['title'] = "%matched points"
     fig['layout']['yaxis']['range'] = [0, 100]
 
-    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df['frechet'],
+    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df[FRECHET],
                              mode='lines',
                              showlegend=False,
                              line=dict(color='#898989',
@@ -358,7 +325,7 @@ def generate_statistical_info_stairs(x_axis_var: str, alignment_df: pd.DataFrame
     fig['layout']['yaxis2']['title'] = "Fréchet (m/s2)"
     fig['layout']['yaxis2']['range'] = [0, 0.3]
 
-    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df['match_mean'],
+    fig.add_trace(go.Scatter(x=alignment_df[x_axis_var], y=alignment_df[P2P_EUCLIDEAN],
                              mode='lines',
                              showlegend=False,
                              line=dict(color='#898989',
@@ -366,7 +333,7 @@ def generate_statistical_info_stairs(x_axis_var: str, alignment_df: pd.DataFrame
                              ),
                   row=3, col=1)
 
-    fig['layout']['yaxis3']['title'] = "Eucl. mean (m/s2)"
+    fig['layout']['yaxis3']['title'] = "Eucl. Avg. (m/s2)"
     fig['layout']['xaxis3']['title'] = "Maximum acceptable distance (m/s2)"
     fig['layout']['yaxis3']['range'] = [0, 0.03]
 
@@ -382,7 +349,7 @@ def generate_statistical_info_stairs(x_axis_var: str, alignment_df: pd.DataFrame
 def generate_statistical_info_stairs_variability(x_axis_var: str, path: str, starting_pattern: str):
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.1)
 
-    variability_df = pd.DataFrame(columns=['tolerance', '%matched', 'frechet', 'match_mean'])
+    variability_df = pd.DataFrame(columns=[x_axis_var, MATCHED_SNAPSHOTS, FRECHET, P2P_EUCLIDEAN])
     for align_file in fu.list_directory_files(path, ".csv", starting_pattern):
         alignment = pd.read_csv(path + "/" + align_file, index_col=False)
 
@@ -390,79 +357,89 @@ def generate_statistical_info_stairs_variability(x_axis_var: str, path: str, sta
         # generate_statistical_info_stairs(x_axis_var, alignment, fig)
 
         for _, row in alignment.iterrows():
-            new_row = {'tolerance': row['tolerance'].round(2),
-                       '%matched': row['%matched'],
-                       'frechet': row['frechet'],
-                       'match_mean': row['match_mean']}
+            new_row = {x_axis_var: row[x_axis_var].round(2),
+                       MATCHED_SNAPSHOTS: row[MATCHED_SNAPSHOTS],
+                       FRECHET: row[FRECHET],
+                       P2P_EUCLIDEAN: row[P2P_EUCLIDEAN]}
             variability_df = pd.concat([variability_df, pd.DataFrame([new_row])], ignore_index=True)
 
-    rows = variability_df.drop_duplicates(['tolerance'])['tolerance']
+    rows = variability_df.drop_duplicates([x_axis_var])[x_axis_var]
     result_df = pd.DataFrame()
+    table_df = pd.DataFrame()
     for row in rows:
-        mean = np.mean(variability_df.loc[variability_df['tolerance'] == row], axis=0)
-        std = np.std(variability_df.loc[variability_df['tolerance'] == row], axis=0)
-        new_row = {'tolerance': row,
-                   '%matched_mean': mean['%matched'],
-                   '%matched_std': std['%matched'],
-                   'frechet_mean': mean['frechet'],
-                   'frechet_std': std['frechet'],
-                   'euc_mean': mean['match_mean'],
-                   'euc_std': std['match_mean']}
+        average = np.mean(variability_df.loc[variability_df[x_axis_var] == row], axis=0)
+        std = np.std(variability_df.loc[variability_df[x_axis_var] == row], axis=0)
+        new_row = {x_axis_var: row,
+                   f'{MATCHED_SNAPSHOTS}_avg': average[MATCHED_SNAPSHOTS],
+                   f'{MATCHED_SNAPSHOTS}_std': std[MATCHED_SNAPSHOTS],
+                   f'{FRECHET}_avg': average[FRECHET],
+                   f'{FRECHET}_std': std[FRECHET],
+                   f'{P2P_EUCLIDEAN}_avg': average[P2P_EUCLIDEAN],
+                   f'{P2P_EUCLIDEAN}_std': std[P2P_EUCLIDEAN]}
+        new_table_row = {x_axis_var: row,
+                         '% matched': f'{average[MATCHED_SNAPSHOTS]:.4f} ± {std[MATCHED_SNAPSHOTS]:.4f}',
+                         'Frèchet': f'{average[FRECHET]:.4f} ± {std[FRECHET]:.4f}',
+                         'Avg. Euclidean': f'{average[P2P_EUCLIDEAN]:.4f} ± {std[P2P_EUCLIDEAN]:.4f}'}
         result_df = pd.concat([result_df, pd.DataFrame([new_row])], ignore_index=True)
+        table_df = pd.concat([table_df, pd.DataFrame([new_table_row])], ignore_index=True)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['%matched_mean'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df[f'{MATCHED_SNAPSHOTS}_avg'],
                              mode='lines+markers',
                              ),
                   row=1, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['%matched_mean'] + result_df['%matched_std'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var],
+                             y=result_df[f'{MATCHED_SNAPSHOTS}_avg'] + result_df[f'{MATCHED_SNAPSHOTS}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              name='upper bound'))
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['%matched_mean'] - result_df['%matched_std'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var],
+                             y=result_df[f'{MATCHED_SNAPSHOTS}_avg'] - result_df[f'{MATCHED_SNAPSHOTS}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              fill='tonexty',
                              name='lower bound'))
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['frechet_mean'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df[f'{FRECHET}_avg'],
                              mode='lines+markers',
                              showlegend=False
                              ),
                   row=2, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['frechet_mean'] + result_df['frechet_std'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df[f'{FRECHET}_avg'] + result_df[f'{FRECHET}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              name='upper bound'),
                   row=2, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['frechet_mean'] - result_df['frechet_std'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df[f'{FRECHET}_avg'] - result_df[f'{FRECHET}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              fill='tonexty',
                              name='lower bound'),
                   row=2, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['euc_mean'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df[f'{P2P_EUCLIDEAN}_avg'],
                              mode='lines+markers',
                              showlegend=False
                              ),
                   row=3, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['euc_mean'] + result_df['euc_std'],
-                             mode='lines',
-                             line=dict(width=0.1),
-                             name='upper bound'),
-                  row=3, col=1)
+    fig.add_trace(
+        go.Scatter(x=result_df[x_axis_var], y=result_df[f'{P2P_EUCLIDEAN}_avg'] + result_df[f'{P2P_EUCLIDEAN}_std'],
+                   mode='lines',
+                   line=dict(width=0.1),
+                   name='upper bound'),
+        row=3, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df['euc_mean'] - result_df['euc_std'],
-                             mode='lines',
-                             line=dict(width=0.1),
-                             fill='tonexty',
-                             name='lower bound'),
-                  row=3, col=1)
+    fig.add_trace(
+        go.Scatter(x=result_df[x_axis_var], y=result_df[f'{P2P_EUCLIDEAN}_avg'] - result_df[f'{P2P_EUCLIDEAN}_std'],
+                   mode='lines',
+                   line=dict(width=0.1),
+                   fill='tonexty',
+                   name='lower bound'),
+        row=3, col=1)
 
     for align_file in fu.list_directory_files(path, ".csv", starting_pattern):
         alignment = pd.read_csv(path + "/" + align_file, index_col=False)
@@ -470,8 +447,11 @@ def generate_statistical_info_stairs_variability(x_axis_var: str, path: str, sta
 
     fig['layout']['yaxis']['range'] = [0, 100]
     fig['layout']['yaxis2']['range'] = [0, 0.20]
-    fig['layout']['yaxis3']['range'] = [0, 0.035]
+    fig['layout']['yaxis3']['range'] = [0, 0.07]
     fig.update_layout()
 
     fig.show()
+    # Save the DataFrame to a CSV file
+    output_file = f'{path}/results/variability_results_{starting_pattern}.csv'
+    table_df.to_csv(output_file, index=False)
     return fig

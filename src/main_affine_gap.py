@@ -110,7 +110,7 @@ if __name__ == "__main__":
                     # --- GRAPHIC GENERATION ---
                     generate_alignment_graphic(alignment_df, dt_trace, pt_trace, param_interest, timestamp_label,
                                                output_path=output_dir_filename_gap,
-                                               tolerance=mad_curr[param_interest],
+                                               mad=mad_curr[param_interest],
                                                open_gap=init_curr, continue_gap=cont_curr)
 
                 # --- DISTANCE ANALYSIS ---
