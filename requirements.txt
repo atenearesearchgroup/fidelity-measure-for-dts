@@ -8,3 +8,8 @@ Cython==0.29.32
 plotly~=5.13.0
 kaleido==0.0.3.post1
 argparse==1.4.0
+numba~=0.57.0
+PyYAML~=6.0
+scikit-learn~=1.0.2
+statsmodels~=0.13.2
+ruptures~=1.1.7
