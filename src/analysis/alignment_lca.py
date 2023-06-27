@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import List
 
 import pandas as pd
-from similaritymeasures import similaritymeasures
 
 from analysis.alignment import Alignment
+from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan, euclidean
 from systems_config.system import SystemBase
 
 
@@ -47,10 +47,12 @@ class AlignmentLCA(Alignment):
     @property
     def frechet_lca(self) -> dict:
         if not (self._dt_matched_relevant_snapshots.empty and self._pt_matched_relevant_snapshots.empty):
-            frechet_euclidean = similaritymeasures.frechet_dist(self._dt_matched_relevant_snapshots.to_numpy(),
-                                                                self._pt_matched_relevant_snapshots.to_numpy(), 2)
-            frechet_manhattan = similaritymeasures.frechet_dist(self._dt_matched_relevant_snapshots.to_numpy(),
-                                                                self._pt_matched_relevant_snapshots.to_numpy(), 1)
+            frechet_euclidean = FastDiscreteFrechetMatrix(euclidean).distance(
+                self._dt_matched_relevant_snapshots.to_numpy(),
+                self._pt_matched_relevant_snapshots.to_numpy())
+            frechet_manhattan = FastDiscreteFrechetMatrix(manhattan).distance(
+                self._dt_matched_relevant_snapshots.to_numpy(),
+                self._pt_matched_relevant_snapshots.to_numpy())
         else:
             frechet_euclidean = 0
             frechet_manhattan = 0
