@@ -1,0 +1,48 @@
+system: "RoboticArm"
+paths:
+  input:
+    main: "resources/input/niryo/"
+    dt: "digital_twin/"
+    dt_files:
+      - "DT_Scenario_0.csv"
+      - "DT_Scenario_1.csv"
+      - "DT_Scenario_2.csv"
+      - "DT_Scenario_3.csv"
+      - "DT_Scenario_4.csv"
+    pt: "physical_twin/"
+    pt_files:
+      - "Real_Scenario_0.csv"
+      - "Real_Scenario_1.csv"
+      - "Real_Scenario_2.csv"
+      - "Real_Scenario_3.csv"
+      - "Real_Scenario_4.csv"
+  output: "resources/output/evaluation/niryo_gap_tunning/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  params:
+    - "s1"
+    - "s2"
+    - "s3"
+    - "s4"
+    - "s5"
+    - "s6"
+  param_interest: "s1"
+
+ranges:
+  mad:
+    start: 0.05
+    step: 0.05
+    end: 1.01
+  low:
+    start: 5
+    step: 2
+    end: 6
+  init_gap:
+    start: -3.0
+    step: 0.5
+    end: 0.01
+  cont_gap:
+    start: -2.0
+    step: 0.1
+    end: 0.01
