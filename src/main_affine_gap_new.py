@@ -4,6 +4,7 @@ import time
 
 import numpy as np
 import pandas as pd
+import plotly
 import yaml
 
 import util.file_util as fu
@@ -12,6 +13,7 @@ from analysis.alignment import Alignment
 from analysis.alignment_lca import AlignmentLCA
 from result_analysis.alignment_graphic import generate_alignment_graphic
 from systems_config.lift import Lift
+from systems_config.robotic_arm import RoboticArm
 from systems_config.system import SystemBase
 from util.float_util import get_input_values_list
 
@@ -22,15 +24,17 @@ CONT_GAP = 'cont_gap'
 
 if __name__ == "__main__":
 
+    plotly.io.orca.config.executable = 'C:\\Users\\paula\\AppData\\Local\\Programs\\orca\\orca.exe'
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--figures", help="It processes the alignment and generates figures as image files")
     args = parser.parse_args()
-    # args.figures = True
+    args.figures = True
 
     current_directory = os.path.join(os.getcwd(), "")
 
     # Read the YAML file
-    with open(current_directory + 'config/incubator.yaml', 'r') as file:
+    with open(current_directory + 'config/robotic_arm_pt.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
     # FILE PATHS
@@ -48,6 +52,7 @@ if __name__ == "__main__":
     # ANALYSIS PARAMETERS
     timestamp_label = config['labels']['timestamp_label']
     param_interest = config['labels']['param_interest']
+    params = config['labels']['params']
 
     # INPUT PARAMETERS
     ranges = config['ranges']
@@ -86,6 +91,12 @@ if __name__ == "__main__":
     else:
         methods = fu.get_property_methods(Alignment)
 
+    if not os.path.exists(f"{output_directory}/"):
+        os.makedirs(f"{output_directory}/")
+
+    if not os.path.exists(f"{output_directory}/results"):
+        os.makedirs(f"{output_directory}/results")
+
     # Iterate over Physical Twin Files against Digital Twins'
     for i in range(len(pt_files)):
         for pt_file in fu.list_directory_files(pt_path, ".csv", pt_files[i]):
@@ -102,13 +113,15 @@ if __name__ == "__main__":
             for inputs in input_values:
                 input_dict = {
                     MAD: {
-                        param_interest: inputs[0],
                         timestamp_label: inputs[0]
                     },
                     LOW: inputs[1],
                     INIT_GAP: inputs[2],
                     CONT_GAP: inputs[3]
                 }
+
+                for p in params:
+                    input_dict[MAD][p] = inputs[0]
 
                 config_output_dir_filename = f"{output_directory}{output_filename}-({input_dict[INIT_GAP]:.2f}," \
                                              f"{input_dict[CONT_GAP]:.2f})" \
@@ -118,6 +131,8 @@ if __name__ == "__main__":
                 # --- CALCULATE ALIGNMENT - MAIN ALGORITHM ---
                 if config['system'] == 'Lift':
                     cps = Lift()
+                elif config['system'] == 'RoboticArm':
+                    cps = RoboticArm()
                 else:
                     cps = SystemBase()
 
@@ -133,23 +148,25 @@ if __name__ == "__main__":
 
                 print(f"--- SCENARIO: {output_filename} ---")
                 print(
-                    f"--- Mad {input_dict[MAD][param_interest]}, Init gap {input_dict[INIT_GAP]:.2f}, Continue gap {input_dict[CONT_GAP]:.2f} : "
+                    f"--- Mad {input_dict[MAD][param_interest]:.2f}, Init gap {input_dict[INIT_GAP]:.2f}, Continue gap {input_dict[CONT_GAP]:.2f}, Low {input_dict[LOW]} : "
                     f"{(time.time() - start_time):.2f} seconds ---")
 
                 alignment_df.to_csv(config_output_dir_filename, index=False, encoding='utf-8', sep=',')
 
                 if args.figures:
                     # --- GRAPHIC GENERATION ---
-                    generate_alignment_graphic(alignment_df, dt_trace, pt_trace, param_interest, timestamp_label,
+                    generate_alignment_graphic(alignment_df, dt_trace, pt_trace, params, timestamp_label,
                                                output_path=config_output_dir_filename,
                                                mad=input_dict[MAD][param_interest],
-                                               open_gap=input_dict[INIT_GAP], continue_gap=input_dict[CONT_GAP])
+                                               open_gap=input_dict[INIT_GAP], continue_gap=input_dict[CONT_GAP],
+                                               # engine='kaleido'
+                                               )
 
                 # --- DISTANCE ANALYSIS ---
                 if config['system'] == 'Lift':
-                    alignment_results = AlignmentLCA(alignment_df, dt_trace, pt_trace, cps, [param_interest])
+                    alignment_results = AlignmentLCA(alignment_df, dt_trace, pt_trace, cps, params)
                 else:
-                    alignment_results = Alignment(alignment_df, dt_trace, pt_trace, cps, [param_interest])
+                    alignment_results = Alignment(alignment_df, dt_trace, pt_trace, cps, params)
                 statistical_values = fu.get_property_values(alignment_results, methods)
                 concatenated_dict = {**fu.flatten_dictionary(input_dict),
                                      **fu.flatten_dictionary(statistical_values)}
