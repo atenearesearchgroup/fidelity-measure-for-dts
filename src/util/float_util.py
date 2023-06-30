@@ -23,7 +23,7 @@ def max_tolerance(v1: float, v2: float, v3: float, equals_value: float, toleranc
     return max_value, max_index
 
 
-def get_input_values_list(*args, factor: float):
+def get_input_values_list(*args):
     combinations = []
     for elements in itertools.product(*args):
         combinations.append(elements)

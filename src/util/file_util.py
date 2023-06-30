@@ -2,15 +2,6 @@ import inspect
 import os
 
 
-def list_directory_files(dir: str, extension: str):
-    """It returns a list with all the files of a given extension."""
-    result = []
-    for file in os.listdir(dir):
-        if file.endswith(extension):
-            result.append(file)
-    return result
-
-
 def list_directory_files(dir: str, extension: str, pattern: str):
     """It returns a list with all the files of a given extension and starts with pattern."""
     result = []
