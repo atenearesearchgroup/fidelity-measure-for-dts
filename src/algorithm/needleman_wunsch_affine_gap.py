@@ -72,7 +72,6 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         dt_index = len(self._dt_trace)  # - 1
         pt_index = len(self._pt_trace)  # - 1
 
-        # TODO: Transform this to numpy arrays
         self._deletion_table = np.array([[self._init_deletion(i, j) for j in range(0, pt_index)] for i in range(0, dt_index)])
         self._insert_table = np.array([[self._init_insertion(i, j) for j in range(0, pt_index)] for i in range(0, dt_index)])
         [[self._init_match(i, j) for j in range(0, pt_index)] for i in range(0, dt_index)]
