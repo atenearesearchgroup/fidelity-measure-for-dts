@@ -23,7 +23,7 @@ P2P_EUCLIDEAN_AXIS = 'ED'
 MAD_AXIS = 'MAD'
 
 # FONT OPTIONS
-FONT_SIZE = 20
+FONT_SIZE = 24
 
 
 def generate_parallel_behavior_graphic(x_axis_var: str,
@@ -77,7 +77,7 @@ def generate_parallel_behavior_graphic(x_axis_var: str,
             xanchor="left",
             x=0.01
         ),
-        margin=dict(t=0, b=0)
+        margin=dict(t=0, l=0, r=0, b=0)
     )
 
     fig.update_layout(template='plotly')
@@ -203,19 +203,19 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str,
 
     fig['layout']['xaxis3']['title'] = f'{MAD_AXIS} {units}'
 
-    fig.update_yaxes(ticksuffix=" ", title_standoff=0)
-    fig.update_xaxes(ticksuffix=" ", title_standoff=0)
+    fig.update_yaxes(tickprefix="  ", ticksuffix=" ", title_standoff=0)
+    fig.update_xaxes(ticksuffix=" ", title_standoff=10)
 
     fig.update_layout(
         font=dict(
             size=FONT_SIZE),  # Figure font
         legend=dict(  # Legend position
             yanchor="top",
-            y=0.99,
+            y=0.82,  # 0.99
             xanchor="left",
-            x=0.01
+            x=0.88  # 0.01
         ),
-        margin=dict(t=0, b=0)
+        margin=dict(t=0, l=0, r=0, b=0)
     )
 
     return fig
@@ -299,7 +299,7 @@ def generate_statistical_info_stairs(x_axis_var: str,
         font=dict(
             size=FONT_SIZE),
         showlegend=False,
-        margin=dict(t=0, b=0)
+        margin=dict(t=0, l=0, r=0, b=0)
     )
     return fig
 
@@ -430,8 +430,10 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
     fig.update_layout(
         font=dict(
             size=FONT_SIZE),
-        margin=dict(t=0, b=0)  # Figure font
+        margin=dict(t=0, l=0, r=0, b=0)
     )
+    fig.update_yaxes(tickprefix="  ", ticksuffix=" ", title_standoff=0)
+    fig.update_xaxes(ticksuffix=" ", title_standoff=10)
 
     # Save the DataFrame to a CSV file
     output_file = f'{path}/variability_results_{starting_pattern}.csv'

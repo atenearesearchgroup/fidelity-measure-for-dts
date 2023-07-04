@@ -35,3 +35,11 @@ def get_property_values(obj, methods):
     for name in methods:
         values[name] = getattr(obj, name)
     return values
+
+
+def generate_sublist(label_params: list, include_params: list):
+    result = []
+    for params in include_params:
+        result.extend(label_params[params[0]:params[1]])
+
+    return result
