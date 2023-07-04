@@ -4,7 +4,6 @@ scipy==1.10.1
 matplotlib==3.7.1
 seaborn==0.12.2
 setuptools==67.8.0
-Cython==0.29.32
 plotly==5.15.0
 kaleido==0.2.1
 argparse==1.4.0
@@ -13,3 +12,4 @@ PyYAML~=6.0
 scikit-learn==1.2.2
 statsmodels==0.14.0
 ruptures~=1.1.7
+IPython~=8.14.0
