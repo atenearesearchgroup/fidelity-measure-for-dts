@@ -1,18 +1,22 @@
 system: "Lift"
+
+# orca_path: <your_orca_executable_path>
+
 paths:
   input:
     main: "resources/input/lift/"
-    dt: "04.5-simulation/"
+    dt: "digital_twin_high_fid_elevate/"
+    # dt: "digital_twin_low_fid_use/"
     dt_files:
-      - "cutBajada_4_0_4.csv"
-      #- "cutBajada_4_2_0_2_4.csv"
-      #- "cutBajada_4_3_2_1_0_1_2_3_4.csv"
-    pt: "03.55-derived_values/"
+      - "Bajada_4_0_4.csv"
+      #- "Bajada_4_2_0_2_4.csv"
+      #- "Bajada_4_3_2_1_0_1_2_3_4.csv"
+    pt: "physical_twin/"
     pt_files:
-      - "Bajada_4_0_4"
+      - "Bajada_4_0_4_01"
       #- "Bajada_4_2_0_2_4"
       #- "Bajada_4_3_2_1_0_1_2_3_4"
-  output: "resources/output/evaluation/lift/elevate/"
+  output: "resources/output/lift/"
 
 labels:
   timestamp_label: "timestamp(s)"
@@ -24,11 +28,11 @@ ranges:
   mad:
     start: 0.00
     step: 0.02
-    end: 0.32
+    end: 1.00
   low:
-    start: 200
+    start: 300
     step: 1
-    end: 201
+    end: 301
   init_gap:
     start: -1.0
     step: 1.1

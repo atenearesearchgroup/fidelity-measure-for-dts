@@ -24,18 +24,29 @@ CONT_GAP = 'cont_gap'
 
 if __name__ == "__main__":
 
-    plotly.io.orca.config.executable = 'C:\\Users\\paula\\AppData\\Local\\Programs\\orca\\orca.exe'
-
     parser = argparse.ArgumentParser()
-    parser.add_argument("--figures", help="It processes the alignment and generates figures as image files")
+    parser.add_argument("--figures", help="It processes the alignment and generates figures as image files",
+                        action='store_true')
+    parser.add_argument("--engine", help="Engine to process output pdf figures (orca or kaleido). By default, kaleido.",
+                        default='kaleido')
+    parser.add_argument("--config", help="Config file path", default=None)
+    parser.add_argument("--config_ex", help="Config file name stored in the /src/config folder")
+
     args = parser.parse_args()
-    args.figures = True
 
     current_directory = os.path.join(os.getcwd(), "")
 
     # Read the YAML file
-    with open(current_directory + 'config/robotic_arm_pt.yaml', 'r') as file:
+    if not args.config:
+        path = current_directory + '/config/' + args.config_ex
+    else:
+        path = args.config
+    with open(path, 'r') as file:
         config = yaml.safe_load(file)
+
+    # ORCA EXECUTABLE PATH
+    if args.figures and args.engine == "orca":
+        plotly.io.orca.config.executable = config['orca_path']
 
     # FILE PATHS
     input_directory = current_directory + config['paths']['input']['main']
@@ -85,7 +96,7 @@ if __name__ == "__main__":
     )
     # = init_gap / factor
 
-    input_values = get_input_values_list(max_acceptable_dist, low, init_gap, continue_gap, factor=factor)
+    input_values = get_input_values_list(max_acceptable_dist, low, init_gap, continue_gap)
     if config['system'] == 'Lift':
         methods = fu.get_property_methods(AlignmentLCA)
     else:
@@ -159,7 +170,7 @@ if __name__ == "__main__":
                                                output_path=config_output_dir_filename,
                                                mad=input_dict[MAD][param_interest],
                                                open_gap=input_dict[INIT_GAP], continue_gap=input_dict[CONT_GAP],
-                                               # engine='kaleido'
+                                               engine=args.engine
                                                )
 
                 # --- DISTANCE ANALYSIS ---

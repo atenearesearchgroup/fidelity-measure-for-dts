@@ -13,3 +13,4 @@ scikit-learn==1.2.2
 statsmodels==0.14.0
 ruptures~=1.1.7
 IPython~=8.14.0
+orca~=1.8
