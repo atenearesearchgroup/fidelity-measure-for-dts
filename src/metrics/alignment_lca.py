@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import List
 
 import pandas as pd
-
 from analysis.alignment import Alignment
-from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan, euclidean
 from systems_config.system import SystemBase
+
+from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan, euclidean
 
 
 class AlignmentLCA(Alignment):

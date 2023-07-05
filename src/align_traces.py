@@ -6,15 +6,15 @@ import numpy as np
 import pandas as pd
 import plotly
 import yaml
-
-import util.file_util as fu
-from algorithm.needleman_wunsch_affine_gap import NeedlemanWunschAffineGap
 from analysis.alignment import Alignment
 from analysis.alignment_lca import AlignmentLCA
-from result_analysis.alignment_graphic import generate_alignment_graphic
 from systems_config.lift import Lift
 from systems_config.robotic_arm import RoboticArm
 from systems_config.system import SystemBase
+
+import util.file_util as fu
+from algorithm.needleman_wunsch_affine_gap import NeedlemanWunschAffineGap
+from result_analysis.alignment_graphic import generate_alignment_graphic
 from util.float_util import get_input_values_list
 
 MAD = 'mad'
@@ -29,19 +29,14 @@ if __name__ == "__main__":
                         action='store_true')
     parser.add_argument("--engine", help="Engine to process output pdf figures (orca or kaleido). By default, kaleido.",
                         default='kaleido')
-    parser.add_argument("--config", help="Config file path", default=None)
-    parser.add_argument("--config_ex", help="Config file name stored in the /src/config folder")
+    parser.add_argument("--config", help="Config file name stored in the /src/config folder")
 
     args = parser.parse_args()
 
     current_directory = os.path.join(os.getcwd(), "")
 
     # Read the YAML file
-    if not args.config:
-        path = current_directory + '/config/' + args.config_ex
-    else:
-        path = args.config
-    with open(path, 'r') as file:
+    with open(current_directory + '/config_files/' + args.config_ex, 'r') as file:
         config = yaml.safe_load(file)
 
     # ORCA EXECUTABLE PATH

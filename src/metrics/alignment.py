@@ -3,9 +3,9 @@ from typing import List
 import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cityblock, euclidean
+from systems_config.system import SystemBase
 
 from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan
-from systems_config.system import SystemBase
 
 
 class Alignment:

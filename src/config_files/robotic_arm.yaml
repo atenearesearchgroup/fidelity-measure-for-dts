@@ -1,22 +1,23 @@
 system: "RoboticArm"
+
+# orca_path: <your_orca_executable_path>
+
 paths:
   input:
     main: "resources/input/niryo/"
     dt: "digital_twin/"
     dt_files:
-      - "DT_Scenario_0.csv"
-      - "DT_Scenario_1.csv"
-      - "DT_Scenario_2.csv"
-      - "DT_Scenario_3.csv"
-      - "DT_Scenario_4.csv"
+      - "dt_scenario_1_run_1.csv"
+      - "dt_scenario_2_run_1.csv"
+      - "dt_scenario_3_run_1.csv"
+      - "dt_scenario_4_run_1.csv"
     pt: "physical_twin/"
     pt_files:
-      - "Real_Scenario_0.csv"
-      - "Real_Scenario_1.csv"
-      - "Real_Scenario_2.csv"
-      - "Real_Scenario_3.csv"
-      - "Real_Scenario_4.csv"
-  output: "resources/output/evaluation/niryo_gap_tunning/"
+      - "scenario_1_run_"
+      - "scenario_2_run_"
+      - "scenario_3_run_"
+      - "scenario_4_run_"
+  output: "resources/output/niryo/"
 
 labels:
   timestamp_label: "timestamp(s)"
