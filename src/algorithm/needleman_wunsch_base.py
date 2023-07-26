@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
-from systems_config.system import SystemBase
+from systems.system import SystemBase
 
 
 class NeedlemanWunschBase(ABC):

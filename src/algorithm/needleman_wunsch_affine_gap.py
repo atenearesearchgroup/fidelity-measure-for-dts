@@ -4,7 +4,7 @@ import numpy as np
 
 import util.float_util as fu
 from algorithm.needleman_wunsch_base import NeedlemanWunschBase
-from systems_config.system import SystemBase
+from systems.system import SystemBase
 
 
 class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):

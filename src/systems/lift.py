@@ -1,4 +1,4 @@
-from systems_config.system import SystemBase
+from systems.system import SystemBase
 
 
 class Lift(SystemBase):
