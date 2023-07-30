@@ -6,15 +6,15 @@ import numpy as np
 import pandas as pd
 import plotly
 import yaml
-from analysis.alignment import Alignment
-from analysis.alignment_lca import AlignmentLCA
-from systems_config.lift import Lift
-from systems_config.robotic_arm import RoboticArm
-from systems_config.system import SystemBase
 
 import util.file_util as fu
 from algorithm.needleman_wunsch_affine_gap import NeedlemanWunschAffineGap
+from metrics.alignment import Alignment
+from metrics.alignment_lca import AlignmentLCA
 from result_analysis.alignment_graphic import generate_alignment_graphic
+from systems.lift import Lift
+from systems.robotic_arm import RoboticArm
+from systems.system import SystemBase
 from util.float_util import get_input_values_list
 
 MAD = 'mad'
@@ -32,11 +32,14 @@ if __name__ == "__main__":
     parser.add_argument("--config", help="Config file name stored in the /src/config folder")
 
     args = parser.parse_args()
+    # args.figures = True
+    # args.engine = 'kaleido'
+    # args.config = '/braccio.yaml'
 
     current_directory = os.path.join(os.getcwd(), "")
 
     # Read the YAML file
-    with open(current_directory + '/config_files/' + args.config_ex, 'r') as file:
+    with open(current_directory + '/config_files/' + args.config, 'r') as file:
         config = yaml.safe_load(file)
 
     # ORCA EXECUTABLE PATH
@@ -109,11 +112,11 @@ if __name__ == "__main__":
             # Unique filename combining both in format : <fileAfileB>
             output_filename = os.path.splitext(dt_file[i])[0] + os.path.splitext(pt_file)[0]
             # Output directory combined with filename and extension : path/to/output/fileAfileB.csv
-            output_dir_filename = f"{output_directory}/results/{output_filename}.csv"
+            output_dir_filename = f"{output_directory}/results/{output_filename}-{param_interest}.csv"
 
             # DT and PT traces in dict
-            dt_trace = pd.read_csv(dt_path + dt_file[i])
-            pt_trace = pd.read_csv(pt_path + pt_file)
+            dt_trace = pd.read_csv(dt_path + dt_file[i]).filter(items=[timestamp_label, *params])
+            pt_trace = pd.read_csv(pt_path + pt_file).filter(items=[timestamp_label, *params])
 
             statistical_results_df = pd.DataFrame()
             for inputs in input_values:
@@ -132,7 +135,8 @@ if __name__ == "__main__":
                 config_output_dir_filename = f"{output_directory}{output_filename}-({input_dict[INIT_GAP]:.2f}," \
                                              f"{input_dict[CONT_GAP]:.2f})" \
                                              f"-{input_dict[LOW]:.2f}" \
-                                             f"-{input_dict[MAD][param_interest]:.2f}.csv"
+                                             f"-{input_dict[MAD][param_interest]:.2f}" \
+                                             f"-{param_interest}.csv"
 
                 # --- CALCULATE ALIGNMENT - MAIN ALGORITHM ---
                 if config['system'] == 'Lift':
