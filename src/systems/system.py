@@ -1,5 +1,7 @@
 from abc import ABC
 
+import pandas
+
 
 class SystemBase(ABC):
 
@@ -36,4 +38,7 @@ class SystemBase(ABC):
         return result / (len(dt_snapshot) - 1)
 
     def is_low_complexity(self, key: str, value):
+        return False
+
+    def filter_low_complexity(self, df: pandas.DataFrame):
         return False

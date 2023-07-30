@@ -40,9 +40,8 @@ class AlignmentLCA(Alignment):
     def _get_relevant_snapshots(self, snapshots, condition_snapshots=None):
         if condition_snapshots is None:
             condition_snapshots = snapshots
-        relevant_snapshots = snapshots.loc[self._selected_params].apply(lambda row: any(
-            self._system.is_low_complexity(key, value) for key, value in
-            condition_snapshots[self._selected_params].iteritems()), axis=1)
+        relevant_snapshots = snapshots.loc[
+            ~self._system.filter_low_complexity(condition_snapshots[self._selected_params]), self._selected_params]
         return relevant_snapshots
 
     @property
