@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import List
 
 import pandas as pd
-from analysis.alignment import Alignment
-from systems_config.system import SystemBase
 
+from metrics.alignment import Alignment
 from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan, euclidean
+from systems.system import SystemBase
 
 
 class AlignmentLCA(Alignment):
@@ -40,8 +40,9 @@ class AlignmentLCA(Alignment):
     def _get_relevant_snapshots(self, snapshots, condition_snapshots=None):
         if condition_snapshots is None:
             condition_snapshots = snapshots
-        relevant_snapshots = snapshots.loc[
-            ~self._system.is_low_complexity(condition_snapshots[self._selected_params]), self._selected_params]
+        relevant_snapshots = snapshots.loc[self._selected_params].apply(lambda row: any(
+            self._system.is_low_complexity(key, value) for key, value in
+            condition_snapshots[self._selected_params].iteritems()), axis=1)
         return relevant_snapshots
 
     @property
