@@ -13,7 +13,6 @@ from metrics.alignment import Alignment
 from metrics.alignment_lca import AlignmentLCA
 from result_analysis.alignment_graphic import generate_alignment_graphic
 from systems.lift import Lift
-from systems.robotic_arm import RoboticArm
 from systems.system import SystemBase
 from util.float_util import get_input_values_list
 
@@ -141,8 +140,6 @@ if __name__ == "__main__":
                 # --- CALCULATE ALIGNMENT - MAIN ALGORITHM ---
                 if config['system'] == 'Lift':
                     cps = Lift()
-                elif config['system'] == 'RoboticArm':
-                    cps = RoboticArm()
                 else:
                     cps = SystemBase()
 
