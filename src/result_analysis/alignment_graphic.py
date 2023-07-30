@@ -111,20 +111,20 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
     fig.update_yaxes(ticksuffix=" ", title_standoff=0)
     fig.update_xaxes(ticksuffix=" ", title_standoff=0)
 
-    # fig.update_layout(
-    #     # xaxis_range=[0, 64],  # x axis range
-    #     font=dict(
-    #         size=FONT_SIZE),  # Figure font
-    #     legend=dict(  # Legend position
-    #         yanchor="top",
-    #         y=0.99,
-    #         xanchor="left",
-    #         x=0.01,
-    #         bordercolor='white',  # Set the border color
-    #         borderwidth=3,  # Set the border width
-    #     ),
-    #     margin=dict(t=7, l=7, r=7, b=7))
-    #
+    fig.update_layout(
+        # xaxis_range=[0, 64],  # x axis range
+        font=dict(
+            size=FONT_SIZE),  # Figure font
+        legend=dict(  # Legend position
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01,
+            bordercolor='white',  # Set the border color
+            borderwidth=3,  # Set the border width
+        ),
+        margin=dict(t=7, l=7, r=7, b=7))
+
     # annotation_text = f"<b>MAD:</b> {mad:.2f}" \
     #      #f"<br><b>Gap:</b> ({open_gap:.1f}, {continue_gap:.1f})"
     # fig.add_annotation(text=annotation_text,
