@@ -1,0 +1,42 @@
+system: "Lift"
+
+# orca_path: <your_orca_executable_path>
+
+paths:
+  input:
+    main: "resources/input/lift/"
+    dt: "digital_twin_high_fid_elevate/"
+    dt_files:
+      - "Bajada_4_0_4.csv"
+      - "Bajada_4_2_0_2_4.csv"
+      - "Bajada_4_3_2_1_0_1_2_3_4.csv"
+    pt: "physical_twin/"
+    pt_files:
+      - "Bajada_4_0_4"
+      - "Bajada_4_2_0_2_4"
+      - "Bajada_4_3_2_1_0_1_2_3_4"
+  output: "resources/output/lift/gap_tuning/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "accel(m/s2)"
+  params:
+    - "accel(m/s2)"
+
+ranges:
+  mad:
+    start: 0.1
+    step: 0.04
+    end: 0.24
+  low:
+    start: 200
+    step: 2
+    end: 201
+  init_gap:
+    start: -3.0
+    step: 0.5
+    end: 0.0
+  cont_gap:
+    start: -2.0
+    step: 0.1
+    end: 0.0

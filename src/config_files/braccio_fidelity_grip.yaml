@@ -1,0 +1,42 @@
+system: "RoboticArm"
+
+# orca_path: <your_orca_executable_path>
+
+paths:
+  input:
+    main: "resources/input/braccio/"
+    dt: "/"
+    dt_files:
+      - "pick_drop_dt.csv"
+      - "simple_moves_dt.csv"
+    pt: "/"
+    pt_files:
+      - "pick_drop_pt.csv"
+      - "simple_moves_pt.csv"
+  output: "resources/output/braccio/fidelity/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  params:
+    - "x"
+    - "y"
+    - "z"
+  param_interest: "x"
+
+ranges:
+  mad:
+    start: 3.0
+    step: 0.5
+    end: 5.01
+  low:
+    start: 50
+    step: 2
+    end: 51
+  init_gap:
+    start: -1.0
+    step: 0.5
+    end: -0.6
+  cont_gap:
+    start: -0.1
+    step: 0.1
+    end: -0.09
