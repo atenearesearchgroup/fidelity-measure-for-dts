@@ -1,0 +1,44 @@
+system: "Incubator"
+
+# orca_path: <your_orca_executable_path>
+
+paths:
+  input:
+    main: "resources/input/incubator/"
+    dt: "digital_twin/"
+    dt_files:
+      - "2P_exp1_ht3_hg2_2P_Model.csv"
+      - "4P_exp1_ht3_hg2_4P_Model.csv"
+      - "2P_exp2_ht20_hg30_2P_Model.csv"
+      - "4P_exp2_ht20_hg30_4P_Model.csv"
+    pt: "physical_twin/"
+    pt_files:
+      - "exp1_ht3_hg2_Real.csv"
+      - "exp1_ht3_hg2_Real.csv"
+      - "exp2_ht20_hg30_Real.csv"
+      - "exp2_ht20_hg30_Real.csv"
+  output: "resources/output/incubator/comparison/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "temperature(degrees)"
+  params:
+    - "temperature(degrees)"
+
+ranges:
+  mad:
+    start: 0.10
+    step: 0.05
+    end: 5.00
+  low:
+    start: 1
+    step: 2
+    end: 2
+  init_gap:
+    start: -1.0
+    step: 0.1
+    end: -0.95
+  cont_gap:
+    start: -0.1
+    step: 0.10
+    end: -0.09

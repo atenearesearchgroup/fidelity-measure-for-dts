@@ -111,7 +111,7 @@ if __name__ == "__main__":
             # Unique filename combining both in format : <fileAfileB>
             output_filename = os.path.splitext(dt_file[i])[0] + os.path.splitext(pt_file)[0]
             # Output directory combined with filename and extension : path/to/output/fileAfileB.csv
-            output_dir_filename = f"{output_directory}/results/{output_filename}-{param_interest}.csv"
+            output_dir_filename = f"{output_directory}/results/{output_filename}-{param_interest.replace('/', '')}.csv"
 
             # DT and PT traces in dict
             dt_trace = pd.read_csv(dt_path + dt_file[i]).filter(items=[timestamp_label, *params])
@@ -135,7 +135,7 @@ if __name__ == "__main__":
                                              f"{input_dict[CONT_GAP]:.2f})" \
                                              f"-{input_dict[LOW]:.2f}" \
                                              f"-{input_dict[MAD][param_interest]:.2f}" \
-                                             f"-{param_interest}.csv"
+                                             f"-{param_interest.replace('/', '')}.csv"
 
                 # --- CALCULATE ALIGNMENT - MAIN ALGORITHM ---
                 if config['system'] == 'Lift':

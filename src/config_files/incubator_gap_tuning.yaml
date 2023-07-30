@@ -17,7 +17,7 @@ paths:
       - "exp1_ht3_hg2_Real.csv"
       - "exp2_ht20_hg30_Real.csv"
       - "exp2_ht20_hg30_Real.csv"
-  output: "resources/output/incubator/"
+  output: "resources/output/incubator/gap_tuning/"
 
 labels:
   timestamp_label: "timestamp(s)"
@@ -27,18 +27,18 @@ labels:
 
 ranges:
   mad:
-    start: 0.00
+    start: 0.10
     step: 0.02
-    end: 2.00
+    end: 0.20
   low:
     start: 1
     step: 2
     end: 2
   init_gap:
-    start: -1.0
-    step: 0.1
-    end: -0.95
+    start: -3.0
+    step: 0.5
+    end: 0.0
   cont_gap:
-    start: -0.1
-    step: 0.10
-    end: -0.09
+    start: -2.0
+    step: 0.1
+    end: 0.0
