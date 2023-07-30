@@ -70,7 +70,8 @@ def generate_parallel_behavior_graphic(x_axis_var: str,
 
     fig.update_layout(
         font=dict(
-            size=FONT_SIZE),  # Figure font
+            # size=FONT_SIZE
+        ),  # Figure font
         legend=dict(  # Legend position
             yanchor="top",
             y=0.99,
@@ -208,7 +209,8 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str,
 
     fig.update_layout(
         font=dict(
-            size=FONT_SIZE),  # Figure font
+            # size=FONT_SIZE
+        ),  # Figure font
         legend=dict(  # Legend position
             yanchor="top",
             y=0.82,  # 0.99
@@ -297,7 +299,8 @@ def generate_statistical_info_stairs(x_axis_var: str,
     fig.update_xaxes(ticksuffix=" ", title_standoff=0)
     fig.update_layout(
         font=dict(
-            size=FONT_SIZE),
+            # size=FONT_SIZE
+        ),
         showlegend=False,
         margin=dict(t=0, l=0, r=0, b=0)
     )
@@ -311,7 +314,10 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
                                                  range_ms: list = None,
                                                  range_fd: list = None,
                                                  range_ed: list = None,
-                                                 lca: bool = False):
+                                                 lca: bool = False,
+                                                 x_axis_upper_bound: float = None,
+                                                 x_axis_lower_bound: float = None
+                                                 ):
     # Use LCA statistics
     if lca:
         matched_snapshots = MATCHED_SNAPSHOTS_LCA
@@ -326,8 +332,15 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
     fig.update_layout(template='plotly')
 
     variability_df = pd.DataFrame(columns=[x_axis_var, matched_snapshots, frechet, p2p_euclidean])
+
     for align_file in fu.list_directory_files(path, ".csv", starting_pattern):
         alignment = pd.read_csv(path + "/" + align_file, index_col=False)
+
+        # Filter desired range
+        if x_axis_lower_bound:
+            alignment = alignment[alignment[x_axis_var] > x_axis_lower_bound]
+        if x_axis_upper_bound:
+            alignment = alignment[alignment[x_axis_var] < x_axis_upper_bound]
 
         for _, row in alignment.iterrows():
             new_row = {x_axis_var: row[x_axis_var].round(2),
@@ -416,6 +429,11 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
 
     for align_file in fu.list_directory_files(path, ".csv", starting_pattern):
         alignment = pd.read_csv(path + "/" + align_file, index_col=False)
+        # Filter desired range
+        if x_axis_lower_bound:
+            alignment = alignment[alignment[x_axis_var] > x_axis_lower_bound]
+        if x_axis_upper_bound:
+            alignment = alignment[alignment[x_axis_var] < x_axis_upper_bound]
         generate_statistical_info_stairs(x_axis_var, alignment, units, fig, lca=lca)
 
     if range_ms is not None:
@@ -429,13 +447,11 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
 
     fig.update_layout(
         font=dict(
-            size=FONT_SIZE),
+            # size=FONT_SIZE
+        ),
         margin=dict(t=0, l=0, r=0, b=0)
     )
     fig.update_yaxes(tickprefix="  ", ticksuffix=" ", title_standoff=0)
     fig.update_xaxes(ticksuffix=" ", title_standoff=10)
 
-    # Save the DataFrame to a CSV file
-    output_file = f'{path}/variability_results_{starting_pattern}.csv'
-    table_df.to_csv(output_file, index=False)
     return fig, table_df
