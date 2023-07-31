@@ -11,8 +11,6 @@
   - [Repository structure](#repository-structure)
   - [Usage and examples](#usage-and-examples)
 
----
-
 ## Overview
 
 Digital twins are gaining relevance in many domains to improve the operation and maintenance of complex systems. Despite its importance, most efforts focus on their design, development and deployment, but do not fully address their validation. 
@@ -21,13 +19,13 @@ In this work, we are interested in assessing the fidelity of physical and digita
 
 Our contribution is threefold. First, we have defined a measure of equivalence between individual snapshots capable of deciding whether two snapshots are sufficiently similar. Second, we have developed a trace alignment algorithm to align the corresponding equivalent states reached by the two twins. Finally, we measure the fidelity of the behavior of the two twins using the level of alignment achieved, in terms of the percentage of matched snapshots, and the distance between the aligned traces. 
 
-This repository describes the dynamic programming algorithm that we have developed for aligning the behavioral traces of two systems, the digital and the physical twin. It is mainly based on the Needleman-Wunsch global alignment algorithm, although it also incorporates some of the optimizations proposed in the BLAST algorithm for aligning biological sequences such as the possibility of defining strategies for deciding how to deal with sequences of gaps or for masking low-complexity regions. We have also defined the *Maximum Acceptable Distance* (MAD), a threshold that determines when two snapshots are far enough apart to be matched. 
+This repository describes the *dynamic programming algorithm* that we have developed for aligning the behavioral traces of two systems, the digital and the physical twin. It is mainly based on the Needleman-Wunsch global alignment algorithm, although it also incorporates some of the optimizations proposed in the BLAST algorithm for aligning biological sequences, such as the possibility of defining strategies for deciding how to deal with sequences of gaps, or for masking low-complexity regions. We have also defined the *Maximum Acceptable Distance* (MAD), a threshold that determines when two snapshots are far enough apart to be matched. 
 
 Our proposal has been validated with the digital twins of three cyber-physical systems: an elevator, an incubator and a robotic arm. We were able to determine which systems were sufficiently faithful and which parts of their behaviors failed to emulate their counterparts.
 
 This repository contains all artefacts and programs developed around this algorithm. It serves as a companion to the paper entitled _'Measuring the Fidelity of a Physical and a Digital Twin Using Trace Alignments,'_ which is currently under review. This repository can be cited using [CITATION.cff](CITATION.cff) or [CITATION.bib](CITATION.bib). 
 
-The repository also contains four technical reports in the [/docs](/docs) directory. [One of them](./docs/Technical_Report_General_Concepts.pdf) provides the detailed description of the algorithm and the precise definitions of all the metrics we have defined to assess the fidelity of two twins. The other three technical reports contain the detailed evaluation experiments we have performed to assess the fidelity of the three digital twins that have been used in our journal paper to validate our proposal: an [elevator](./docs/Technical_Report_Elevator.pdf), an [incubator](./docs/Technical_Report_Incubator.pdf) and a [robotic arm](./docs/Technical_Report_Robotic_Arm.pdf).
+The repository also contains four technical reports in the [/docs](/docs) directory. [One of them](./docs/Technical_Report_General_Concepts.pdf) provides the detailed description of the algorithm and the precise definitions of all the metrics we have defined to assess the fidelity of two twins. The other three technical reports contain the detailed experiments we have performed to assess the fidelity of the three digital twins that have been used in our journal paper to demonstrate our proposal: an [elevator](./docs/Technical_Report_Elevator.pdf), an [incubator](./docs/Technical_Report_Incubator.pdf) and a [robotic arm](./docs/Technical_Report_Robotic_Arm.pdf).
 
 <!--
 This repository includes a dynamic programming algorithm based on the Needleman-Wunsch global alignment algorithm
