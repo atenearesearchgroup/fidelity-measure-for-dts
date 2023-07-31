@@ -13,7 +13,7 @@ authors:
 - family-names: "Vallecillo"
   given-names: "Antonio"
   orcid: "https://orcid.org/0000-0002-8139-9986"
-title: "Measuring the Fidelity of a Physical and a Digital Twin Using Trace Alignments"
+title: "Measuring the Fidelity of a Physical and a Digital Twin Using Trace Alignments -- Git repository"
 version: 1.0.0
 doi: ToBePublished
 date-released: 2023-07-30
@@ -37,8 +37,8 @@ preferred-citation:
   journal: "ToBePublished"
   month: 1
   start: 1 # First page number
-  end: 100 # Last page number
-  title: "Using Trace Alignments for Measuring the Fidelity of a Physical and a Digital Twin"
+  end: 15 # Last page number
+  title: "Measuring the Fidelity of a Physical and a Digital Twin Using Trace Alignments -- Git repository"
   issue: 1
-  volume: 29
-  year: 2022
+  volume: 1
+  year: 2023
