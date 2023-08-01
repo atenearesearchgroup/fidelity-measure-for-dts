@@ -13,7 +13,7 @@
 
 ## Overview
 
-Digital twins are gaining relevance in many domains to improve the operation and maintenance of complex systems. Despite their importance, most efforts are currently focuses on their design, development and deployment, but do not fully address their validation. 
+Digital twins are gaining relevance in many domains to improve the operation and maintenance of complex systems. Despite their importance, most efforts are currently focused on their design, development and deployment, but do not fully address their validation. 
 
 In this work, we are interested in assessing the fidelity of physical and digital twins, and more specifically whether they exhibit twinned behaviors. This will enable engineers to test the suitability of the digital twin for its intended purpose.  Our approach assesses their fidelity by comparing the behavioral traces of the two twins. In our context, traces are sequences of snapshots. Each snapshot represents the state of the system at a given moment in time. Thus, we try to check whether the two systems have gone through the same states at the same times, i.e., they exhibit similar behaviors. 
 
