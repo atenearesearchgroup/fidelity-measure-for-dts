@@ -91,3 +91,29 @@ class NeedlemanWunschBase(ABC):
     @property
     def initiate_gap(self):
         return self._initiate_gap
+
+    @property
+    def dt_trace(self):
+        return self._dt_trace
+
+    @dt_trace.setter
+    def dt_trace(self, new_trace):
+        self.set_property('dt_trace', new_trace)
+
+    @property
+    def pt_trace(self):
+        return self._pt_trace
+
+    @pt_trace.setter
+    def pt_trace(self, new_trace):
+        self.set_property('pt_trace', new_trace)
+
+    def set_property(self, prop_name, new_value):
+        # Check if there's an existing property value
+        existing_value = getattr(self, '_' + prop_name, None)
+        if existing_value is not None:
+            delattr(self, '_' + prop_name)
+
+        # Assign the new value
+        if new_value is not None:
+            setattr(self, '_' + prop_name, np.array(new_value))

@@ -23,7 +23,8 @@ class AlignmentLCA(Alignment):
     @property
     def percentage_matched_snapshots_lca(self) -> float:
         pt_relevant_snapshots = self._get_relevant_snapshots(self._pt_trace)
-        return (self._pt_matched_relevant_snapshots.shape[0] / pt_relevant_snapshots.shape[0]) * 100
+        return (self._pt_matched_relevant_snapshots.shape[0] / pt_relevant_snapshots.shape[0]) * 100 \
+            if pt_relevant_snapshots.shape[0] > 0 else 0
 
     @property
     def percentage_mismatched_snapshots_lca(self) -> float:
@@ -31,7 +32,8 @@ class AlignmentLCA(Alignment):
         mismatched_pt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_PT)
         pt_mismatched_relevant_snapshots = self._get_relevant_snapshots(mismatched_pt_snapshots)
         pt_relevant_snapshots = self._get_relevant_snapshots(self._pt_trace)
-        return (pt_mismatched_relevant_snapshots.shape[0] / pt_relevant_snapshots.shape[0]) * 100
+        return (pt_mismatched_relevant_snapshots.shape[0] / pt_relevant_snapshots.shape[0]) * 100 \
+            if pt_relevant_snapshots.shape[0] > 0 else 0
 
     @property
     def percentage_gaps_lca(self) -> float:
