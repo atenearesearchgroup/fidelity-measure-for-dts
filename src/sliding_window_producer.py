@@ -2,21 +2,18 @@ import argparse
 import multiprocessing
 import os
 
+import window.alignment_config as ac
 from window.alignment_config import AlignmentConfiguration
 from window.producer import TwinCSVDriver
 
-DIGITAL_TWIN = 'digital_twin'
-PHYSICAL_TWIN = 'physical_twin'
-
 
 def start_producers(dt_path: str, pt_path: str, timestamp_label: str, host: str = 'localhost'):
-    pt = TwinCSVDriver(host, PHYSICAL_TWIN, pt_path, timestamp_label)
+    # Start Physical Twin trace transference
+    pt = TwinCSVDriver(host, ac.PHYSICAL_TWIN, pt_path, timestamp_label)
     pt_thread = multiprocessing.Process(target=pt.send_data_to_server)
-    # pt.send_data_to_server()
-
-    dt = TwinCSVDriver(host, DIGITAL_TWIN, dt_path, timestamp_label)
+    # Start Digital Twin trace transference
+    dt = TwinCSVDriver(host, ac.DIGITAL_TWIN, dt_path, timestamp_label)
     dt_thread = multiprocessing.Process(target=dt.send_data_to_server)
-    # dt.send_data_to_server()
 
     pt_thread.start()
     dt_thread.start()
@@ -33,7 +30,6 @@ if __name__ == "__main__":
                         default='kaleido')
     parser.add_argument("--config", help="Config file name stored in the /src/config folder")
 
-    # TODO: enter as parameter
     args = parser.parse_args()
     args.figures = True
     args.engine = 'kaleido'

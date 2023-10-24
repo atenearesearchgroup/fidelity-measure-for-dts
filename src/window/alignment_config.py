@@ -11,6 +11,9 @@ LOW = 'low'
 INIT_GAP = 'init_gap'
 CONT_GAP = 'cont_gap'
 
+DIGITAL_TWIN = 'digital_twin'
+PHYSICAL_TWIN = 'physical_twin'
+
 
 class AlignmentConfiguration:
     def __init__(self, current_directory, args):
@@ -20,10 +23,16 @@ class AlignmentConfiguration:
         with open(current_directory + '/config_files/' + args.config, 'r') as file:
             config = yaml.safe_load(file)
 
+        if not args.engine:
+            self.engine = 'kaleido'
+        else:
+            self.engine = args.engine
+
         # ORCA EXECUTABLE PATH
         if args.figures and args.engine == "orca":
             plotly.io.orca.config.executable = config['orca_path']
 
+        # The attributes in this class are read-only
         # FILE PATHS
         self._input_directory = current_directory + config['paths']['input']['main']
         self._output_directory = current_directory + config['paths']['output']
@@ -117,5 +126,5 @@ class AlignmentConfiguration:
         return self._init_gap
 
     @property
-    def continue_gap(self):
+    def cont_gap(self):
         return self._continue_gap

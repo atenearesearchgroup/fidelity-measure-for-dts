@@ -139,7 +139,9 @@ def generate_alignment_graphic(alignment: pd.DataFrame,
 
     # fig.show()
     # fig.write_html(output_path.replace(".csv", ".html"))
-    if len(params_of_interest) > 1:
-        fig.write_image(output_path.replace(".csv", ".pdf"), format="pdf", width=1750, height=3000, engine=engine)
-    else:
-        fig.write_image(output_path.replace(".csv", ".pdf"), format="pdf", width=1750, height=800, engine=engine)
+    # if len(params_of_interest) > 1:
+    #     fig.write_image(output_path.replace(".csv", ".pdf"), format="pdf", width=1750, height=3000, engine=engine)
+    # else:
+    #     fig.write_image(output_path.replace(".csv", ".pdf"), format="pdf", width=1750, height=800, engine=engine)
+
+    return fig

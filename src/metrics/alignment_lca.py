@@ -10,15 +10,17 @@ from systems.system import SystemBase
 
 
 class AlignmentLCA(Alignment):
-    def __init__(self, alignment: pd.Dataframe,
+    def __init__(self, alignment: pd.DataFrame,
                  dt_trace: pd.DataFrame,
                  pt_trace: pd.DataFrame,
                  system: SystemBase,
                  selected_params: List[str]):
         super().__init__(alignment, dt_trace, pt_trace, system, selected_params)
-        self._pt_matched_relevant_snapshots = self._get_relevant_snapshots(self._matched_dt_snapshots,
-                                                                           self._matched_pt_snapshots)
-        self._dt_matched_relevant_snapshots = self._get_relevant_snapshots(self._matched_pt_snapshots)
+        self._pt_matched_relevant_snapshots = self._get_relevant_snapshots(
+            self._matched_dt_snapshots,
+            self._matched_pt_snapshots)
+        self._dt_matched_relevant_snapshots = self._get_relevant_snapshots(
+            self._matched_pt_snapshots)
 
     @property
     def percentage_matched_snapshots_lca(self) -> float:
