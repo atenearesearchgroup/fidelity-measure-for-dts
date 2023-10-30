@@ -20,6 +20,7 @@ class ConfigFactory:
             return NeedlemanWunschConfiguration(current_directory, config)
         raise ValueError(f"Invalid input algorithm name {config['alignment_alg']}.")
 
+    @staticmethod
     def _load_configuration(curr_dir: str, input_args):
         """
             Initialize the configuration parameters for the alignment and, if necessary, set
