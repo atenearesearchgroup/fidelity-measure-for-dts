@@ -52,10 +52,10 @@ class Alignment:
     @property
     def frechet(self) -> dict:
         if not (self._matched_dt_snapshots.empty and self._matched_pt_snapshots.empty):
-            frechet_euclidean = FastDiscreteFrechetMatrix(euclidean).distance(self._matched_dt_snapshots.to_numpy(),
-                                                                              self._matched_pt_snapshots.to_numpy())
-            frechet_manhattan = FastDiscreteFrechetMatrix(manhattan).distance(self._matched_dt_snapshots.to_numpy(),
-                                                                              self._matched_pt_snapshots.to_numpy())
+            frechet_euclidean = FastDiscreteFrechetMatrix(euclidean).distance \
+                (self._matched_dt_snapshots.to_numpy(), self._matched_pt_snapshots.to_numpy())
+            frechet_manhattan = FastDiscreteFrechetMatrix(manhattan).distance \
+                (self._matched_dt_snapshots.to_numpy(), self._matched_pt_snapshots.to_numpy())
         else:
             frechet_euclidean = 0
             frechet_manhattan = 0
@@ -128,7 +128,8 @@ class Alignment:
         gap_cont = 0
         gap_lengths = []
         for i in range(len(self._alignment['operation'])):
-            if self._alignment['operation'][i] == 'Insertion' or self._alignment['operation'][i] == 'Deletion':
+            if self._alignment['operation'][i] == 'Insertion' \
+                    or self._alignment['operation'][i] == 'Deletion':
                 gap_cont += 1  # Increase gap counter
             else:
                 if gap_cont > 0:  # Gap ended
