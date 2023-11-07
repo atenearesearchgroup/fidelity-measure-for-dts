@@ -1,0 +1,28 @@
+system: "Lift"
+low_complexity_area: false
+#alignment_alg: 'DTW_Snaps'
+alignment_alg: 'DTW_Lugaresi'
+
+orca_path: 'C:\\Users\\paula\\AppData\\Local\\Programs\\orca\\orca.exe'
+
+paths:
+  input:
+    main: "resources/input/lift/"
+    dt: "digital_twin_high_fid_elevate/"
+    dt_files:
+      - "Bajada_4_3_2_1_0_1_2_3_4-events.csv"
+      #- "Bajada_4_2_0_2_4.csv"
+      #- "Bajada_4_3_2_1_0_1_2_3_4.csv"
+    pt: "physical_twin/"
+    pt_files:
+      - "Bajada_4_3_2_1_0_1_2_3_4_01-events.csv"
+      #- "Bajada_4_2_0_2_4"
+      #- "Bajada_4_3_2_1_0_1_2_3_4"
+  output: "resources/output/lift/variability_tolerance_dtw/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "average_time_between_events"
+  params:
+    - "average_time_between_events"
+

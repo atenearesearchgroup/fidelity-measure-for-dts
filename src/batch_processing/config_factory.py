@@ -4,7 +4,9 @@ import plotly
 import yaml
 
 from batch_processing.alg_config.alignment_config import AlignmentConfiguration
-from batch_processing.alg_config.needleman_wunsch_config import NeedlemanWunschConfiguration
+from batch_processing.alg_config.dtw_lug_config import DynamicTimeWarpingLugaresiConfig
+from batch_processing.alg_config.dtw_snaps_config import DynamicTimeWarpingSnapsConfig
+from batch_processing.alg_config.ndw_config import NeedlemanWunschConfiguration
 
 
 class ConfigFactory:
@@ -19,8 +21,8 @@ class ConfigFactory:
         algorithms = {
             'NDW_Affine': NeedlemanWunschConfiguration,
             'NDW_Tolerance': NeedlemanWunschConfiguration,
-            'DTW_Snaps': AlignmentConfiguration,
-            # 'DTW_Lugaresi': DynamicTimeWarpingLugaresi,
+            'DTW_Snaps': DynamicTimeWarpingSnapsConfig,
+            'DTW_Lugaresi': DynamicTimeWarpingLugaresiConfig,
             # 'LCSS_KPIs': LongestCommonSubsequenceKPI,
             # 'LCSS_Events': LongestCommonSubsequenceEvents
         }

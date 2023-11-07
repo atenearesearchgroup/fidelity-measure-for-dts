@@ -1,0 +1,45 @@
+system: "Lift"
+low_complexity_area: true
+#alignment_alg: 'NDW_Affine'
+alignment_alg: 'NDW_Tolerance'
+
+orca_path: 'C:\\Users\\paula\\AppData\\Local\\Programs\\orca\\orca.exe'
+
+paths:
+  input:
+    main: "resources/input/lift/"
+    dt: "digital_twin_high_fid_elevate/"
+    dt_files:
+      - "Bajada_4_0_4.csv"
+      #- "Bajada_4_2_0_2_4.csv"
+      #- "Bajada_4_3_2_1_0_1_2_3_4.csv"
+    pt: "physical_twin/"
+    pt_files:
+      - "Bajada_4_0_4_01"
+      #- "Bajada_4_2_0_2_4"
+      #- "Bajada_4_3_2_1_0_1_2_3_4"
+  output: "resources/output/lift/variability_tolerance/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "accel(m/s2)"
+  params:
+    - "accel(m/s2)"
+
+ranges:
+  mad:
+    start: 0.10
+    step: 0.02
+    end: 0.22
+  low:
+    start: 200
+    step: 2
+    end: 201
+  init_gap:
+    start: 0.0
+    step: 1.1
+    end: 0.1
+  cont_gap:
+    start: -1.0
+    step: 1.01
+    end: 0.0

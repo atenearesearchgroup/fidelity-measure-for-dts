@@ -1,4 +1,5 @@
-from metrics.dtw.dtw_alignment import DynamicTimeWarpingAlignmentMetrics
+from metrics.dtw.dtw_alignment import DynamicTimeWarpingAlignmentMetrics, \
+    DynamicTimeWarpingSnapsAlignmentMetrics
 from metrics.ndw.ndw_alignment_lca import NeedlemanWunschAlignmentMetricsLCA, \
     NeedlemanWunschAlignmentMetrics
 
@@ -18,11 +19,14 @@ class AnalysisFactory:
         algorithms = {
             'NDW': NeedlemanWunschAlignmentMetrics,
             'NDW_LCA': NeedlemanWunschAlignmentMetricsLCA,
-            'DTW': DynamicTimeWarpingAlignmentMetrics,
+            'DTW_Snaps': DynamicTimeWarpingSnapsAlignmentMetrics,
+            'DTW_Lugaresi': DynamicTimeWarpingAlignmentMetrics
         }
-        algorithm = algorithm[:3]
-        if lca:
-            algorithm += '_LCA'
+
+        if algorithm[:3] == 'NDW':
+            algorithm = algorithm[:3]
+            if lca:
+                algorithm += '_LCA'
 
         if algorithm in algorithms:
             return algorithms[algorithm]
