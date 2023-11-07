@@ -43,3 +43,22 @@ def generate_sublist(label_params: list, include_params: list):
         result.extend(label_params[params[0]:params[1] + 1])
 
     return result
+
+
+def generate_filename(parameter_values):
+    """
+        Generate a filename based on a set of parameter values.
+
+        :param parameter_values: A dictionary containing parameter names as
+        keys and their values.
+
+        :return str: The generated filename.
+    """
+    param_strings = []
+    for key, value in parameter_values.items():
+        if isinstance(value, (int, float)):
+            param_strings.append(f"{key[:3]}_{value:.2f}")
+        else:
+            param_strings.append(f"{key[:3]}_{value}")
+
+    return "-".join(param_strings)
