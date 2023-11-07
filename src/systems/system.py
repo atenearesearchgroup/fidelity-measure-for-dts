@@ -6,7 +6,7 @@ import pandas
 class SystemBase(ABC):
 
     def snap_equals(self, dt_snapshot: dict, pt_snapshot: dict, mad: dict, timestamp_label: str,
-                    low: int = 5, include_timestamp: bool = False) -> float:
+                    low: float, include_timestamp: bool = False) -> float:
         result = 0.0
         for key in dt_snapshot.keys():
             if include_timestamp or key != timestamp_label:
@@ -34,7 +34,23 @@ class SystemBase(ABC):
                     if dt_value[key] == pt_value[key]:
                         result += 1
 
-        return result / (len(dt_snapshot) - 1)
+        return result / (len(dt_snapshot) - (1 if not include_timestamp else 0))
+
+    def distance(self, dt_snapshot: dict, pt_snapshot: dict, timestamp_label: str,
+                 include_timestamp: bool = False) -> float:
+        result = 0.0
+        for key in dt_snapshot.keys():
+            if include_timestamp or key != timestamp_label:
+                dt_value = dt_snapshot[key]
+                pt_value = pt_snapshot[key]
+
+                if isinstance(dt_snapshot[key], (float, int)):
+                    result += abs(dt_value - pt_value)
+                else:
+                    if dt_value[key] == pt_value[key]:
+                        result += 1
+
+        return result / (len(dt_snapshot) - (1 if not include_timestamp else 0))
 
     def is_low_complexity(self, key: str, value):
         return False
