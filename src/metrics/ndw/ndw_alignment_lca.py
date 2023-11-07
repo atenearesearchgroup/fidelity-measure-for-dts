@@ -4,12 +4,12 @@ from typing import List
 
 import pandas as pd
 
-from metrics.alignment import Alignment
+from metrics.ndw.ndw_alignment import NeedlemanWunschAlignmentMetrics
 from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan, euclidean
 from systems.system import SystemBase
 
 
-class AlignmentLCA(Alignment):
+class NeedlemanWunschAlignmentMetricsLCA(NeedlemanWunschAlignmentMetrics):
     def __init__(self, alignment: pd.DataFrame,
                  dt_trace: pd.DataFrame,
                  pt_trace: pd.DataFrame,

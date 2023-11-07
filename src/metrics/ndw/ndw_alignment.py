@@ -4,13 +4,12 @@ import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cityblock, euclidean
 
+from metrics.alignment_base import AlignmentBase
 from packages.discrete_frechet.discrete import FastDiscreteFrechetMatrix, manhattan
 from systems.system import SystemBase
 
 
-class Alignment:
-    PREFIX_DT = 'dt-'
-    PREFIX_PT = 'pt-'
+class NeedlemanWunschAlignmentMetrics(AlignmentBase):
     MATCH_OPERATION = 'Match'
     MISMATCH_OPERATION = 'Mismatch'
 
@@ -18,17 +17,12 @@ class Alignment:
                  dt_trace: pd.DataFrame,
                  pt_trace: pd.DataFrame,
                  system: SystemBase,
-                 selected_params: List[str]):
-        # Traces to align
-        self._dt_trace = dt_trace
-        self._pt_trace = pt_trace
-        # System information
-        self._system = system
-        # Alignment
-        self._alignment = alignment
-        # Relevant columns
-        self._selected_params = selected_params
-        # Matched snapshots
+                 selected_params: List[str],
+                 score: float,
+                 timestamp_label: str):
+        super().__init__(alignment, dt_trace, pt_trace, system, selected_params, score,
+                         timestamp_label)
+
         condition = self._alignment['operation'] == self.MATCH_OPERATION
         self._matched_dt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT)
         self._matched_pt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_PT)
@@ -118,7 +112,7 @@ class Alignment:
         )
         return matched_snapshots.shape[0] / total_snapshots * 100
 
-    def _get_matched_snapshots(self, match_condition: pd.Series, prefix: str) -> pd.DataFrame:
+    def _get_matched_snapshots(self, match_condition: bool, prefix: str) -> pd.DataFrame:
         params = [prefix + p for p in self._selected_params]
         matched_trace = self._alignment.loc[match_condition, params].astype(float)
         matched_trace.columns = matched_trace.columns.str.replace(prefix, '')
