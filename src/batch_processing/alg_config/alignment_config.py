@@ -10,11 +10,6 @@ from batch_processing.analysis_factory import AnalysisFactory
 from systems import Lift, SystemBase
 from util.file_util import generate_filename
 
-PT_TRACE = 'pt_trace'
-DT_TRACE = 'dt_trace'
-SYSTEM = 'system'
-TIMESTAMP_LABEL = 'timestamp_label'
-
 
 class AlignmentConfiguration:
     """
@@ -25,6 +20,9 @@ class AlignmentConfiguration:
         - current_directory (str): Path to the current working directory, to use relative paths
         - args (dict): input command-line arguments
     """
+
+    PT_TRACE = 'pt_trace'
+    DT_TRACE = 'dt_trace'
 
     def __init__(self, current_directory, config):
         self._current_directory = current_directory
@@ -126,8 +124,9 @@ class AlignmentConfiguration:
                     print(f"---{generate_filename(current_config)}"
                           f" : {(time.time() - start_time):.2f} seconds ---")
 
-                    alignment_df.to_csv(alignment_filepath, index=False,
-                                        encoding='utf-8', sep=',')
+                    if not alignment_df.empty:
+                        alignment_df.to_csv(alignment_filepath, index=False,
+                                            encoding='utf-8', sep=',')
 
                     # if args.figures:
                     #     # --- GRAPHIC GENERATION ---
@@ -168,7 +167,8 @@ class AlignmentConfiguration:
         :param pt_file: The filename for fileB.
         :return: The combined unique filename.
         """
-        return f"{os.path.splitext(dt_file)[0] + os.path.splitext(pt_file)[0]}" \
+        return f"{self._alignment_algorithm}-" \
+               f"{os.path.splitext(dt_file)[0] + os.path.splitext(pt_file)[0]}" \
                f"-{self._param_interest.replace('/', '')}"
 
     def _get_hyperparameters_labels(self) -> list:
@@ -179,8 +179,6 @@ class AlignmentConfiguration:
 
     def get_config_params(self, pt_trace, dt_trace, current_config=None):
         return {
-            PT_TRACE: pt_trace,
-            DT_TRACE: dt_trace,
-            SYSTEM: self._system,
-            TIMESTAMP_LABEL: self._timestamp_label
+            self.PT_TRACE: pt_trace,
+            self.DT_TRACE: dt_trace,
         }
