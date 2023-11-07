@@ -76,7 +76,6 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
     def _create_row(self, dt_index, pt_index, keys):
         aux = []
         row = []
-        print(f"{dt_index},{pt_index}")
         for key in keys:
             row.append(self._dt_trace[dt_index][key])
             aux.append(self._pt_trace[pt_index][key])
