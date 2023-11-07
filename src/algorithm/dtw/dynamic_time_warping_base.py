@@ -6,8 +6,8 @@ from algorithm.alignment_algorithm import AlignmentAlgorithm
 
 
 class DynamicTimeWarpingBase(ABC, AlignmentAlgorithm):
-    def __init__(self, dt_trace: list,
-                 pt_trace: list):
+    def __init__(self, dt_trace: dict,
+                 pt_trace: dict):
         self._dt_trace = dt_trace
         self._pt_trace = pt_trace
 

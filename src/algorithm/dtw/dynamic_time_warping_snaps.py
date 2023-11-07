@@ -7,8 +7,11 @@ from util.float_util import min_tolerance
 
 
 class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
-    def __init__(self, dt_trace: list,
-                 pt_trace: list,
+    SYSTEM = 'system'
+    TIMESTAMP_LABEL = 'timestamp_label'
+
+    def __init__(self, dt_trace: dict,
+                 pt_trace: dict,
                  system: SystemBase,
                  timestamp_label: str = 'timestamp(s)'):
         super().__init__(dt_trace, pt_trace)
