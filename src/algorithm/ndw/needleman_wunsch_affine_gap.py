@@ -2,7 +2,7 @@ from abc import ABC
 
 import numpy as np
 
-from algorithm.needleman_wunsch_base import NeedlemanWunschBase
+from algorithm.ndw.needleman_wunsch_base import NeedlemanWunschBase
 from systems.system import SystemBase
 from util.float_util import max_tolerance
 
@@ -105,7 +105,8 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
 
                 equals_value = self._system.snap_equals(self._dt_trace[i],
                                                         self._pt_trace[j],
-                                                        self._mad, self._timestamp_label,
+                                                        self._mad,
+                                                        self._timestamp_label,
                                                         self._low)
 
                 sub = self._table[i - 1, j - 1, 1] + equals_value

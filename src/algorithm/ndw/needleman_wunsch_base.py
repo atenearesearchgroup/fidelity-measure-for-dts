@@ -21,13 +21,15 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
           similarities in the amino acid sequence of two proteins. Journal of Molecular Biology,
           48(3), 443-453.
     """
+
     def __init__(self, dt_trace: list,
                  pt_trace: list,
                  system: SystemBase,
                  timestamp_label: str = "timestamp(s)",
                  init_gap: float = -0.2,
                  cont_gap: float = 0,
-                 mad: dict = None):
+                 mad: float = None,
+                 low: float = None):
         # Traces to align
         self._continue_gap = cont_gap
         self._dt_trace = dt_trace
@@ -40,6 +42,7 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
         self._mad = mad
         # Alignment table to calculate alignment
         self._table = np.zeros((len(dt_trace), len(pt_trace), 2))
+        self._low = low
 
     def build_result(self) -> pd.DataFrame:
         dt_size = len(self._table) - 1
@@ -105,3 +108,7 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
     @property
     def initiate_gap(self):
         return self._init_gap
+
+    @property
+    def score(self):
+        return self._table[-1, -1]
