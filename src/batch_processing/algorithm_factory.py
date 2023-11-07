@@ -1,7 +1,6 @@
-from algorithm import NeedlemanWunschAffineGap, NeedlemanWunschTolerance, AlignmentAlgorithm
-
-NDW_AFFINE = "NDW_Affine"
-NDW_TOLERANCE = "NDW_Tolerance"
+from algorithm import NeedlemanWunschAffineGap, NeedlemanWunschTolerance, AlignmentAlgorithm, \
+    DynamicTimeWarpingLugaresi, DynamicTimeWarpingSnaps, LongestCommonSubsequenceEvents, \
+    LongestCommonSubsequenceKPI
 
 
 class AlignmentAlgorithmFactory:
@@ -9,33 +8,51 @@ class AlignmentAlgorithmFactory:
     Factory class for creating instances of alignment algorithms.
 
     This class provides a method to create instances of alignment algorithms, such as the
-    Needleman-Wunsch algorithm with different variations, based on the specified algorithm name.
+    Needleman-Wunsch algorithm, Dynamic Time Warping and Longest Common Subsequence with different
+    variations, based on the specified algorithm name.
 
-    Methods:
-        get_alignment_algorithm(algorithm, **kwargs) -> AlignmentAlgorithm:
-            Create an instance of the specified alignment algorithm with the given keyword
-            arguments.
+    Some of these variations were presented by Lugaresi et al. in [1]
 
-    Parameters:
-        algorithm (str): The name of the alignment algorithm to create. It should be one of the
-        following:
-            - NDW_Affine: Needleman-Wunsch algorithm with affine gap penalties.
-            - NDW_Tolerance: Needleman-Wunsch algorithm with tolerance-based scoring.
-        **kwargs: Additional keyword arguments to pass to the chosen alignment algorithm's
-        constructor.
-
-    Returns:
-        AlignmentAlgorithm: An instance of the selected alignment algorithm.
-
-    Raises:
-        ValueError: If an invalid input algorithm name is provided.
+    References:
+        [1] Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta: Online validation of
+        digital twins for manufacturing systems. Comput. Ind. 150: 103942 (2023)
     """
 
     @staticmethod
     def get_alignment_algorithm(algorithm, **kwargs) -> AlignmentAlgorithm:
-        if algorithm == NDW_AFFINE:
-            return NeedlemanWunschAffineGap(**kwargs)
-        elif algorithm == NDW_TOLERANCE:
-            return NeedlemanWunschTolerance(**kwargs)
-        else:
-            raise ValueError(f'Invalid input algorithm name {algorithm}.')
+        """
+        Create an instance of the specified alignment algorithm with the given keyword
+        arguments.
+
+        :param algorithm: The name of the alignment algorithm to create. It should be one of the
+            following:
+            - 'NDW_Affine': Needleman-Wunsch algorithm with affine gap penalty.
+            - 'NDW_Tolerance': Needleman-Wunsch algorithm with tolerance-based scoring.
+            - 'DTW_Snaps': Dynamic Time Warping algorithm to align snapshots
+            - 'DTW_Lugaresi': Dynamic Time Warping algorithm to align strings that returns a value
+            between 0 and 1 to measure similarity [1].
+            - 'LCSS_KPIs': Longest Common Subsequence algorithm modified to align numerical values
+            and provide a value between 0 and 1 to measure similarity [1].
+            - 'LCSS_Events': Longest Common Subsequence algorithm modified to align strings that
+            represent sequences of discrete events in a system. It returns a value between 0
+            and 1 to measure similarity [1].
+        :param kwargs: Additional keyword arguments to pass to the chosen alignment algorithm's
+            constructor.
+        :return: AlignmentAlgorithm: An instance of the selected alignment algorithm.
+        :raise: ValueError: If an invalid input algorithm name is provided.
+
+        References:
+            [1] Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta: Online validation of
+            digital twins for manufacturing systems. Comput. Ind. 150: 103942 (2023)
+        """
+        algorithms = {
+            'NDW_Affine': NeedlemanWunschAffineGap,
+            'NDW_Tolerance': NeedlemanWunschTolerance,
+            'DTW_Snaps': DynamicTimeWarpingSnaps,
+            'DTW_Lugaresi': DynamicTimeWarpingLugaresi,
+            'LCSS_KPIs': LongestCommonSubsequenceKPI,
+            'LCSS_Events': LongestCommonSubsequenceEvents
+        }
+        if algorithm in algorithms:
+            return algorithms[algorithm](**kwargs)
+        raise ValueError(f'Invalid input algorithm name {algorithm}.')
