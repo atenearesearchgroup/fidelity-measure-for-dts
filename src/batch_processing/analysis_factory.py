@@ -1,4 +1,6 @@
-from metrics.alignment_lca import AlignmentLCA, Alignment
+from metrics.dtw.dtw_alignment import DynamicTimeWarpingAlignmentMetrics
+from metrics.ndw.ndw_alignment_lca import NeedlemanWunschAlignmentMetricsLCA, \
+    NeedlemanWunschAlignmentMetrics
 
 
 class AnalysisFactory:
@@ -8,11 +10,20 @@ class AnalysisFactory:
     """
 
     @staticmethod
-    def create_instance(lca, **kwargs):
-        return AnalysisFactory.get_class(lca)(**kwargs)
+    def create_instance(algorithm, lca, **kwargs):
+        return AnalysisFactory.get_class(algorithm, lca)(**kwargs)
 
     @staticmethod
-    def get_class(lca):
+    def get_class(algorithm, lca):
+        algorithms = {
+            'NDW': NeedlemanWunschAlignmentMetrics,
+            'NDW_LCA': NeedlemanWunschAlignmentMetricsLCA,
+            'DTW': DynamicTimeWarpingAlignmentMetrics,
+        }
+        algorithm = algorithm[:3]
         if lca:
-            return AlignmentLCA
-        return Alignment
+            algorithm += '_LCA'
+
+        if algorithm in algorithms:
+            return algorithms[algorithm]
+        raise ValueError(f"Invalid input algorithm name {algorithm}.")
