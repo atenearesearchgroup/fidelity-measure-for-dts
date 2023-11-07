@@ -3,7 +3,7 @@ from abc import ABC
 import numpy as np
 
 import util.float_util as fu
-from algorithm.needleman_wunsch_base import NeedlemanWunschBase
+from algorithm.ndw.needleman_wunsch_base import NeedlemanWunschBase
 
 
 class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
@@ -40,21 +40,22 @@ class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
 
         for j in range(1, pt_index):  # + 1
             self._table[0, j, 0] = 1  # Insertion
-            self._table[0, j, 1] = self._table[0, j - 1, 1] + self._init_gap
+            self._table[0, j, 1] = self._table[0, j - 1, 1] + self._continue_gap
 
         for i in range(1, dt_index):  # + 1
             # table[i, 0, 0] = 0  # Deletion
-            self._table[i, 0, 1] = self._table[i - 1, 0, 1] + self._init_gap
+            self._table[i, 0, 1] = self._table[i - 1, 0, 1] + self._continue_gap
 
             for j in range(1, pt_index):
                 equals_value = self._system.snap_equals(self._dt_trace[i],  # [i - 1]
                                                         self._pt_trace[j],  # [j - 1]
                                                         self._mad,
-                                                        self._timestamp_label)
+                                                        self._timestamp_label,
+                                                        self._low)
 
                 sub = self._table[i - 1, j - 1, 1] + equals_value  # Match/Mismatch
-                ins = self._table[i, j - 1, 1] + self._init_gap  # Insertion
-                dele = self._table[i - 1, j, 1] + self._init_gap  # Deletion
+                ins = self._table[i, j - 1, 1] + self._continue_gap  # Insertion
+                dele = self._table[i - 1, j, 1] + self._continue_gap  # Deletion
 
                 max_value, max_index = fu.max_tolerance(sub, ins, dele, equals_value)
 
