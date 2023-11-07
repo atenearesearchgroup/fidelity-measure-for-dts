@@ -3,8 +3,8 @@ import os
 import plotly
 import yaml
 
-from batch_processing.alignment_config import AlignmentConfiguration
-from batch_processing.needleman_wunsch_config import NeedlemanWunschConfiguration
+from batch_processing.alg_config.alignment_config import AlignmentConfiguration
+from batch_processing.alg_config.needleman_wunsch_config import NeedlemanWunschConfiguration
 
 
 class ConfigFactory:
@@ -16,9 +16,18 @@ class ConfigFactory:
     @staticmethod
     def get_batch_configuration(current_directory, args) -> AlignmentConfiguration:
         config = ConfigFactory._load_configuration(current_directory, args)
-        if 'NDW' in config['alignment_alg']:
-            return NeedlemanWunschConfiguration(current_directory, config)
-        raise ValueError(f"Invalid input algorithm name {config['alignment_alg']}.")
+        algorithms = {
+            'NDW_Affine': NeedlemanWunschConfiguration,
+            'NDW_Tolerance': NeedlemanWunschConfiguration,
+            'DTW_Snaps': AlignmentConfiguration,
+            # 'DTW_Lugaresi': DynamicTimeWarpingLugaresi,
+            # 'LCSS_KPIs': LongestCommonSubsequenceKPI,
+            # 'LCSS_Events': LongestCommonSubsequenceEvents
+        }
+        algorithm = config['alignment_alg']
+        if algorithm in algorithms:
+            return algorithms[algorithm](current_directory, config)
+        raise ValueError(f"Invalid input algorithm name {algorithm}.")
 
     @staticmethod
     def _load_configuration(curr_dir: str, input_args):
