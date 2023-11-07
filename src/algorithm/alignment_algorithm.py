@@ -1,9 +1,9 @@
-import abc
+from abc import abstractmethod, ABCMeta
 
 import pandas as pd
 
 
-class AlignmentAlgorithm(metaclass=abc.ABCMeta):
+class AlignmentAlgorithm(metaclass=ABCMeta):
     """
     Abstract base class for alignment algorithms.
 
@@ -22,10 +22,18 @@ class AlignmentAlgorithm(metaclass=abc.ABCMeta):
                 callable(subclass.calculate_alignment) or
                 NotImplemented)
 
-    @abc.abstractmethod
+    @abstractmethod
     def calculate_alignment(self) -> pd.DataFrame:
         """
         Calculate the alignment between two sequences or data sets and return the alignment result
         :return: a DataFrame that includes the alignment
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def score(self) -> float:
+        """
+        Returns the score resulting from the alignment.
+        :return: A float value that contains the score
         """
         raise NotImplementedError
