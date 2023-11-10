@@ -1,5 +1,6 @@
 from metrics.dtw.dtw_alignment import DynamicTimeWarpingAlignmentMetrics, \
     DynamicTimeWarpingSnapsAlignmentMetrics
+from metrics.lcss.lcss_alignment import LCSSAlignmentMetrics
 from metrics.ndw.ndw_alignment_lca import NeedlemanWunschAlignmentMetricsLCA, \
     NeedlemanWunschAlignmentMetrics
 
@@ -20,7 +21,9 @@ class AnalysisFactory:
             'NDW': NeedlemanWunschAlignmentMetrics,
             'NDW_LCA': NeedlemanWunschAlignmentMetricsLCA,
             'DTW_Snaps': DynamicTimeWarpingSnapsAlignmentMetrics,
-            'DTW_Lugaresi': DynamicTimeWarpingAlignmentMetrics
+            'DTW_Lugaresi': DynamicTimeWarpingAlignmentMetrics,
+            'LCSS_Events': LCSSAlignmentMetrics,
+            'LCSS_KPIs': LCSSAlignmentMetrics,
         }
 
         if algorithm[:3] == 'NDW':
