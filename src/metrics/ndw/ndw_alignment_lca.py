@@ -14,8 +14,11 @@ class NeedlemanWunschAlignmentMetricsLCA(NeedlemanWunschAlignmentMetrics):
                  dt_trace: pd.DataFrame,
                  pt_trace: pd.DataFrame,
                  system: SystemBase,
-                 selected_params: List[str]):
-        super().__init__(alignment, dt_trace, pt_trace, system, selected_params)
+                 selected_params: List[str],
+                 score: float,
+                 timestamp_label: str):
+        super().__init__(alignment, dt_trace, pt_trace, system, selected_params, score,
+                         timestamp_label)
         self._pt_matched_relevant_snapshots = self._get_relevant_snapshots(
             self._matched_dt_snapshots,
             self._matched_pt_snapshots)
