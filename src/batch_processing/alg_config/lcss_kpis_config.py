@@ -7,8 +7,8 @@ class LongestCommonSubsequenceKPIsConfig(AlignmentConfiguration):
     EPSILON = 'epsilon'
     PARAM_INTEREST = 'param_interest'
 
-    def __init__(self, current_directory, config):
-        super().__init__(current_directory, config)
+    def __init__(self, current_directory, args, config):
+        super().__init__(current_directory, args, config)
 
         ranges = self._config['ranges']
 
