@@ -30,7 +30,7 @@ class ConfigFactory:
         }
         algorithm = config['alignment_alg']
         if algorithm in algorithms:
-            return algorithms[algorithm](current_directory, config)
+            return algorithms[algorithm](current_directory, args, config)
         raise ValueError(f"Invalid input algorithm name {algorithm}.")
 
     @staticmethod
