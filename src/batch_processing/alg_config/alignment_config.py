@@ -7,6 +7,7 @@ import pandas as pd
 import util.file_util as fu
 from batch_processing.algorithm_factory import AlignmentAlgorithmFactory
 from batch_processing.analysis_factory import AnalysisFactory
+from result_analysis.alignment_graphic.graphic_factory import GraphicFactory
 from systems import Lift, SystemBase
 from util.file_util import generate_filename
 
@@ -24,8 +25,10 @@ class AlignmentConfiguration:
     PT_TRACE = 'pt_trace'
     DT_TRACE = 'dt_trace'
 
-    def __init__(self, current_directory, config):
+    def __init__(self, current_directory, args, config):
         self._current_directory = current_directory
+        self._figures = args.figures
+        self._engine = args.engine
         self._config = config
         self._set_file_paths()
         self._initialize_analysis_labels()
@@ -100,6 +103,13 @@ class AlignmentConfiguration:
                 pt_trace = pd.read_csv(self._pt_path + pt_file) \
                     .filter(items=[self._timestamp_label, *self._params])
 
+                # Filter any null row for the parameters of interest
+                dt_trace = dt_trace[~dt_trace.apply(lambda row: row.astype(str).str.contains('-'))
+                .any(axis=1)]
+
+                pt_trace = pt_trace[~pt_trace.apply(lambda row: row.astype(str).str.contains('-'))
+                .any(axis=1)]
+
                 statistical_results_df = pd.DataFrame()
                 for current_config in self._get_hyperparameters_combinations():
                     current_config = dict(zip(self._get_hyperparameters_labels(), current_config))
@@ -109,7 +119,8 @@ class AlignmentConfiguration:
                              f"{scenario}-{generate_filename(current_config)}.csv")
 
                     # TODO: Decorator to measure time for all algorithms in calculate alignment
-                    start_time = time.time()
+                    start_ex_time = time.time()
+                    start_proc_time = time.process_time()
 
                     alg = AlignmentAlgorithmFactory. \
                         get_alignment_algorithm(self._alignment_algorithm,
@@ -120,22 +131,42 @@ class AlignmentConfiguration:
 
                     alignment_df = alg.calculate_alignment()
 
+                    process_time = time.process_time() - start_proc_time
+                    ex_time = time.time() - start_ex_time
+
                     print(f"--- SCENARIO: {scenario} ---")
                     print(f"---{generate_filename(current_config)}"
-                          f" : {(time.time() - start_time):.2f} seconds ---")
+                          f" : {process_time :.2f} seconds ---")
 
                     if not alignment_df.empty:
                         alignment_df.to_csv(alignment_filepath, index=False,
                                             encoding='utf-8', sep=',')
 
-                    # if args.figures:
-                    #     # --- GRAPHIC GENERATION ---
-                    #     generate_alignment_graphic()
+                        if self._figures:
+                            # --- GRAPHIC GENERATION ---
+                            fig = GraphicFactory.get_graphic(self._alignment_algorithm,
+                                                             alignment_df,
+                                                             dt_trace,
+                                                             pt_trace,
+                                                             **{'params_of_interest': self._params,
+                                                                'timestamp_label':
+                                                                    self._timestamp_label})
+                            height = 800
+                            if len(self._params) > 1:
+                                height = 3000
+                            fig.write_image(alignment_filepath.replace(".csv", ".pdf"),
+                                            format="pdf", width=2500, height=height,
+                                            engine=self._engine)
+                            # fig.show()
 
-                    alignment_metrics = self._get_alignment_metrics(alignment_df, dt_trace,
-                                                                    pt_trace,
-                                                                    current_config,
-                                                                    alg.score)
+                    alignment_metrics = {**self._get_alignment_metrics(alignment_df, dt_trace,
+                                                                       pt_trace,
+                                                                       current_config,
+                                                                       alg.score),
+                                         'execution_time': ex_time,
+                                         'process_time': process_time,
+                                         'trace_length': max(len(dt_trace), len(pt_trace))}
+
                     statistical_results_df = pd.concat(
                         [statistical_results_df,
                          pd.DataFrame.from_records([alignment_metrics])],
@@ -168,6 +199,7 @@ class AlignmentConfiguration:
         :return: The combined unique filename.
         """
         return f"{self._alignment_algorithm}-" \
+               f"{'LCA_' if self._lca else ''}" \
                f"{os.path.splitext(dt_file)[0] + os.path.splitext(pt_file)[0]}" \
                f"-{self._param_interest.replace('/', '')}"
 
