@@ -37,7 +37,7 @@ class LongestCommonSubsequenceBase(ABC, AlignmentAlgorithm):
 
     @property
     def score(self) -> float:
-        return self._table[-1][-1]
+        return self._table[-1][-1] if self._table.size > 0 else 0
 
     @abstractmethod
     def equals_condition(self, dt_snap, pt_snap) -> bool:
