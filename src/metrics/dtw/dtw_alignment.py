@@ -8,7 +8,10 @@ class DynamicTimeWarpingAlignmentMetrics(AlignmentBase):
 
     @property
     def normalized_score(self) -> float:
-        return 1 - self._score / max(len(self._dt_trace), len(self._pt_trace))
+        max_len = max(len(self._dt_trace), len(self._pt_trace))
+        if max_len > 0:
+            return 1 - self._score / max(len(self._dt_trace), len(self._pt_trace))
+        return 1
 
 
 class DynamicTimeWarpingSnapsAlignmentMetrics(AlignmentBase):

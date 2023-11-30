@@ -8,4 +8,7 @@ class LCSSAlignmentMetrics(AlignmentBase):
 
     @property
     def normalized_score(self) -> float:
-        return self._score / min(len(self._dt_trace), len(self._pt_trace))
+        min_len = min(len(self._dt_trace), len(self._pt_trace))
+        if min_len > 0:
+            return self._score / min_len
+        return 1
