@@ -172,8 +172,12 @@ class AlignmentConfiguration:
                          pd.DataFrame.from_records([alignment_metrics])],
                         ignore_index=True)
 
-                statistical_results_df.to_csv(os.path.join(self._output_results_directory,
-                                                           global_results_filename), index=False)
+                output_path = os.path.join(self._output_results_directory,
+                                           global_results_filename)
+
+                statistical_results_df.to_csv(output_path, mode='a',
+                                              header=not os.path.exists(output_path),
+                                              index=False)
 
     def _get_hyperparameters_combinations(self):
         return list(itertools.product(*self._get_hyperparameters_ranges()))
