@@ -28,6 +28,12 @@ class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):
         for i in range(1, self._n_dt_trace):
             for j in range(1, self._m_pt_trace):
                 distance = abs(self._dt_trace[i - 1] - self._pt_trace[j - 1])
+                # np.min is slower than min for small arrays because:
+                # - constructs a ndarray from the list
+                # - determines that the correct call is minimum.reduce to do the operation
+                # - call minimum.reduce (which itself is still much slower than the
+                # straight python call)
+                # Taken from: https://github.com/numpy/numpy/issues/12350
                 last_min = np.min(
                     [self._table[i - 1, j], self._table[i, j - 1], self._table[i - 1, j - 1]])
                 self._table[i, j] = distance + last_min
