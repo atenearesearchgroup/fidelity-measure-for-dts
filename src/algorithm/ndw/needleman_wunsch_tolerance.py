@@ -29,26 +29,22 @@ class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
         mismatch : 2
         match : 3
         """
-        if self._mad is None:
-            self._mad = self._dt_trace[0]
-
-        dt_index = len(self._dt_trace)  # - 1
-        pt_index = len(self._pt_trace)  # - 1
+        dt_index, pt_index, _ = self._table.shape
 
         # table[0, 0, 0] = 0  # Initialization first cell
         # table[0, 0, 1] = 0
 
-        for j in range(1, pt_index):  # + 1
+        for j in range(0, pt_index):  # + 1
             self._table[0, j, 0] = 1  # Insertion
             self._table[0, j, 1] = self._table[0, j - 1, 1] + self._continue_gap
 
-        for i in range(1, dt_index):  # + 1
+        for i in range(0, dt_index):  # + 1
             # table[i, 0, 0] = 0  # Deletion
             self._table[i, 0, 1] = self._table[i - 1, 0, 1] + self._continue_gap
 
             for j in range(1, pt_index):
-                equals_value = self._system.snap_equals(self._dt_trace[i],  # [i - 1]
-                                                        self._pt_trace[j],  # [j - 1]
+                equals_value = self._system.snap_equals(self._dt_trace[i - 1],
+                                                        self._pt_trace[j - 1],
                                                         self._mad,
                                                         self._timestamp_label,
                                                         self._low)

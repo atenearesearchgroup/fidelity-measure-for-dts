@@ -28,7 +28,7 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
                  timestamp_label: str = "timestamp(s)",
                  init_gap: float = -0.2,
                  cont_gap: float = 0,
-                 mad: float = None,
+                 mad: dict = None,
                  low: float = None):
         # Traces to align
         self._continue_gap = cont_gap
@@ -41,7 +41,7 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
         self._init_gap = init_gap
         self._mad = mad
         # Alignment table to calculate alignment
-        self._table = np.zeros((len(dt_trace), len(pt_trace), 2))
+        self._table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1, 2))
         self._low = low
 
     def build_result(self) -> pd.DataFrame:
@@ -74,8 +74,8 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
                 if self._table[dt_size, pt_size, 0] > 1:  # Match or mismatch
                     aux = []
                     for key in keys:
-                        row.append(self._dt_trace[dt_size][key])  # - 1
-                        aux.append(self._pt_trace[pt_size][key])  # - 1
+                        row.append(self._dt_trace[dt_size - 1][key])
+                        aux.append(self._pt_trace[pt_size - 1][key])
                     row.extend(aux)
                     if self._table[dt_size, pt_size, 0] > 2:
                         row.append("Match")

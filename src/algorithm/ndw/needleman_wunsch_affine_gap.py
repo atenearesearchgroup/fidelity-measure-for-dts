@@ -41,8 +41,9 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         self._low = low
 
         # Dynamic programming tables
-        self._insert_table = np.zeros((len(dt_trace), len(pt_trace), 1))
-        self._deletion_table = np.zeros((len(dt_trace), len(pt_trace), 1))
+        # +1 to consider the alignment with the empty string
+        self._insert_table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1, 1))
+        self._deletion_table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1, 1))
 
     def _init_deletion(self, i, j):
         if i > 0 and j == 0:
@@ -78,15 +79,10 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         mismatch : 2
         match : 3
         """
-        if self._mad is None:
-            self._mad = self._dt_trace[0]
-
-        dt_index = len(self._dt_trace)  # - 1
-        pt_index = len(self._pt_trace)  # - 1
+        dt_index, pt_index, _ = self._table.shape
 
         for j in range(0, pt_index):
             for i in range(0, dt_index):
-                self._init_deletion(i, j)
                 self._init_match(i, j)
 
         self._deletion_table = np.array(
@@ -103,8 +99,8 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
                     max((self._init_gap + self._continue_gap + self._table[i][j - 1][1]),
                         (self._continue_gap + self._insert_table[i][j - 1]))
 
-                equals_value = self._system.snap_equals(self._dt_trace[i],
-                                                        self._pt_trace[j],
+                equals_value = self._system.snap_equals(self._dt_trace[i - 1],
+                                                        self._pt_trace[j - 1],
                                                         self._mad,
                                                         self._timestamp_label,
                                                         self._low)
