@@ -19,8 +19,8 @@ class SystemBase(ABC):
                 if isinstance(dt_snapshot[key], (float, int)):
                     difference = abs(dt_value - pt_value)
 
-                    if difference < mad:
-                        match_reward = (1 - difference / mad)
+                    if difference < mad[key]:
+                        match_reward = (1 - difference / mad[key])
                         if dt_low and pt_low:  # Both low complexity region
                             result += match_reward / (low * 2)
                         elif dt_low or pt_low:  # At least one low complexity region
@@ -31,8 +31,11 @@ class SystemBase(ABC):
                         result = 0
                         break
                 else:
-                    if dt_value[key] == pt_value[key]:
+                    if dt_value == pt_value:
                         result += 1
+                    else:
+                        result = 0
+                        break
 
         return result / (len(dt_snapshot) - (1 if not include_timestamp else 0))
 
