@@ -9,6 +9,7 @@ from batch_processing.algorithm_factory import AlignmentAlgorithmFactory
 from batch_processing.analysis_factory import AnalysisFactory
 from result_analysis.alignment_graphic.graphic_factory import GraphicFactory
 from systems import Lift, SystemBase
+from util.dic_util import nested_set
 from util.file_util import generate_filename
 
 
@@ -103,16 +104,11 @@ class AlignmentConfiguration:
                 pt_trace = pd.read_csv(self._pt_path + pt_file) \
                     .filter(items=[self._timestamp_label, *self._params])
 
-                # Filter any null row for the parameters of interest
-                dt_trace = dt_trace[~dt_trace.apply(lambda row: row.astype(str).str.contains('-'))
-                .any(axis=1)]
-
-                pt_trace = pt_trace[~pt_trace.apply(lambda row: row.astype(str).str.contains('-'))
-                .any(axis=1)]
-
                 statistical_results_df = pd.DataFrame()
-                for current_config in self._get_hyperparameters_combinations():
-                    current_config = dict(zip(self._get_hyperparameters_labels(), current_config))
+                for init_config in self._get_hyperparameters_combinations():
+                    current_config = {}
+                    for index, label in enumerate(self._get_hyperparameters_labels()):
+                        nested_set(current_config, label.split('-'), init_config[index])
 
                     alignment_filepath = os.path. \
                         join(self._output_directory,
