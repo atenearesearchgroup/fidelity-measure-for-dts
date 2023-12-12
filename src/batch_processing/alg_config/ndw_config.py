@@ -18,11 +18,15 @@ class NeedlemanWunschConfiguration(AlignmentConfiguration):
         ranges = self._config['ranges']
 
         # Calculate Maximum Acceptable Distance (MAD)
-        self._mad = np.arange(
-            ranges['mad']['start'],
-            ranges['mad']['end'],
-            ranges['mad']['step']
-        )
+        self._mad = {}
+        mad = ranges['mad']
+        for p in self._params:
+            if p in mad:
+                self._mad[p] = np.arange(
+                    mad[p]['start'],
+                    mad[p]['end'],
+                    mad[p]['step']
+                )
 
         # Calculate Weight for Low complexity areas
         self._low = np.arange(
@@ -45,10 +49,11 @@ class NeedlemanWunschConfiguration(AlignmentConfiguration):
         )
 
     def _get_hyperparameters_labels(self) -> list:
-        return [self.INIT_GAP, self.CONT_GAP, self.LOW, self.MAD]
+        return [self.INIT_GAP, self.CONT_GAP, self.LOW,
+                *[f"{self.MAD}-{p}" for p in self._mad.keys()]]
 
     def _get_hyperparameters_ranges(self) -> list:
-        return [self._init_gap, self._cont_gap, self._low, self._mad]
+        return [self._init_gap, self._cont_gap, self._low, *self._mad.values()]
 
     def get_config_params(self, pt_trace, dt_trace, current_config=None):
         return {
