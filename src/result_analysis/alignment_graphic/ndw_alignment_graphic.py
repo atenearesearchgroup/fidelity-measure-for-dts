@@ -19,9 +19,12 @@ class NeedlemanWunschAlignmentGraphics(AlignmentGraphics):
         # Plot alignment with matching points
         for i in range(len(self._alignment["operation"])):
             if self._alignment["operation"][i] == "Match":
-                y_var = [float(self._alignment[pt_param_interest][i]),
-                         float(self._alignment[dt_param_interest][i])]
-                if visualization_indent > 0:
+                y_var = [self._alignment[pt_param_interest][i],
+                         self._alignment[dt_param_interest][i]]
+
+                if visualization_indent > 0 and not isinstance(y_var[0], str) and \
+                        (isinstance(y_var[0], (float, int)) or y_var[0].dtype in ['int32', 'int64',
+                                                                                  'float64']):
                     y_var[0] -= visualization_indent
 
                 fig.add_scatter(

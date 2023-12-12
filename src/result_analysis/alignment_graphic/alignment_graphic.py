@@ -17,14 +17,14 @@ class AlignmentGraphics:
                  pt_trace: pd.DataFrame,
                  params_of_interest: list,
                  timestamp_label: str):
-        self._alignment = alignment
-        self._dt_trace = dt_trace
-        self._pt_trace = pt_trace
         self._params_of_interest = params_of_interest
         self._timestamp_label = timestamp_label
 
-        self._visualization_indent = 1
-        # 3 if self._params_of_interest[0] == 'temperature(degrees)' else 0
+        self._alignment = clean_df(alignment)
+        self._dt_trace = clean_df(dt_trace)
+        self._pt_trace = clean_df(pt_trace)
+
+        self._visualization_indent = 5
 
     def generate_alignment_graphic(self):
 
@@ -52,7 +52,7 @@ class AlignmentGraphics:
             fig['layout'][f'yaxis{index}']['title'] = param_interest
 
             self.insert_alignment_links(fig, index, param_interest,
-                                        plot_color='rgba(126, 255, 84, 0.7)',
+                                        plot_color='rgba(80, 80, 124, 0.3)',
                                         visualization_indent=self._visualization_indent)
 
         fig['layout'][f'xaxis{len(self._params_of_interest)}']['title'] = self._timestamp_label
@@ -86,9 +86,10 @@ class AlignmentGraphics:
                      show_legend: bool = False,
                      visualization_indent: int = 0):
 
-        selected_pt = clean_df(trace, [self._timestamp_label, param_interest])
+        # selected_pt = clean_df(trace, [self._timestamp_label, param_interest])
+        selected_pt = trace.loc[:, [self._timestamp_label, param_interest]]
 
-        if visualization_indent > 0:
+        if visualization_indent > 0 and selected_pt[param_interest].dtype in ['float64', 'int64']:
             selected_pt[param_interest] = selected_pt[param_interest].apply(
                 lambda x: x - visualization_indent)
 
