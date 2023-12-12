@@ -57,8 +57,10 @@ def generate_filename(parameter_values):
     param_strings = []
     for key, value in parameter_values.items():
         if isinstance(value, (int, float)):
-            param_strings.append(f"{key[:3]}_{value:.2f}")
+            param_strings.append(f"{key[:2]}_{value:.2f}")
+        elif isinstance(value, dict):
+            param_strings.append(f"{key[:3]}_{list(value.values())[0]}")
         else:
-            param_strings.append(f"{key[:3]}_{value}")
+            param_strings.append(f"{key[:2]}_{value}")
 
     return "-".join(param_strings)
