@@ -114,7 +114,16 @@ class NeedlemanWunschAlignmentMetrics(AlignmentBase):
 
     def _get_matched_snapshots(self, match_condition: bool, prefix: str) -> pd.DataFrame:
         params = [prefix + p for p in self._selected_params]
-        matched_trace = self._alignment.loc[match_condition, params].astype(float)
+
+        numeric_columns = []
+        for p in params:
+            if self._alignment[p].apply(lambda x: isinstance(x, (float, int)) and
+                                                  not isinstance(x, bool)).any():
+                numeric_columns.append(p)
+
+        # Filter the DataFrame to select only numeric columns
+        # matched_trace = self._alignment[numeric_columns]
+        matched_trace = self._alignment.loc[match_condition, numeric_columns]
         matched_trace.columns = matched_trace.columns.str.replace(prefix, '')
         return matched_trace
 
