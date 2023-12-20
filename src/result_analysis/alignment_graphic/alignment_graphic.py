@@ -1,6 +1,6 @@
 import pandas as pd
 import plotly.graph_objects as go
-import seaborn as sns
+from _plotly_utils.colors import sample_colorscale
 from plotly.graph_objs import Figure
 from plotly.subplots import make_subplots
 
@@ -24,9 +24,10 @@ class AlignmentGraphics:
         self._dt_trace = clean_df(dt_trace)
         self._pt_trace = clean_df(pt_trace)
 
-        self._visualization_indent = 5
+        self._visualization_indent = 30
 
     def generate_alignment_graphic(self):
+        colors = sample_colorscale('Sunset', [0.20, 0.70])
 
         # Set a custom figure size
         fig = make_subplots(rows=len(self._params_of_interest),
@@ -36,38 +37,41 @@ class AlignmentGraphics:
 
         for index, param_interest in enumerate(self._params_of_interest, start=1):
             # Style for the line plot
-            sns.set_theme(style="darkgrid")
-            sns.set(font_scale=3)
-
-            # Plot line plot using dataframe columns
-            # ------------ Physical Twin trajectory
-            self.insert_trace(self._pt_trace, index, param_interest,
-                              fig, 'Physical Twin', '#3498DB', index == 1,
-                              self._visualization_indent)
-
-            # ------------- Digital Twin trajectory
-            self.insert_trace(self._dt_trace, index, param_interest,
-                              fig, 'Digital Twin', '#E74C3C', index == 1)
-
-            fig['layout'][f'yaxis{index}']['title'] = param_interest
 
             self.insert_alignment_links(fig, index, param_interest,
                                         plot_color='rgba(80, 80, 124, 0.3)',
                                         visualization_indent=self._visualization_indent)
 
+            # Plot line plot using dataframe columns
+            # ------------ Physical Twin trajectory
+            self.insert_trace(self._pt_trace, index, param_interest,
+                              fig, 'Physical Twin', colors[0], index == 1,
+                              self._visualization_indent,
+                              marker_symbol='circle')
+
+            # ------------- Digital Twin trajectory
+            self.insert_trace(self._dt_trace, index, param_interest,
+                              fig, 'Digital Twin', colors[1], index == 1,
+                              marker_symbol='star-square')
+
+            fig['layout'][f'yaxis{index}']['title'] = f'{param_interest} (mm)'
+
         fig['layout'][f'xaxis{len(self._params_of_interest)}']['title'] = self._timestamp_label
 
         # Distance between titles and axes to 0
-        fig.update_yaxes(ticksuffix=" ", title_standoff=0)
-        fig.update_xaxes(ticksuffix=" ", title_standoff=0)
+        fig.update_yaxes(showline=True, linewidth=1, linecolor='gray', ticksuffix=" ",
+                         title_standoff=2)
+        fig.update_xaxes(showline=True, linewidth=1, linecolor='gray', ticksuffix=" ",
+                         title_standoff=2)
 
         fig.update_layout(
             # xaxis_range=[0, 64],  # x axis range
+            template='plotly_white',
             font=dict(
                 size=self.FONT_SIZE),  # Figure font
             legend=dict(  # Legend position
                 yanchor="top",
-                y=0.99,
+                y=1.00,
                 xanchor="left",
                 x=0.01,
                 bordercolor='white',  # Set the border color
@@ -84,7 +88,8 @@ class AlignmentGraphics:
                      plot_label: str = '',
                      plot_color: str = '#000000',  # Black
                      show_legend: bool = False,
-                     visualization_indent: int = 0):
+                     visualization_indent: float = 0,
+                     marker_symbol: str = 'circle'):
 
         # selected_pt = clean_df(trace, [self._timestamp_label, param_interest])
         selected_pt = trace.loc[:, [self._timestamp_label, param_interest]]
@@ -98,12 +103,13 @@ class AlignmentGraphics:
                                  mode='lines+markers',
                                  name=plot_label,
                                  marker={
-                                     "size": 5,
-                                     "line_width": 1,
-                                     "color": plot_color
+                                     # "size": 10,
+                                     "line_width": 0.5,
+                                     "color": plot_color,
+                                     "symbol": marker_symbol
                                  },
                                  line={
-                                     "width": 3,
+                                     "width": 5,
                                      "color": plot_color
                                  },
                                  showlegend=show_legend),
@@ -113,7 +119,7 @@ class AlignmentGraphics:
                                row_index: int,
                                param_interest: int,
                                plot_color: str = '#000000',  # Black
-                               visualization_indent: int = 0):
+                               visualization_indent: float = 0):
         """
         Fill this function in any subclass if you wish to add the alignment links between the
         traces.

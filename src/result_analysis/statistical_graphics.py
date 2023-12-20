@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from _plotly_utils.colors import sample_colorscale
 from plotly.graph_objs import Figure
 from plotly.subplots import make_subplots
 
@@ -42,6 +43,7 @@ def generate_parallel_behavior_graphic(x_axis_var: str,
     :param y_axis_var: variable to set in y_axis
     :return:
     """
+    colors = sample_colorscale('Sunset', [0.70, 0.20])
     fig = make_subplots(rows=len(traces_labels),
                         cols=1,
                         shared_xaxes=True,
@@ -54,10 +56,11 @@ def generate_parallel_behavior_graphic(x_axis_var: str,
                                  name=label,
                                  marker=dict(
                                      size=6,
-                                     line_width=0
+                                     color=colors[index]
                                  ),
                                  line=dict(
-                                     width=2
+                                     width=2,
+                                     color=colors[index]
                                  )),
                       row=(index + 1), col=1)
         fig['layout'][f'yaxis{index + 1}']['title'] = y_axis_title
@@ -65,12 +68,15 @@ def generate_parallel_behavior_graphic(x_axis_var: str,
     fig['layout'][f'xaxis{len(traces_labels)}']['title'] = x_axis_title
 
     # Distance between titles and axes to 0
-    fig.update_yaxes(ticksuffix=" ", title_standoff=0)
-    fig.update_xaxes(ticksuffix=" ", title_standoff=0)
+    fig.update_yaxes(showline=True, linewidth=1, linecolor='gray', tickprefix=" ", ticksuffix=" ",
+                     title_standoff=4)
+    fig.update_xaxes(showline=True, linewidth=1, linecolor='gray', tickprefix=" ", ticksuffix=" ",
+                     title_standoff=4)
 
     fig.update_layout(
+        template='plotly_white',
         font=dict(
-            # size=FONT_SIZE
+            size=FONT_SIZE
         ),  # Figure font
         legend=dict(  # Legend position
             yanchor="top",
@@ -81,7 +87,6 @@ def generate_parallel_behavior_graphic(x_axis_var: str,
         margin=dict(t=0, l=0, r=0, b=0)
     )
 
-    fig.update_layout(template='plotly')
     return fig
 
 
@@ -113,6 +118,9 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str,
     :param trace_b_path:
     :return:
     """
+    colors = sample_colorscale('Sunset', [0.24, 0.90])
+    markers = ['circle', 'star-square']
+
     # Get dataframe from csv file
     trace_a_alignment = pd.read_csv(trace_a_path, index_col=False)
     trace_b_alignment = pd.read_csv(trace_b_path, index_col=False)
@@ -139,22 +147,28 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str,
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.05)
     fig.update_layout(template='plotly')
 
-    fig.add_trace(go.Scatter(x=trace_a_alignment[x_axis_var], y=trace_a_alignment[matched_snapshots],
-                             mode='lines+markers',
-                             name=trace_a_label,
-                             line=dict(color='#FF7F0E'),
-                             marker=dict(color='#FF7F0E')
-                             ),
-                  row=1, col=1)
+    fig.add_trace(
+        go.Scatter(x=trace_a_alignment[x_axis_var], y=trace_a_alignment[matched_snapshots],
+                   mode='lines+markers',
+                   name=trace_a_label,
+                   line=dict(color=colors[0]),
+                   marker=dict(color=colors[0],
+                               symbol=markers[0],
+                               size=10)
+                   ),
+        row=1, col=1)
 
-    fig.add_trace(go.Scatter(x=trace_b_alignment[x_axis_var], y=trace_b_alignment[matched_snapshots],
-                             mode='lines+markers',
-                             name=trace_b_label,
-                             line=dict(color='#636EFA'),
-                             marker=dict(color='#636EFA'),
-                             fill='tonexty'
-                             ),
-                  row=1, col=1)
+    fig.add_trace(
+        go.Scatter(x=trace_b_alignment[x_axis_var], y=trace_b_alignment[matched_snapshots],
+                   mode='lines+markers',
+                   name=trace_b_label,
+                   line=dict(color=colors[1]),
+                   marker=dict(color=colors[1],
+                               symbol=markers[1],
+                               size=10),
+                   fill='tonexty'
+                   ),
+        row=1, col=1)
 
     fig['layout']['yaxis']['title'] = MATCHED_SNAPSHOTS_AXIS
     if range_ms is not None:
@@ -162,16 +176,20 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str,
 
     fig.add_trace(go.Scatter(x=trace_a_alignment[x_axis_var], y=trace_a_alignment[frechet],
                              mode='lines+markers',
-                             line=dict(color='#FF7F0E'),
-                             marker=dict(color='#FF7F0E'),
+                             line=dict(color=colors[0]),
+                             marker=dict(color=colors[0],
+                                         symbol=markers[0],
+                                         size=10),
                              showlegend=False
                              ),
                   row=2, col=1)
 
     fig.add_trace(go.Scatter(x=trace_b_alignment[x_axis_var], y=trace_b_alignment[frechet],
                              mode='lines+markers',
-                             line=dict(color='#636EFA'),
-                             marker=dict(color='#636EFA'),
+                             line=dict(color=colors[1]),
+                             marker=dict(color=colors[1],
+                                         symbol=markers[1],
+                                         size=10),
                              fill='tonexty',
                              showlegend=False
                              ),
@@ -183,16 +201,20 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str,
 
     fig.add_trace(go.Scatter(x=trace_a_alignment[x_axis_var], y=trace_a_alignment[p2p_euclidean],
                              mode='lines+markers',
-                             line=dict(color='#FF7F0E'),
-                             marker=dict(color='#FF7F0E'),
+                             line=dict(color=colors[0]),
+                             marker=dict(color=colors[0],
+                                         symbol=markers[0],
+                                         size=10),
                              showlegend=False
                              ),
                   row=3, col=1)
 
     fig.add_trace(go.Scatter(x=trace_b_alignment[x_axis_var], y=trace_b_alignment[p2p_euclidean],
                              mode='lines+markers',
-                             line=dict(color='#636EFA'),
-                             marker=dict(color='#636EFA'),
+                             line=dict(color=colors[1]),
+                             marker=dict(color=colors[1],
+                                         symbol=markers[1],
+                                         size=10),
                              fill='tonexty',
                              showlegend=False
                              ),
@@ -204,18 +226,21 @@ def generate_statistical_info_stairs_comparison(x_axis_var: str,
 
     fig['layout']['xaxis3']['title'] = f'{MAD_AXIS} {units}'
 
-    fig.update_yaxes(tickprefix="  ", ticksuffix=" ", title_standoff=0)
-    fig.update_xaxes(ticksuffix=" ", title_standoff=10)
+    fig.update_yaxes(showline=True, linewidth=1, linecolor='gray', tickprefix=" ", ticksuffix=" ",
+                     title_standoff=4)
+    fig.update_xaxes(showline=True, linewidth=1, linecolor='gray', tickprefix=" ", ticksuffix=" ",
+                     title_standoff=10)
 
     fig.update_layout(
+        template='plotly_white',
         font=dict(
-            # size=FONT_SIZE
+            size=FONT_SIZE
         ),  # Figure font
         legend=dict(  # Legend position
             yanchor="top",
-            y=0.82,  # 0.99
-            xanchor="left",
-            x=0.88  # 0.01
+            y=0.88,
+            xanchor="right",
+            x=0.95
         ),
         margin=dict(t=0, l=0, r=0, b=0)
     )
@@ -375,13 +400,15 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
                   row=1, col=1)
 
     fig.add_trace(go.Scatter(x=result_df[x_axis_var],
-                             y=result_df[f'{matched_snapshots}_avg'] + result_df[f'{matched_snapshots}_std'],
+                             y=result_df[f'{matched_snapshots}_avg'] + result_df[
+                                 f'{matched_snapshots}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              name='upper bound'))
 
     fig.add_trace(go.Scatter(x=result_df[x_axis_var],
-                             y=result_df[f'{matched_snapshots}_avg'] - result_df[f'{matched_snapshots}_std'],
+                             y=result_df[f'{matched_snapshots}_avg'] - result_df[
+                                 f'{matched_snapshots}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              fill='tonexty',
@@ -393,13 +420,15 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
                              ),
                   row=2, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df[f'{frechet}_avg'] + result_df[f'{frechet}_std'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var],
+                             y=result_df[f'{frechet}_avg'] + result_df[f'{frechet}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              name='upper bound'),
                   row=2, col=1)
 
-    fig.add_trace(go.Scatter(x=result_df[x_axis_var], y=result_df[f'{frechet}_avg'] - result_df[f'{frechet}_std'],
+    fig.add_trace(go.Scatter(x=result_df[x_axis_var],
+                             y=result_df[f'{frechet}_avg'] - result_df[f'{frechet}_std'],
                              mode='lines',
                              line=dict(width=0.1),
                              fill='tonexty',
@@ -413,14 +442,16 @@ def generate_statistical_info_stairs_variability(x_axis_var: str,
                   row=3, col=1)
 
     fig.add_trace(
-        go.Scatter(x=result_df[x_axis_var], y=result_df[f'{p2p_euclidean}_avg'] + result_df[f'{p2p_euclidean}_std'],
+        go.Scatter(x=result_df[x_axis_var],
+                   y=result_df[f'{p2p_euclidean}_avg'] + result_df[f'{p2p_euclidean}_std'],
                    mode='lines',
                    line=dict(width=0.1),
                    name='upper bound'),
         row=3, col=1)
 
     fig.add_trace(
-        go.Scatter(x=result_df[x_axis_var], y=result_df[f'{p2p_euclidean}_avg'] - result_df[f'{p2p_euclidean}_std'],
+        go.Scatter(x=result_df[x_axis_var],
+                   y=result_df[f'{p2p_euclidean}_avg'] - result_df[f'{p2p_euclidean}_std'],
                    mode='lines',
                    line=dict(width=0.1),
                    fill='tonexty',
