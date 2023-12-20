@@ -19,51 +19,62 @@ class NeedlemanWunschAlignmentMetricsLCA(NeedlemanWunschAlignmentMetrics):
                  timestamp_label: str):
         super().__init__(alignment, dt_trace, pt_trace, system, selected_params, score,
                          timestamp_label)
-        self._pt_matched_relevant_snapshots = self._get_relevant_snapshots(
+        self._pt_matched_relevant = self._get_relevant_snapshots(
             self._matched_dt_snapshots,
             self._matched_pt_snapshots)
-        self._dt_matched_relevant_snapshots = self._get_relevant_snapshots(
+        self._dt_matched_relevant = self._get_relevant_snapshots(
+            self._matched_dt_snapshots,
             self._matched_pt_snapshots)
+
+        self._pt_trace_relevant = self._get_relevant_snapshots(self._pt_trace)
+        self._dt_trace_relevant = self._get_relevant_snapshots(self._dt_trace)
 
     @property
     def percentage_matched_snapshots_lca(self) -> float:
-        pt_relevant_snapshots = self._get_relevant_snapshots(self._pt_trace)
-        if pt_relevant_snapshots.shape[0] > 0:
-            return (self._pt_matched_relevant_snapshots.shape[0] / pt_relevant_snapshots.shape[
-                0]) * 100
+        if self._pt_trace_relevant.shape[0] > 0:
+            return (self._pt_matched_relevant.shape[0] + self._dt_matched_relevant.shape[0]) \
+                / (self._pt_trace_relevant.shape[0] + self._dt_trace_relevant.shape[0]) * 100
         return 0
 
     @property
     def percentage_mismatched_snapshots_lca(self) -> float:
         condition = self._alignment['operation'] == self.MISMATCH_OPERATION
         mismatched_pt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_PT)
-        pt_mismatched_relevant_snapshots = self._get_relevant_snapshots(mismatched_pt_snapshots)
-        pt_relevant_snapshots = self._get_relevant_snapshots(self._pt_trace)
-        if pt_relevant_snapshots.shape[0] > 0:
-            return (pt_mismatched_relevant_snapshots.shape[0] / pt_relevant_snapshots.shape[
-                0]) * 100
+        mismatched_dt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT)
+        mismatched_relevant_snapshots = self._get_relevant_snapshots(mismatched_pt_snapshots,
+                                                                     mismatched_dt_snapshots)
+        mismatched_relevant_snapshots += self._get_relevant_snapshots(mismatched_dt_snapshots,
+                                                                      mismatched_pt_snapshots)
+        if (self._pt_trace_relevant.shape[0] + self._dt_trace_relevant.shape[0]) > 0:
+            return ((mismatched_relevant_snapshots.shape[0] / (self._pt_trace_relevant.shape[0] +
+                                                               self._dt_trace_relevant.shape[
+                                                                   0])) * 100)
         return 0
 
     @property
     def percentage_gaps_lca(self) -> float:
-        return 100 - self.percentage_matched_snapshots_lca - self.percentage_mismatched_snapshots_lca
+        return 100 - self.percentage_matched_snapshots_lca - \
+            self.percentage_mismatched_snapshots_lca
 
-    def _get_relevant_snapshots(self, snapshots, condition_snapshots=None):
-        if condition_snapshots is None:
-            condition_snapshots = snapshots
-        relevant_snapshots = snapshots.loc[
-            ~self._system.filter_low_complexity(condition_snapshots[self._selected_params]), self._selected_params]
+    def _get_relevant_snapshots(self, snaps, condition_snaps=None):
+        snap_filter = ~self._system.filter_low_complexity(
+            snaps[self._selected_params])
+        if condition_snaps is not None:
+            snap_filter = snap_filter | ~self._system.filter_low_complexity(
+                condition_snaps[self._selected_params])
+        relevant_snapshots = snaps.loc[snap_filter, self._selected_params]
         return relevant_snapshots
 
     @property
     def frechet_lca(self) -> dict:
-        if not (self._dt_matched_relevant_snapshots.empty and self._pt_matched_relevant_snapshots.empty):
+        if not (
+                self._dt_matched_relevant.empty and self._pt_matched_relevant.empty):
             frechet_euclidean = FastDiscreteFrechetMatrix(euclidean).distance(
-                self._dt_matched_relevant_snapshots.to_numpy(),
-                self._pt_matched_relevant_snapshots.to_numpy())
+                self._dt_matched_relevant.to_numpy(),
+                self._pt_matched_relevant.to_numpy())
             frechet_manhattan = FastDiscreteFrechetMatrix(manhattan).distance(
-                self._dt_matched_relevant_snapshots.to_numpy(),
-                self._pt_matched_relevant_snapshots.to_numpy())
+                self._dt_matched_relevant.to_numpy(),
+                self._pt_matched_relevant.to_numpy())
         else:
             frechet_euclidean = 0
             frechet_manhattan = 0
@@ -71,9 +82,11 @@ class NeedlemanWunschAlignmentMetricsLCA(NeedlemanWunschAlignmentMetrics):
 
     @property
     def p2p_mean_lca(self) -> dict:
-        p2p_euclidean = self._calculate_p2p_distance(self._dt_matched_relevant_snapshots,
-                                                     self._pt_matched_relevant_snapshots, 'euclidean')
-        p2p_manhattan = self._calculate_p2p_distance(self._dt_matched_relevant_snapshots,
-                                                     self._pt_matched_relevant_snapshots, 'cityblock')
+        p2p_euclidean = self._calculate_p2p_distance(self._dt_matched_relevant,
+                                                     self._pt_matched_relevant,
+                                                     'euclidean')
+        p2p_manhattan = self._calculate_p2p_distance(self._dt_matched_relevant,
+                                                     self._pt_matched_relevant,
+                                                     'cityblock')
 
         return {'euclidean': p2p_euclidean, 'manhattan': p2p_manhattan}
