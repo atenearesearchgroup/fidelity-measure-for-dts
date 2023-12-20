@@ -62,7 +62,7 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
                     aux = []
                     for key in keys:
                         row.append("-")
-                        aux.append(self._pt_trace[pt_size][key])  # - 1
+                        aux.append(self._pt_trace[pt_size - 1][key])  # - 1
 
                     row.extend(aux)
                     row.append("Insertion")
@@ -88,7 +88,7 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
 
             aux = []  # Must be a deletion
             for key in keys:
-                row.append(self._dt_trace[dt_size][key])  # - 1
+                row.append(self._dt_trace[dt_size - 1][key])  # - 1
                 aux.append("-")
             row.extend(aux)
             row.append("Deletion")
