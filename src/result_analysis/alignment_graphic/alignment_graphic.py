@@ -24,7 +24,7 @@ class AlignmentGraphics:
         self._dt_trace = clean_df(dt_trace)
         self._pt_trace = clean_df(pt_trace)
 
-        self._visualization_indent = 30
+        self._visualization_indent = 1.5
 
     def generate_alignment_graphic(self):
         colors = sample_colorscale('Sunset', [0.20, 0.70])

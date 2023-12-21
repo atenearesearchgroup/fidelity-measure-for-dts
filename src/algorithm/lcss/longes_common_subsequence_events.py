@@ -1,6 +1,10 @@
 from algorithm.lcss.longest_common_subsequence_base import LongestCommonSubsequenceBase
 
-
+"""
+Taken from for comparison purposes:
+Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta:
+Online validation of digital twins for manufacturing systems. Comput. Ind. 150: 103942 (2023)
+"""
 class LongestCommonSubsequenceEvents(LongestCommonSubsequenceBase):
 
     def __init__(self, dt_trace: list,

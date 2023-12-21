@@ -1,15 +1,16 @@
 system: "RoboticArm"
-
+low_complexity_area: false
+alignment_alg: 'NDW_Affine'
 # orca_path: <your_orca_executable_path>
 
 paths:
   input:
     main: "resources/input/braccio/"
-    dt: "/"
+    dt: ""
     dt_files:
       - "pick_drop_dt.csv"
       - "simple_moves_dt.csv"
-    pt: "/"
+    pt: ""
     pt_files:
       - "pick_drop_pt.csv"
       - "simple_moves_pt.csv"
@@ -28,9 +29,30 @@ labels:
 
 ranges:
   mad:
-    start: 0.05
-    step: 0.05
-    end: 4.01
+    s1:
+      start: 0.05
+      step: 0.05
+      end: 4.01
+    s2:
+      start: 0.05
+      step: 0.05
+      end: 4.01
+    s3:
+      start: 0.05
+      step: 0.05
+      end: 4.01
+    s4:
+      start: 0.05
+      step: 0.05
+      end: 4.01
+    s5:
+      start: 0.05
+      step: 0.05
+      end: 4.01
+    s6:
+      start: 0.05
+      step: 0.05
+      end: 4.01
   low:
     start: 50
     step: 2

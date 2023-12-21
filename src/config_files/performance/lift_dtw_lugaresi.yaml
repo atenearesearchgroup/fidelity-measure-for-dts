@@ -1,0 +1,23 @@
+system: "Lift"
+low_complexity_area: false
+alignment_alg: 'DTW_Lugaresi'
+
+# orca_path: <your orca path here>
+
+paths:
+  input:
+    main: "resources/input/lift/"
+    dt: "performance/output_directory/"
+    dt_files:
+      - "Bajada_4_3_2_1_0_1_2_3_4-events_subset_10000.csv"
+    pt: "performance/output_directory/"
+    pt_files:
+      - "Bajada_4_3_2_1_0_1_2_3_4_01-events_subset_10000.csv"
+  output: "resources/output/lift/performance/dtw_lugaresi/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "average_time_between_events"
+  params:
+    - "average_time_between_events"
+

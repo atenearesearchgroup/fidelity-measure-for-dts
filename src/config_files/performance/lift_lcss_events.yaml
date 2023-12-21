@@ -1,0 +1,28 @@
+system: "Lift"
+low_complexity_area: false
+alignment_alg: 'LCSS_Events'
+
+# orca_path: <your orca path here>
+
+paths:
+  input:
+    main: "resources/input/lift/"
+    dt: "performance/output_directory/"
+    dt_files:
+      - "dt-events_subset_10000.csv"
+    pt: "performance/output_directory/"
+    pt_files:
+      - "pt-events_subset_10000.csv"
+  output: "resources/output/lift/performance/lcss_ev_lug/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "events"
+  params:
+    - "events"
+
+ranges:
+  delta:
+    start: 6.0
+    step: 0.10
+    end: 6.05

@@ -1,0 +1,28 @@
+system: "Lift"
+low_complexity_area: false
+alignment_alg: 'LCSS_Events'
+
+# orca_path: <your orca path here>
+
+paths:
+  input:
+    main: "resources/input/lift/"
+    dt: "digital_twin_high_fid_elevate/"
+    dt_files:
+      - "Bajada_4_3_2_1_0_1_2_3_4-events.csv"
+    pt: "physical_twin/"
+    pt_files:
+      - "Bajada_4_3_2_1_0_1_2_3_4_01-events.csv"
+  output: "resources/output/lift/state_of_the_art_comparison/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "events"
+  params:
+    - "events"
+
+ranges:
+  delta:
+    start: 6.5
+    step: 0.1
+    end: 9.0

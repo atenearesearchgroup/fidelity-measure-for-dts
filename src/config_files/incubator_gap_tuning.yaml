@@ -1,4 +1,6 @@
 system: "Incubator"
+low_complexity_area: false
+alignment_alg: 'NDW_Affine'
 
 # orca_path: <your_orca_executable_path>
 

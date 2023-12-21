@@ -1,4 +1,6 @@
 system: "Lift"
+low_complexity_area: true
+alignment_alg: 'NDW_Affine'
 
 # orca_path: <your_orca_executable_path>
 
@@ -21,9 +23,10 @@ labels:
 
 ranges:
   mad:
-    start: 0.30
-    step: 0.02
-    end: 0.32
+    accel(m/s2):
+      start: 0.30
+      step: 0.02
+      end: 0.32
   low:
     start: 200
     step: 1

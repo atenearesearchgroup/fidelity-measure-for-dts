@@ -1,19 +1,24 @@
-system: "Lift"
+system: 'Lift'
 low_complexity_area: true
 alignment_alg: 'NDW_Affine'
 
-# orca_path: <your_orca_executable_path>
+# orca_path: <your orca path here>
 
 paths:
   input:
     main: "resources/input/lift/"
+    #    dt: "digital_twin_high_fid_elevate/"
     dt: "digital_twin_low_fid_use/"
     dt_files:
       - "Bajada_4_0_4.csv"
+      #- "Bajada_4_2_0_2_4.csv"
+      #- "Bajada_4_3_2_1_0_1_2_3_4.csv"
     pt: "physical_twin/"
     pt_files:
-      - "Bajada_4_0_4_01"
-  output: "resources/output/lift/comparison/use/"
+      - "Bajada_4_0_4"
+      #- "Bajada_4_2_0_2_4"
+      #- "Bajada_4_3_2_1_0_1_2_3_4"
+  output: "resources/output/lift/variants_comparison/lcaw_affine_variant/"
 
 labels:
   timestamp_label: "timestamp(s)"
@@ -24,18 +29,18 @@ labels:
 ranges:
   mad:
     accel(m/s2):
-      start: 0.02
-      step: 0.02
-      end: 0.32
+      start: 0.15
+      step: 0.04
+      end: 0.16
   low:
     start: 200
-    step: 1
+    step: 2
     end: 201
   init_gap:
     start: -1.0
-    step: 1.1
-    end: 0.0
+    step: 0.5
+    end: -0.95
   cont_gap:
     start: -0.1
-    step: 0.11
-    end: 0.0
+    step: 0.1
+    end: -0.05

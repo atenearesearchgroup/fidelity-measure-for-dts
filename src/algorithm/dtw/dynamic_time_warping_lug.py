@@ -3,6 +3,11 @@ import pandas as pd
 
 from algorithm.dtw.dynamic_time_warping_base import DynamicTimeWarpingBase
 
+"""
+Taken from for comparison purposes:
+Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta:
+Online validation of digital twins for manufacturing systems. Comput. Ind. 150: 103942 (2023)
+"""
 
 class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):
 

@@ -15,11 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("--config", help="Config file name stored in the /src/config folder")
 
     args = parser.parse_args()
-    args.figures = True
-    args.engine = 'kaleido'
-    args.config = 'new_config/lift_dtw.yaml'
 
     current_directory = os.path.join(os.getcwd(), "")
-
     alignment_config = ConfigFactory.get_batch_configuration(current_directory, args)
     alignment_config.execute_alignments()
