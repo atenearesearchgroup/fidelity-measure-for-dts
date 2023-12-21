@@ -1,0 +1,17 @@
+reset
+
+!new Elevator('e')
+!e.position:=0.0
+
+
+!new Controller('c')
+!insert(c,e) into Control
+
+-- ?(-1).srand() -- seed
+
+!c.wait(8,0.1)
+!c.move_elevator(-2,0.1)
+!c.wait(8,0.1)
+!c.move_elevator(0,0.1)
+!c.wait(8,0.1)
+

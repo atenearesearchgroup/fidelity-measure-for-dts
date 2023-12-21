@@ -1,0 +1,168 @@
+model Elevator
+-- No uncertainty
+
+class Elevator
+  attributes
+  -- state attributes 
+    position : Real  init: 0  -- current position
+    max_speed : Real init: 0.976  
+    max_acceleration : Real init: 1.0
+    goingUp : Boolean init: true
+  operations
+    move(speed: Real, dt: Real) -- dt is the time 
+      begin
+        self.position := self.position + speed * dt; 
+      end
+end -- class Elevator
+
+class Controller 
+  attributes 
+-- state variables
+    speed : Real init: 0.0        -- current speed
+    acceleration : Real init: 0.0 -- current acceleration
+    totalTime:Real init: 0.0      -- total time since the simulation started
+    timeMoving:Real init: 0.0     -- time of current movement 
+    targetFloor : Integer init: 0 -- number of the destination floor (can be negative too) 
+    timeToStop : Real init: 0.0   -- time at which an elevator in motion should start decelerating before reaching destination 
+-- constants
+    floorHeight : Real derive: 4.08
+    rampUpTime:Real derive: 0.8     
+    plateauTime:Real derive: 0.8
+    rampDownTime:Real derive: 0.8
+    acceleration_step : Real derive: 0.0695   
+  operations
+    distanceToTargetFloor() : Real = (self.elevator.position-self.targetFloor*self.floorHeight).abs()
+    hasReachedDestination() : Boolean = if self.elevator.goingUp
+                                        then self.elevator.position >= self.targetFloor*self.floorHeight 
+                                        else self.elevator.position <= self.targetFloor*self.floorHeight endif
+    printTrace()
+      begin 
+        WriteLine(self.totalTime.toString()+';'+self.elevator.position.toString()+';'+self.speed.toString()+';'+self.acceleration.toString());
+      end
+
+    -- This operation simply represents the passage of time. 
+    -- It is used to model the elevator waiting for the user to push a button to go to a floor.
+    wait(time:Real,dt:Real) -- time to wait (in seconds), dt (delta time) is the simulation time-step (in seconds)
+      begin
+        self.acceleration:=0.0;
+        self.speed:=0.0;
+        self.timeMoving:=0.0;
+        while self.timeMoving<time/dt do
+          self.printTrace();
+          self.timeMoving:=self.timeMoving+dt;
+          self.totalTime:=self.totalTime+dt;
+        end;
+      end
+
+    -- This operation models the behavior of the elevator moving from its current floor to its destination floor. 
+    -- The "dt" (delta time) parameter represents the simulation time-step
+    -- This operation cannot be interrupted, i.e., it cannot be used in concurrent environments with several
+    -- elevators moving at the same time.
+    -- It basically invokes "step_move_elevator()" operation until the elevator reaches the destination floor
+    move_elevator(targetFloor:Integer,dt:Real)
+      begin
+        declare currentFloor:Integer;
+        currentFloor:=self.targetFloor;
+        self.elevator.goingUp:=currentFloor<=targetFloor;
+        self.targetFloor:=targetFloor;
+        self.timeMoving:=0.0;
+        self.acceleration:=0.0;
+        self.speed:=0.0;
+        self.timeToStop:=if self.elevator.goingUp then 
+          self.distanceToTargetFloor()+((targetFloor-currentFloor-1).abs())*(dt/self.elevator.max_speed)
+        else
+          -- not sure why, but this case needs a slight adjustement (-2dt)
+          self.distanceToTargetFloor()+((targetFloor-currentFloor-1).abs())*(dt/self.elevator.max_speed) -2*dt
+        endif;
+
+        while not self.hasReachedDestination() do
+          self.step_move_elevator(dt)
+        end;
+
+        self.acceleration:=0.0;
+        self.speed:=0.0;
+      end
+
+    -- this operation represents the movement of the elevator each time-step
+    -- it is basically a state machine where the elevator can be 
+    -- (a) starting the move by increasing its speed if going up (accelerate-plateau-decelerate)
+    --     or decreasing its speed (increasing it since we use negative numbers) if descending (decelerate-plateau-accelerate)
+    -- (b) moving (at constant speed -- max_speed)
+    -- (c) decreasing the speed before reaching the destination floor (decelerate-plateau-accelerate if going up) 
+    -- We have differentiated when the elevator is going up or down, which finally produces 6 different states
+    -- The states are implemented by means of a sequence of "if"s for laziness..
+
+    step_move_elevator(dt:Real)
+      begin
+        if self.elevator.goingUp then 
+          -- start the movement...
+          -- rampUp time
+          if self.timeMoving<self.rampUpTime then 
+            if self.speed<self.elevator.max_speed then 
+              self.acceleration:=(self.acceleration+self.acceleration_step).min(self.elevator.max_acceleration)
+            end;
+          end;
+          -- in the plateau period we do not accelerate...
+          -- but then in the rampDown time we decelerate
+          if self.timeMoving>=self.rampUpTime+self.plateauTime and self.timeMoving<=self.rampUpTime+self.plateauTime+self.rampDownTime then 
+              self.acceleration:=(self.acceleration-self.acceleration_step).max(0.0)
+          end;
+          if self.timeMoving>self.rampUpTime+self.plateauTime+self.rampDownTime and self.timeMoving<self.timeToStop then
+            self.acceleration:=0.0;
+          end;
+          -- start the deceleration phase
+          if self.timeMoving>=self.timeToStop and self.timeMoving<=self.timeToStop+self.rampDownTime then
+              self.acceleration:=(self.acceleration-self.acceleration_step).max(-self.elevator.max_acceleration)
+          end;
+          -- in the plateau period we do not accelerate...
+          -- but then in the rampDown time we accelerate
+          if self.timeMoving>=self.timeToStop+self.rampDownTime+self.plateauTime then 
+            if self.speed<self.elevator.max_speed then 
+              self.acceleration:=(self.acceleration+self.acceleration_step).min(self.elevator.max_acceleration)
+            end;
+          end;
+        else -- GOING DOWN
+          -- start the movement...
+          -- rampDown time
+          if self.timeMoving<=self.rampDownTime then 
+               self.acceleration:=(self.acceleration-self.acceleration_step).max(-self.elevator.max_acceleration)
+          end;
+          -- in the plateau period we do not decelerate...
+          -- but then in the rampDown time we accelerate
+          if self.timeMoving>=self.rampDownTime+self.plateauTime and self.timeMoving<=self.rampUpTime+self.plateauTime+self.rampDownTime then 
+            if self.speed>=self.elevator.max_speed then 
+              self.acceleration:=(self.acceleration+self.acceleration_step).min(self.elevator.max_acceleration)
+            end;
+          end;
+          if self.timeMoving>self.rampUpTime+self.plateauTime+self.rampDownTime and self.timeMoving<self.timeToStop then
+            self.acceleration:=0.0;
+          end;
+          -- start the acceleration phase
+          if self.timeMoving>=self.timeToStop and self.timeMoving<=self.timeToStop+self.rampDownTime then
+           if self.speed<self.elevator.max_speed then 
+              self.acceleration:=(self.acceleration+self.acceleration_step).min(self.elevator.max_acceleration)
+            end;
+          end;
+          -- in the plateau period we do not decelerate...
+          -- but then in the rampDown time we decelerate
+          if self.timeMoving>=self.timeToStop+self.rampDownTime+self.plateauTime then 
+              self.acceleration:=(self.acceleration-self.acceleration_step).max(0.0)
+          end;
+        end;
+        -- and then we move!
+        self.speed:=self.speed+self.acceleration*dt;
+        if (self.speed >  self.elevator.max_speed) then self.speed := self.elevator.max_speed end;
+        if (self.speed < -self.elevator.max_speed) then self.speed := -self.elevator.max_speed end;
+        self.elevator.move(self.speed, dt);
+        self.printTrace();
+        self.timeMoving:=self.timeMoving+dt;
+        self.totalTime:=self.totalTime+dt;
+      end
+end -- class Controller
+
+
+association Control between 
+    Controller [1] role controller 
+    Elevator [1] role elevator
+end
+

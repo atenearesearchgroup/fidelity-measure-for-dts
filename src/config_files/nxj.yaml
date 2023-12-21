@@ -1,0 +1,85 @@
+system: "NXJCar"
+low_complexity_area: false
+alignment_alg: 'NDW_Affine'
+
+# orca_path: <your orca path here>
+
+paths:
+  input:
+    main: "resources/input/nxj/"
+    dt: ""
+    dt_files:
+      - "LegoCarSyntheticTraces-1lapcar1.csv"
+      - "LegoCarSyntheticTraces-1lapcar2.csv"
+      - "LegoCarSyntheticTraces-1lapcar2.csv"
+      - "LegoCarSyntheticTraces-2lapsFastcar.csv"
+      - "LegoCarSyntheticTraces-1lapcar2.csv"
+    pt: ""
+    pt_files:
+      - "LegoCarSyntheticTraces-1lapcar1-PT.csv"
+      - "LegoCarSyntheticTraces-1lapcar2-accel-PT-actions.csv"
+      - "LegoCarSyntheticTraces-1lapcar2-PT.csv"
+      - "LegoCarSyntheticTraces-2lapsFastcar-PT.csv"
+      - "LegoCarSyntheticTraces-2lapsFastcar-PT.csv"
+  output: "resources/output/nxj/"
+
+labels:
+  timestamp_label: "timestamp"
+  param_interest: "distance"
+  params:
+    - "xPos"
+    - "yPos"
+    - "angle"
+    - "speed"
+    - "isMoving"
+    - "distance"
+    - "bump"
+    - "light"
+    - "action"
+
+ranges:
+  mad:
+    xPos:
+      start: 3
+      step: 0.04
+      end: 3.01
+    yPos:
+      start: 3
+      step: 0.04
+      end: 3.01
+    angle:
+      start: 0.15
+      step: 0.04
+      end: 0.16
+    speed:
+      start: 3
+      step: 0.5
+      end: 3.01
+    distance:
+      start: 1.50
+      step: 0.04
+      end: 1.51
+    isMoving:
+      start: 0.1
+      step: 0.1
+      end: 0.11
+    bump:
+      start: 0.1
+      step: 0.1
+      end: 0.11
+    light:
+      start: 0.15
+      step: 0.04
+      end: 0.16
+  low:
+    start: 200
+    step: 2
+    end: 201
+  init_gap:
+    start: -1.0
+    step: 0.5
+    end: -0.95
+  cont_gap:
+    start: -0.1
+    step: 0.1
+    end: -0.05

@@ -1,0 +1,43 @@
+system: "Incubator"
+low_complexity_area: false
+alignment_alg: 'NDW_Affine'
+
+# orca_path: <your_orca_executable_path>
+
+paths:
+  input:
+    main: "resources/input/incubator/"
+    dt: "digital_twin/"
+    dt_files:
+      - "2P_exp1_ht3_hg2_2P_Model.csv"
+      - "4P_exp1_ht3_hg2_4P_Model.csv"
+    pt: "physical_twin/"
+    pt_files:
+      - "exp1_ht3_hg2_Real-open_lid.csv"
+      - "exp1_ht3_hg2_Real-open_lid.csv"
+  output: "resources/output/incubator/synthetic_example/"
+
+labels:
+  timestamp_label: "timestamp(s)"
+  param_interest: "temperature(degrees)"
+  params:
+    - "temperature(degrees)"
+
+ranges:
+  mad:
+    temperature(degrees):
+      start: 1.50
+      step: 0.05
+      end: 1.51
+  low:
+    start: 1
+    step: 2
+    end: 2
+  init_gap:
+    start: -1.0
+    step: 0.1
+    end: -0.95
+  cont_gap:
+    start: -0.1
+    step: 0.10
+    end: -0.09

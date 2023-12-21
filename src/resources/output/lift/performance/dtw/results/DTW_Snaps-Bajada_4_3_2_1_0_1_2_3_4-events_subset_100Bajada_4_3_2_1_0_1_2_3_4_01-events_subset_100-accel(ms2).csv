@@ -1,0 +1,6 @@
+dt_snap_aligned_max_rep,dt_snap_aligned_number_rep,dt_snap_aligned_avg_rep,dt_snap_aligned_std_rep,number_one_to_many_dt,number_one_to_many_pt,pt_snap_aligned_max_rep,pt_snap_aligned_number_rep,pt_snap_aligned_avg_rep,pt_snap_aligned_std_rep,score,execution_time,process_time,trace_length
+12,1,12.0,,97,11,99,1,99.0,,0.01962,0.006071567535400391,0.006063527000000235,100
+12,1,12.0,,97,11,99,1,99.0,,0.01962,0.005907773971557617,0.005901208000000047,100
+12,1,12.0,,97,11,99,1,99.0,,0.01962,0.006425380706787109,0.006419375000000116,100
+12,1,12.0,,97,11,99,1,99.0,,0.01962,0.005803823471069336,0.005796999000000191,100
+12,1,12.0,,97,11,99,1,99.0,,0.01962,0.005738735198974609,0.0057323650000000725,100
