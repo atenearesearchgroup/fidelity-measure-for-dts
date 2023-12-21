@@ -63,13 +63,40 @@ To install all the required packages:
 ```
 ├── /src
 │   ├── align_traces.py
-│   ├── /algorithm
-│   │   ├── needleman_wunsch_affine_gap.py
-│   │   ├── needleman_wunsch_base.py
-│   │   └── needleman_wunsch_tolerance.py
-│   ├── /metrics
-│   │   ├── alignment.py
-│   │   └── alignment_lca.py
+│   ├── algorithm
+│   │   ├── alignment_algorithm.py
+│   │   ├── dtw
+│   │   │   ├── dynamic_time_warping_base.py
+│   │   │   ├── dynamic_time_warping_lug.py
+│   │   │   └── dynamic_time_warping_snaps.py
+│   │   ├── lcss
+│   │   │   ├── longes_common_subsequence_events.py
+│   │   │   ├── longes_common_subsequence_kpi.py
+│   │   │   └── longest_common_subsequence_base.py
+│   │   └── ndw
+│   │   │   ├── needleman_wunsch_affine_gap.py
+│   │   │   ├── needleman_wunsch_base.py
+│   │   │   └── needleman_wunsch_tolerance.py
+│   ├── batch_processing
+│   │   ├── alg_config
+│   │   │   ├── alignment_config.py
+│   │   │   ├── dtw_lug_config.py
+│   │   │   ├── dtw_snaps_config.py
+│   │   │   ├── lcss_events_config.py
+│   │   │   ├── lcss_kpis_config.py
+│   │   │   └── ndw_config.py
+│   │   ├── algorithm_factory.py
+│   │   ├── analysis_factory.py
+│   │   └── config_factory.py
+│   ├── metrics
+│   │   ├── alignment_base.py
+│   │   ├── dtw
+│   │   │   └── dtw_alignment.py
+│   │   ├── lcss
+│   │   │   └── lcss_alignment.py
+│   │   └── ndw
+│   │       ├── ndw_alignment.py
+│   │       └── ndw_alignment_lca.py
 │   ├── /systems
 │   │   ├── lift.py
 │   │   └── system.py
@@ -86,18 +113,23 @@ To install all the required packages:
 │   │       └── braccio_fidelity_analysis.yaml
 │   ├── /config_files
 │   ├── /result_analysis
-│   │   ├── alignment_graphic.py
-│   │   ├── gap_tuning.py
+│   │   ├── alignment_graphic
+│   │   │   ├── alignment_graphic.py
+│   │   │   ├── dtw_alignment_graphic.py
+│   │   │   ├── graphic_factory.py
+│   │   │   └── ndw_alignment_graphic.py
+│   │   ├── gap_tunning.py
 │   │   └── statistical_graphics.py
 │   ├── /packages
 │   ├── /util
 ├── /resources
 │   ├── /input
 │   └── /output
-├── /docs
-│   ├── Technical_Report_General_Concepts.pdf
+├── docs
 │   ├── Technical_Report_Elevator.pdf
+│   ├── Technical_Report_General_Concepts.pdf
 │   ├── Technical_Report_Incubator.pdf
+│   ├── Technical_Report_NXT_Car.pdf
 │   └── Technical_Report_Robotic_Arm.pdf
 ├── CITATION.cff
 ├── LICENSE
@@ -108,20 +140,19 @@ To install all the required packages:
 Breakdown of the repository structure:
 
 - /src:
-    - /algorithm:
-        - needleman_wunsch_base.py: abstract class with general alignment logic.
-        - needleman_wunsch_tolerance.py: alignment implementation using _Simple Gap_.
-        - needleman_wunsch_affine_gap.py: alignment implementation using _Affine Gap_.
-    - /metrics
-        - alignment.py: calculates the fidelity metrics for an alignment.
-        - alignment_lca.py: extension of alignment.py including analysis of low-complexity areas.
+    - /algorithm: Implementations of our Needleman-Wunsch adaptation, and the adaptations from [1]
+      of Dynamic Time Warping and Longest Common Subsequence.
+    - /metrics: Metrics to measure fidelity based on the results of the alignment algorithms.
+    - /batch_processing: auxiliary classes to perform the analysis and alignments automatically.
     - /systems
-        - System.py: general class that defines the **Comparison Function** between snapshots and the **Low Complexity
+        - System.py: general class that defines the **Comparison Function** between snapshots and
+          the **Low Complexity
           Area** condition.
         - Lift.py: it extends System.py redefining the **Low Complexity Area** condition.
     - /evaluation: it includes the Jupyter Notebooks to reproduce all the analysis performed in
       the [Technical Reports](/docs).
-    - /config_files: YAML configuration file to execute all the alignments included in the [Technical Reports](/docs).
+    - /config_files: YAML configuration file to execute all the alignments included in
+      the [Technical Reports](/docs).
     - /result analysis: auxiliary classes for data analysis.
 
     - /resources: raw traces for the alignments.
@@ -146,10 +177,16 @@ options:
   --config CONFIG  Config file name stored in the /src/config folder
 ```
 
-4. To execute alignments for the Incubator case study using one of the predefined YAML configuration files:
+4. To execute alignments for the Incubator case study using one of the predefined YAML configuration
+   files:
 
 ```
 python3.10 align_traces.py --figures --engine kaleido --config incubator_comparison.yaml
 ```
 
 ---
+
+## References
+
+[1] Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta:
+Online validation of digital twins for manufacturing systems. Comput. Ind. 150: 103942 (2023)
