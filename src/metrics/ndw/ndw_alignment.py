@@ -27,7 +27,9 @@ class NeedlemanWunschAlignmentMetrics(AlignmentBase):
         self._matched_dt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_DT)
         self._matched_pt_snapshots = self._get_matched_snapshots(condition, self.PREFIX_PT)
         # Gaps
+        self._gaped_alignment = alignment
         self._gaps = self._count_gaps()
+
 
     @property
     def percentage_matched_snapshots(self) -> float:
@@ -130,9 +132,9 @@ class NeedlemanWunschAlignmentMetrics(AlignmentBase):
     def _count_gaps(self) -> List[int]:
         gap_cont = 0
         gap_lengths = []
-        for i in range(len(self._alignment['operation'])):
-            if self._alignment['operation'][i] == 'Insertion' \
-                    or self._alignment['operation'][i] == 'Deletion':
+        for i in range(len(self._gaped_alignment['operation'])):
+            if self._gaped_alignment['operation'][i] == 'Insertion' \
+                    or self._gaped_alignment['operation'][i] == 'Deletion':
                 gap_cont += 1  # Increase gap counter
             else:
                 if gap_cont > 0:  # Gap ended

@@ -20,8 +20,8 @@ class NeedlemanWunschAlignmentMetricsLCA(NeedlemanWunschAlignmentMetrics):
         super().__init__(alignment, dt_trace, pt_trace, system, selected_params, score,
                          timestamp_label)
         self._pt_matched_relevant = self._get_relevant_snapshots(
-            self._matched_dt_snapshots,
-            self._matched_pt_snapshots)
+            self._matched_pt_snapshots,
+            self._matched_dt_snapshots)
         self._dt_matched_relevant = self._get_relevant_snapshots(
             self._matched_dt_snapshots,
             self._matched_pt_snapshots)
