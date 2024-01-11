@@ -11,7 +11,7 @@ class LongestCommonSubsequenceEventsConfig(AlignmentConfiguration):
     def __init__(self, current_directory, args, config):
         super().__init__(current_directory, args, config)
 
-        ranges = self._config['ranges']
+        ranges = self.config['ranges']
 
         # Calculate Maximum Acceptable Distance (MAD)
         self._delta = np.arange(
@@ -20,7 +20,7 @@ class LongestCommonSubsequenceEventsConfig(AlignmentConfiguration):
             ranges['delta']['step']
         )
 
-    def _get_hyperparameters_labels(self) -> list:
+    def get_hyperparameters_labels(self) -> list:
         return [self.DELTA]
 
     def _get_hyperparameters_ranges(self) -> list:
@@ -29,7 +29,7 @@ class LongestCommonSubsequenceEventsConfig(AlignmentConfiguration):
     def get_config_params(self, pt_trace, dt_trace, current_config=None):
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
-            self.TIMESTAMP_LABEL: self._timestamp_label,
+            self.TIMESTAMP_LABEL: self.timestamp_label,
             self.PARAM_INTEREST: self._param_interest,
             **current_config
         }

@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from batch_processing.batch_align import BatchAlignments
 from batch_processing.config_factory import ConfigFactory
 
 if __name__ == "__main__":
@@ -18,4 +19,5 @@ if __name__ == "__main__":
 
     current_directory = os.path.join(os.getcwd(), "")
     alignment_config = ConfigFactory.get_batch_configuration(current_directory, args)
-    alignment_config.execute_alignments()
+    batch_alignment = BatchAlignments(alignment_config)
+    batch_alignment.execute_alignments()

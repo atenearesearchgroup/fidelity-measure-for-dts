@@ -10,7 +10,7 @@ class LongestCommonSubsequenceKPIsConfig(AlignmentConfiguration):
     def __init__(self, current_directory, args, config):
         super().__init__(current_directory, args, config)
 
-        ranges = self._config['ranges']
+        ranges = self.config['ranges']
 
         # Calculate Maximum Acceptable Distance (MAD)
         self._epsilon = np.arange(
@@ -19,7 +19,7 @@ class LongestCommonSubsequenceKPIsConfig(AlignmentConfiguration):
             ranges['epsilon']['step']
         )
 
-    def _get_hyperparameters_labels(self) -> list:
+    def get_hyperparameters_labels(self) -> list:
         return [self.EPSILON]
 
     def _get_hyperparameters_ranges(self) -> list:

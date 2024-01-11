@@ -15,12 +15,12 @@ class NeedlemanWunschConfiguration(AlignmentConfiguration):
         super().__init__(current_directory, args, config)
 
         # INPUT PARAMETERS
-        ranges = self._config['ranges']
+        ranges = self.config['ranges']
 
         # Calculate Maximum Acceptable Distance (MAD)
         self._mad = {}
         mad = ranges['mad']
-        for p in self._params:
+        for p in self.params:
             if p in mad:
                 self._mad[p] = np.arange(
                     mad[p]['start'],
@@ -48,7 +48,7 @@ class NeedlemanWunschConfiguration(AlignmentConfiguration):
             ranges['cont_gap']['step']
         )
 
-    def _get_hyperparameters_labels(self) -> list:
+    def get_hyperparameters_labels(self) -> list:
         return [self.INIT_GAP, self.CONT_GAP, self.LOW,
                 *[f"{self.MAD}-{p}" for p in self._mad.keys()]]
 
@@ -59,6 +59,6 @@ class NeedlemanWunschConfiguration(AlignmentConfiguration):
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
             self.SYSTEM: self._system,
-            self.TIMESTAMP_LABEL: self._timestamp_label,
+            self.TIMESTAMP_LABEL: self.timestamp_label,
             **current_config
         }

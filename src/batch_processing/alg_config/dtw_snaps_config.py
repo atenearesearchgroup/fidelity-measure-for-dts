@@ -9,6 +9,6 @@ class DynamicTimeWarpingSnapsConfig(AlignmentConfiguration):
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
             self.SYSTEM: self._system,
-            self.TIMESTAMP_LABEL: self._timestamp_label,
+            self.TIMESTAMP_LABEL: self.timestamp_label,
             **current_config
         }
