@@ -22,7 +22,7 @@ class LongestCommonSubsequenceKPIsConfig(AlignmentConfiguration):
     def get_hyperparameters_labels(self) -> list:
         return [self.EPSILON]
 
-    def _get_hyperparameters_ranges(self) -> list:
+    def get_hyperparameters_ranges(self) -> list:
         return [self._epsilon]
 
     def get_config_params(self, pt_trace, dt_trace, current_config=None):

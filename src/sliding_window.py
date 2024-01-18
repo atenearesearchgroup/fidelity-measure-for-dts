@@ -1,6 +1,6 @@
 import argparse
-import multiprocessing
 import os
+from multiprocessing import Process
 
 from batch_processing import ConfigFactory
 from window_processing.alignment_dispatcher import SlidingWindowProcessor
@@ -9,7 +9,7 @@ from window_processing.alignment_dispatcher import SlidingWindowProcessor
 def start_processor(conf):
     processor = SlidingWindowProcessor(5, conf)
     # Start separate threads for consuming messages from each producer
-    thread1 = multiprocessing.Process(target=processor.consume_messages)
+    thread1 = Process(target=processor.consume_messages)
     thread1.start()
     thread1.join()
 

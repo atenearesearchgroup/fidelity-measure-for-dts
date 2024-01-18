@@ -52,7 +52,7 @@ class NeedlemanWunschConfiguration(AlignmentConfiguration):
         return [self.INIT_GAP, self.CONT_GAP, self.LOW,
                 *[f"{self.MAD}-{p}" for p in self._mad.keys()]]
 
-    def _get_hyperparameters_ranges(self) -> list:
+    def get_hyperparameters_ranges(self) -> list:
         return [self._init_gap, self._cont_gap, self._low, *self._mad.values()]
 
     def get_config_params(self, pt_trace, dt_trace, current_config=None):

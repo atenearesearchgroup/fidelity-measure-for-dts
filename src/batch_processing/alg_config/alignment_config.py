@@ -69,11 +69,11 @@ class AlignmentConfiguration:
         system_name = self.config.get('system', 'System')
         self._system = Lift() if system_name == 'Lift' else SystemBase()
 
-        self._lca = self.config.get('low_complexity_area', False)
+        self.lca = self.config.get('low_complexity_area', False)
 
         self.alignment_algorithm = self.config['alignment_alg']
         self._methods = fu.get_property_methods(AnalysisFactory.get_class
-                                                (self.alignment_algorithm, self._lca))
+                                                (self.alignment_algorithm, self.lca))
 
     def _create_output_directories(self):
         """
@@ -86,12 +86,12 @@ class AlignmentConfiguration:
             os.makedirs(directory, exist_ok=True)
 
     def get_hyperparameters_combinations(self):
-        return list(itertools.product(*self._get_hyperparameters_ranges()))
+        return list(itertools.product(*self.get_hyperparameters_ranges()))
 
     def get_alignment_metrics(self, alignment_df, pt_trace, dt_trace, input_dict, score):
         # --- DISTANCE ANALYSIS ---
         alignment_results = AnalysisFactory.create_instance \
-            (self.alignment_algorithm, self._lca, alignment=alignment_df,
+            (self.alignment_algorithm, self.lca, alignment=alignment_df,
              dt_trace=dt_trace, pt_trace=pt_trace, system=self._system,
              selected_params=self.params, score=score, timestamp_label=self.timestamp_label)
 
@@ -109,14 +109,14 @@ class AlignmentConfiguration:
         :return: The combined unique filename.
         """
         return f"{self.alignment_algorithm}-" \
-               f"{'LCA_' if self._lca else ''}" \
+               f"{'LCA_' if self.lca else ''}" \
                f"{os.path.splitext(dt_file)[0] + os.path.splitext(pt_file)[0]}" \
                f"-{self._param_interest.replace('/', '')}"
 
     def get_hyperparameters_labels(self) -> list:
         return []
 
-    def _get_hyperparameters_ranges(self) -> list:
+    def get_hyperparameters_ranges(self) -> list:
         return []
 
     def get_config_params(self, pt_trace, dt_trace, current_config=None):
