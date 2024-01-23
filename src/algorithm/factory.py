@@ -1,4 +1,10 @@
-from algorithm import NeedlemanWunschAffineGap, NeedlemanWunschTolerance, AlignmentAlgorithm, \
+"""
+algorithm.factory
+~~~~~~~~~~~~~~~~
+
+Factory class for creating instances of alignment algorithms.
+"""
+from algorithm import NeedlemanWunschAffineGap, NeedlemanWunschConstantGap, IAlignmentAlgorithm, \
     DynamicTimeWarpingLugaresi, DynamicTimeWarpingSnaps, LongestCommonSubsequenceEvents, \
     LongestCommonSubsequenceKPI
 
@@ -19,7 +25,7 @@ class AlignmentAlgorithmFactory:
     """
 
     @staticmethod
-    def get_alignment_algorithm(algorithm, **kwargs) -> AlignmentAlgorithm:
+    def get_alignment_algorithm(algorithm, **kwargs) -> IAlignmentAlgorithm:
         """
         Create an instance of the specified alignment algorithm with the given keyword
         arguments.
@@ -47,7 +53,7 @@ class AlignmentAlgorithmFactory:
         """
         algorithms = {
             'NDW_Affine': NeedlemanWunschAffineGap,
-            'NDW_Tolerance': NeedlemanWunschTolerance,
+            'NDW_Tolerance': NeedlemanWunschConstantGap,
             'DTW_Snaps': DynamicTimeWarpingSnaps,
             'DTW_Lugaresi': DynamicTimeWarpingLugaresi,
             'LCSS_KPIs': LongestCommonSubsequenceKPI,

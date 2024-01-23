@@ -1,12 +1,20 @@
+"""
+ndw.constant_gap
+~~~~~~~~~~~~~~~~
+
+Class for performing sequence alignment using the Needleman-Wunsch algorithm with constant
+gap penalties.
+"""
+
 from abc import ABC
 
 import numpy as np
 
 import util.float_util as fu
-from algorithm.ndw.needleman_wunsch_base import NeedlemanWunschBase
+from algorithm.ndw.base import NeedlemanWunschBase
 
 
-class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
+class NeedlemanWunschConstantGap(NeedlemanWunschBase, ABC):
     """
     Class for performing sequence alignment using the Needleman-Wunsch algorithm with constant gap
     penalties.
@@ -23,6 +31,8 @@ class NeedlemanWunschTolerance(NeedlemanWunschBase, ABC):
 
     def calculate_matrix(self) -> np.ndarray:
         """
+        Calculates the values of the Dynamic Programming Matrix and stores them in self._table.
+
         Coding for the matrix
         deletion : 0
         insertion : 1

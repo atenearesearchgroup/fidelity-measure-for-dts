@@ -1,14 +1,31 @@
+"""
+dtw.snaps
+~~~~~~~~~~~~~~~~
+
+Implementation of Dynamic Time Warping adapted to enable the alignment of snapshot sequences.
+"""
+
 import numpy as np
 import pandas as pd
 
-from algorithm.dtw.dynamic_time_warping_base import DynamicTimeWarpingBase
+from algorithm.dtw.base import DynamicTimeWarpingBase
 from systems import SystemBase
 from util.float_util import min_tolerance
 
 
 class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
-    SYSTEM = 'system'
-    TIMESTAMP_LABEL = 'timestamp_label'
+    """
+    This class implements the Dynamic Time Warping algorithm [1] adapted to enable the alignment of
+    snapshot sequences.
+
+    Dynamic Time Warping is a technique used for measuring the similarity between two sequences
+    that may vary in time or speed.
+
+    References:
+        [1] Olsen, NL; Markussen, B; Raket, LL (2018), "Simultaneous inference for misaligned
+        multivariate functional data", Journal of the Royal Statistical Society, Series C,
+        67 (5): 1147–76
+    """
 
     def __init__(self, dt_trace: dict,
                  pt_trace: dict,
@@ -21,8 +38,10 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
         self._decisions = np.zeros((self._n_dt_trace, self._m_pt_trace))
 
     def calculate_matrix(self):
-        # Table initialization
-        for i in range(self._n_dt_trace):
+        """
+        Calculates the values of the Dynamic Programming Matrix and stores them in self._table.
+        """
+        for i in range(self._n_dt_trace):  # Table initialization
             for j in range(self._m_pt_trace):
                 self._table[i, j] = np.inf
         self._table[0, 0] = 0
@@ -38,6 +57,10 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
                 self._decisions[i, j] = decision
 
     def _build_result(self):
+        """
+        Performs backtracking on the Dynamic Programming Matrix to obtain the pairs aligned by
+        the algorithm.
+        """
         dt_size = len(self._dt_trace) - 1
         pt_size = len(self._pt_trace) - 1
         keys = self._pt_trace[0].keys()
@@ -52,31 +75,30 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
                 rows.insert(0, self._create_row(dt_size - 1, pt_size, keys))
                 pt_size -= 1
                 continue
-
-            elif pt_size == 0:
+            if pt_size == 0:
                 rows.insert(0, self._create_row(dt_size, pt_size - 1, keys))
                 dt_size -= 1
                 continue
 
-            else:
-                # Table meaning: {diagonal : 1, i-1 : 2, j-1 : 3}
-                if self._decisions[dt_size][pt_size] == 1:  # diagonal
-                    rows.insert(0, self._create_row(dt_size - 1, pt_size - 1, keys))
-                    dt_size -= 1
-                    pt_size -= 1
-                    continue
-                elif self._decisions[dt_size][pt_size] == 2:  # i-1
-                    rows.insert(0, self._create_row(dt_size - 1, pt_size, keys))
-                    dt_size -= 1
-                    continue
-                elif self._decisions[dt_size][pt_size] == 3:  # j-1
-                    rows.insert(0, self._create_row(dt_size, pt_size - 1, keys))
-                    pt_size -= 1
-                    continue
+            # Table meaning: {diagonal : 1, i-1 : 2, j-1 : 3}
+            if self._decisions[dt_size][pt_size] == 1:  # diagonal
+                rows.insert(0, self._create_row(dt_size - 1, pt_size - 1, keys))
+                dt_size -= 1
+                pt_size -= 1
+                continue
+            if self._decisions[dt_size][pt_size] == 2:  # i-1
+                rows.insert(0, self._create_row(dt_size - 1, pt_size, keys))
+                dt_size -= 1
+                continue
+            if self._decisions[dt_size][pt_size] == 3:  # j-1
+                rows.insert(0, self._create_row(dt_size, pt_size - 1, keys))
+                pt_size -= 1
+                continue
 
         return pd.DataFrame(rows, columns=headers)
 
     def _create_row(self, dt_index, pt_index, keys):
+        """Returns a list with the DT snapshots attributes followed by those of the PT."""
         aux = []
         row = []
         for key in keys:
@@ -87,5 +109,9 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
         return row
 
     def calculate_alignment(self) -> pd.DataFrame:
+        """
+        Calculate the alignment between two sequences or data sets and return the alignment result
+        :return: a DataFrame that includes the alignment
+        """
         self.calculate_matrix()
         return self._build_result()

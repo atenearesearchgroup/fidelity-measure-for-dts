@@ -1,12 +1,17 @@
+"""
+ndw.affine_gap
+~~~~~~~~~~~~~~~~
+
+Class for performing sequence alignment using the Needleman-Wunsch algorithm with affine
+gap penalties.
+"""
 from abc import ABC
 
 import numpy as np
 
-from algorithm.ndw.needleman_wunsch_base import NeedlemanWunschBase
+from algorithm.ndw.base import NeedlemanWunschBase
 from systems.system import SystemBase
 from util.float_util import max_tolerance
-
-MIN = -float("inf")
 
 
 class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
@@ -26,6 +31,7 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
           similarities in the amino acid sequence of two proteins. Journal of Molecular Biology,
           48(3), 443-453.
     """
+    MIN = -float("inf")
 
     def __init__(self, dt_trace: list,
                  pt_trace: list,
@@ -46,20 +52,32 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         self._deletion_table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1, 1))
 
     def _init_deletion(self, i, j):
+        """
+        Returns the score that corresponds to cells of the first row and column of
+        the deletion table
+        """
         if i > 0 and j == 0:
-            return MIN
+            return self.MIN
         if j > 0:
             return self._init_gap + (self._continue_gap * j)
         return 0
 
     def _init_insertion(self, i, j):
+        """
+        Returns the score that corresponds to cells of the first row and column of
+        the insertion table
+        """
         if j > 0 and i == 0:
-            return MIN
+            return self.MIN
         if i > 0:
             return self._init_gap + (self._continue_gap * i)
         return 0
 
     def _init_match(self, i, j):
+        """
+        Initializes a cell of the table that tracks the matched pairs of the alignment.
+        It is used to initialize the first row and column of this table.
+        """
         # if j == 0 and i == 0:
         #   self._table[i, j, 0] = 0
         #   self._table[i, j, 1] = 0 # Deletion
@@ -73,6 +91,8 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
 
     def calculate_matrix(self) -> np.ndarray:
         """
+        Calculates the values of the Dynamic Programming Matrix and stores them in self._table.
+
         Coding for the matrix
         deletion : 0
         insertion : 1

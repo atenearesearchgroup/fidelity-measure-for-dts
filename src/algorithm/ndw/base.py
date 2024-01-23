@@ -1,13 +1,19 @@
+"""
+ndw.base
+~~~~~~~~~~~~~~~~
+
+Abstract class for the implementation of the Needleman Wunsch algorithm variants.
+"""
 from abc import ABC, abstractmethod
 
 import numpy as np
 import pandas as pd
 
-from algorithm.alignment_algorithm import AlignmentAlgorithm
+from algorithm.ialgorithm import IAlignmentAlgorithm
 from systems.system import SystemBase
 
 
-class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
+class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
     """
     Abstract Class for performing sequence alignment using the Needleman-Wunsch algorithm
     which does not include any gap penalty strategy.
@@ -45,6 +51,10 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
         self._low = low
 
     def build_result(self) -> pd.DataFrame:
+        """
+        Performs backtracking on the Dynamic Programming Matrix to obtain the pairs aligned by
+        the algorithm.
+        """
         dt_size = len(self._table) - 1
         pt_size = len(self._table[0, :, :]) - 1
         keys = self._pt_trace[0].keys()
@@ -99,16 +109,29 @@ class NeedlemanWunschBase(ABC, AlignmentAlgorithm):
 
     @abstractmethod
     def calculate_matrix(self) -> np.ndarray:
-        pass
+        """
+        Calculates the values of the Dynamic Programming Matrix and stores them in self._table.
+        """
 
     def calculate_alignment(self) -> pd.DataFrame:
+        """
+        Calculate the alignment between two sequences or data sets and return the alignment result
+        :return: a DataFrame that includes the alignment
+        """
         self.calculate_matrix()
         return self.build_result()
 
     @property
     def initiate_gap(self):
+        """
+        Penalty for initiating a gap sequence in the alignment
+        """
         return self._init_gap
 
     @property
     def score(self):
+        """
+        The resulting score of the algorithm, i.e., the accumulated score after aligning the
+        pairs and including the gap penalty.
+        """
         return self._table[-1, -1]

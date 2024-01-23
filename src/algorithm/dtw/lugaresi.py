@@ -1,15 +1,37 @@
+"""
+dtw.lugaresi
+~~~~~~~~~~~~~~~~
+
+Implementation of Dynamic Time Warping as presented by Lugaresi et al. in [1].
+
+References:
+    [1] Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta:
+    Online validation of digital twins for manufacturing systems. Comput.
+    Ind. 150: 103942 (2023)
+"""
+
 import numpy as np
 import pandas as pd
 
-from algorithm.dtw.dynamic_time_warping_base import DynamicTimeWarpingBase
+from algorithm.dtw.base import DynamicTimeWarpingBase
 
-"""
-Taken from for comparison purposes:
-Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta:
-Online validation of digital twins for manufacturing systems. Comput. Ind. 150: 103942 (2023)
-"""
 
 class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):
+    """
+    This class implements the Dynamic Time Warping algorithm [1] as implemented in [2] for
+    comparison purposes.
+
+    Dynamic Time Warping is a technique used for measuring the similarity between two sequences
+    that may vary in time or speed.
+
+    References:
+        [1] Olsen, NL; Markussen, B; Raket, LL (2018), "Simultaneous inference for misaligned
+        multivariate functional data", Journal of the Royal Statistical Society, Series C,
+        67 (5): 1147–76
+        [2] Giovanni Lugaresi, Sofia Gangemi, Giulia Gazzoni, Andrea Matta:
+        Online validation of digital twins for manufacturing systems. Comput.
+        Ind. 150: 103942 (2023)
+    """
 
     def __init__(self, dt_trace: dict,
                  pt_trace: dict,
@@ -19,13 +41,19 @@ class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):
         self._pt_trace = [x[param_interest] for x in self._pt_trace]
 
     def _normalize_traces(self):
+        """
+        It normalizes the trace values by dividing each value by the maximum value within the
+        corresponding trace.
+        """
         max_value = max((max(self._dt_trace), max(self._pt_trace)))
         self._dt_trace[:] = [value / max_value for value in self._dt_trace]
         self._pt_trace[:] = [value / max_value for value in self._pt_trace]
 
     def calculate_matrix(self):
-        # Table initialization
-        for i in range(self._n_dt_trace):
+        """
+        Calculates the values of the Dynamic Programming Matrix and stores them in self._table.
+        """
+        for i in range(self._n_dt_trace):  # Table initialization
             for j in range(self._m_pt_trace):
                 self._table[i, j] = np.inf
         self._table[0, 0] = 0
@@ -44,7 +72,10 @@ class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):
                 self._table[i, j] = distance + last_min
 
     def calculate_alignment(self) -> pd.DataFrame:
-        # Normalize the traces before computing DTW
+        """
+        Calculate the alignment between two sequences or data sets and return the alignment result
+        :return: a DataFrame that includes the alignment
+        """
         self._normalize_traces()
         self.calculate_matrix()
         return pd.DataFrame()
