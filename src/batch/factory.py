@@ -1,14 +1,21 @@
+"""
+batch.factory
+~~~~~~~~~~~~~~~~
+
+A factory class for creating and managing configuration settings for each of the alignment
+algorithm variants.
+"""
 import os
 
 import plotly
 import yaml
 
-from batch_processing.alg_config.alignment_config import AlignmentConfiguration
-from batch_processing.alg_config.dtw_lug_config import DynamicTimeWarpingLugaresiConfig
-from batch_processing.alg_config.dtw_snaps_config import DynamicTimeWarpingSnapsConfig
-from batch_processing.alg_config.lcss_events_config import LongestCommonSubsequenceEventsConfig
-from batch_processing.alg_config.lcss_kpis_config import LongestCommonSubsequenceKPIsConfig
-from batch_processing.alg_config.ndw_config import NeedlemanWunschConfiguration
+from batch.config.alg_config import AlgorithmConfiguration
+from batch.config.dtw_lug import DynamicTimeWarpingLugaresiConfig
+from batch.config.dtw_snaps import DynamicTimeWarpingSnapsConfig
+from batch.config.lcss_events import LongestCommonSubsequenceEventsConfig
+from batch.config.lcss_kpis import LongestCommonSubsequenceKPIsConfig
+from batch.config.ndw import NeedlemanWunschConfiguration
 
 
 class ConfigFactory:
@@ -18,7 +25,15 @@ class ConfigFactory:
     """
 
     @staticmethod
-    def get_batch_configuration(current_directory, args) -> AlignmentConfiguration:
+    def get_batch_configuration(current_directory, args) -> AlgorithmConfiguration:
+        """
+        Factory method that returns an instance of the corresponding AlgorithmConfiguration
+        subclass to perform an alignment.
+        :param current_directory: The working directory of the project. To locate the config files
+        and export results.
+        :param args: The argparse object with the user input.
+        :return: The corresponding AlgorithmConfiguration instance
+        """
         config = ConfigFactory._load_configuration(current_directory, args)
         algorithms = {
             'NDW_Affine': NeedlemanWunschConfiguration,
@@ -36,11 +51,11 @@ class ConfigFactory:
     @staticmethod
     def _load_configuration(curr_dir: str, input_args):
         """
-            Initialize the configuration parameters for the alignment and, if necessary, set
-            the path to the Orca executable for processing the output alignments using Orca.
+        Initialize the configuration parameters for the alignment and, if necessary, set
+        the path to the Orca executable for processing the output alignments using Orca.
 
-            :param curr_dir: Filepath to the algor
-            :param input_args: An argparse.Namespace object containing command-line arguments.
+        :param curr_dir: Filepath to the algor
+        :param input_args: An argparse.Namespace object containing command-line arguments.
         """
         if input_args.config[0] == '/':
             input_args = input_args[1:]

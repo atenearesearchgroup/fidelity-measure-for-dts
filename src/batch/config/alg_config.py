@@ -1,3 +1,10 @@
+"""
+batch.alg_config
+~~~~~~~~~~~~~~~~
+
+An abstract class that generates alignment batches from a YAML file, using input ranges and
+configuration parameters for sequence alignment algorithms.
+"""
 import itertools
 import os
 
@@ -6,10 +13,10 @@ from metrics.metrics_factory import AnalysisFactory
 from systems import Lift, SystemBase
 
 
-class AlignmentConfiguration:
+class AlgorithmConfiguration:
     """
-    This class parses a YAML file to generate alignment batches based on specified input ranges
-    and configuration parameters for a sequence alignment algorithm.
+    This class generates alignment batches from a YAML file based on input ranges and configuration
+    parameters for sequence alignment.
 
     Attributes:
         - current_directory (str): Path to the current working directory, to use relative paths
@@ -18,6 +25,9 @@ class AlignmentConfiguration:
 
     PT_TRACE = 'pt_trace'
     DT_TRACE = 'dt_trace'
+    SYSTEM = 'system'
+    PARAM_INTEREST = 'param_interest'
+    TIMESTAMP_LABEL = 'timestamp_label'
 
     def __init__(self, current_directory, args, config):
         self.current_directory = current_directory
@@ -77,7 +87,7 @@ class AlignmentConfiguration:
 
     def _create_output_directories(self):
         """
-            Create directories for storing individual result statistics and batch statistics.
+        Create directories for storing individual result statistics and batch statistics.
         """
         self.output_results_directory = os.path.join(self.output_directory, 'results')
         directories = [self.output_directory, self.output_results_directory]
@@ -86,17 +96,31 @@ class AlignmentConfiguration:
             os.makedirs(directory, exist_ok=True)
 
     def get_hyperparameters_combinations(self):
+        """
+        It returns a list of tuples containing all possible combinations of parameter values
+        based on user input ranges.
+        """
         return list(itertools.product(*self.get_hyperparameters_ranges()))
 
-    def get_alignment_metrics(self, alignment_df, pt_trace, dt_trace, input_dict, score):
-        # --- DISTANCE ANALYSIS ---
+    def get_alignment_metrics(self, alignment_df, pt_trace, dt_trace, input_parameters, score):
+        """
+        This method returns a dictionary containing the alignment input parameters and
+        corresponding alignment metrics.
+
+        :param alignment_df: Dataframe that contains the resulting alignment
+        :param pt_trace: The Physical Twin trace
+        :param dt_trace: The Digital Twin trace
+        :param input_parameters: dictionary that contains the algorithm configuration parameters
+        :param score: algorithm resulting score
+        :return:
+        """
         alignment_results = AnalysisFactory.create_instance \
             (self.alignment_algorithm, self.lca, alignment=alignment_df,
              dt_trace=dt_trace, pt_trace=pt_trace, system=self._system,
              selected_params=self.params, score=score, timestamp_label=self.timestamp_label)
 
         statistical_values = fu.get_property_values(alignment_results, self._methods)
-        return {**fu.flatten_dictionary(input_dict),
+        return {**fu.flatten_dictionary(input_parameters),
                 **fu.flatten_dictionary(statistical_values)}
 
     def get_scenario(self, dt_file, pt_file):
@@ -114,13 +138,30 @@ class AlignmentConfiguration:
                f"-{self._param_interest.replace('/', '')}"
 
     def get_hyperparameters_labels(self) -> list:
+        """
+        :return: A list of the hyperparameter labels for the corresponding algorithm.
+        """
         return []
 
     def get_hyperparameters_ranges(self) -> list:
+        """
+        :return: A list of the hyperparameter ranges for the corresponding algorithm.
+        """
         return []
 
     def get_config_params(self, pt_trace, dt_trace, current_config=None):
+        """
+        It generates a dictionary containing the necessary input parameters to instantiate the
+        given algorithm. The dictionary serves as the creation attributes for the algorithm
+        instance.
+
+        :param pt_trace: The Physical Twin Trace
+        :param dt_trace: The Digital Twin Trace
+        :param current_config: The dictionary with the current configuration for the algorithm
+        :return: A dictionary with the configuration parameters and their values.
+        """
         return {
             self.PT_TRACE: pt_trace,
             self.DT_TRACE: dt_trace,
+            **current_config
         }

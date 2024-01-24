@@ -1,7 +1,6 @@
-from algorithm.algorithm_factory import AlignmentAlgorithmFactory
-from batch_processing.alg_config.alignment_config import AlignmentConfiguration
+from algorithm.factory import AlignmentAlgorithmFactory
 from metrics.metrics_factory import AnalysisFactory
-from .config_factory import ConfigFactory
+from .factory import ConfigFactory
 
 __all__ = ['AlignmentAlgorithmFactory',
            'AlignmentConfiguration',
