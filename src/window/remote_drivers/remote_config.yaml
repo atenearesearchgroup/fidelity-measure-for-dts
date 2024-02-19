@@ -1,0 +1,20 @@
+timestamp_label: 'timestep(t)'
+window_size: 100
+timestep: 20
+
+# RabbitMQ configuration
+rabbitmq:
+  host: 'localhost'
+  port: 5670
+  prefetch_count: 1
+
+# Databases configuration
+influxdb:
+  url: 'http://localhost:8086'
+  org: 'uma'
+  token_path: 'INFLUXDB_TOKEN.txt'
+  bucket: 'alignments'
+
+mongodb:
+  host: 'localhost'
+  port: 27017

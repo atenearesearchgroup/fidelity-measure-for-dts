@@ -2,16 +2,21 @@ import argparse
 import os
 from multiprocessing import Process
 
-from batch_processing import ConfigFactory
-from window_processing.alignment_dispatcher import SlidingWindowProcessor
+from batch.factory import ConfigFactory
+from window.alignment_dispatcher import SlidingWindowProcessor
+from window.raw_trace_storer import RawTraceStorer
 
 
-def start_processor(conf):
-    processor = SlidingWindowProcessor(5, conf)
+def start_processor(config_path, alignment_config):
+    alignment_dispatcher = SlidingWindowProcessor(alignment_config, config_path)
+    raw_traces_processor = RawTraceStorer(config_path)
     # Start separate threads for consuming messages from each producer
-    thread1 = Process(target=processor.consume_messages)
-    thread1.start()
-    thread1.join()
+    raw_traces_process = Process(target=raw_traces_processor.consume_messages)
+    alignment_process = Process(target=alignment_dispatcher.consume_messages)
+    raw_traces_process.start()
+    alignment_process.start()
+    raw_traces_process.join()
+    alignment_process.join()
 
 
 if __name__ == "__main__":
@@ -26,8 +31,9 @@ if __name__ == "__main__":
 
     # TODO: enter as parameter
     args = parser.parse_args()
-    args.config = os.path.join('window', 'lift_affine_variant.yaml')
+    args.config = os.path.join('window', 'nasa_mars.yaml')
 
     curr_dir = os.path.join(os.getcwd(), "")
+    config_dir = os.path.join(curr_dir, 'window', 'remote_drivers', 'remote_config.yaml')
     alignment_config = ConfigFactory.get_batch_configuration(curr_dir, args)
-    start_processor(alignment_config)
+    start_processor(config_dir, alignment_config)

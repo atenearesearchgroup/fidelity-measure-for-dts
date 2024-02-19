@@ -129,6 +129,6 @@ class BatchAlignments:
                                              **{'params_of_interest': self._config.params,
                                                 'timestamp_label': self._config.timestamp_label})
             height = 800 if len(self._config.params) == 1 else 3000
-            fig.write_image(output_filepath.replace(".csv", ".pdf"), format="pdf", width=2500,
+            fig.write_image(output_filepath.replace(".csv", ".pdf"), format="pdf", width=4000,
                             height=height,
                             engine=self._config.engine)

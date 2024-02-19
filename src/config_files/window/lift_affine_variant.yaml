@@ -14,7 +14,7 @@ paths:
       #- "Bajada_4_3_2_1_0_1_2_3_4.csv"
     pt: "physical_twin/"
     pt_files:
-      - "Bajada_4_0_4_01.csv"
+      - "Bajada_4_0_4_05.csv"
       #- "Bajada_4_2_0_2_4"
       #- "Bajada_4_3_2_1_0_1_2_3_4"
   output: "resources/output/lift/window/"

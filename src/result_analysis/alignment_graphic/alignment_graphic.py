@@ -24,7 +24,7 @@ class AlignmentGraphics:
         self._dt_trace = clean_df(dt_trace)
         self._pt_trace = clean_df(pt_trace)
 
-        self._visualization_indent = 1.5
+        self._visualization_indent = 3
 
     def generate_alignment_graphic(self):
         colors = sample_colorscale('Sunset', [0.20, 0.70])
@@ -103,13 +103,13 @@ class AlignmentGraphics:
                                  mode='lines+markers',
                                  name=plot_label,
                                  marker={
-                                     # "size": 10,
-                                     "line_width": 0.5,
+                                     "size": 1,
+                                     "line_width": 0.05,
                                      "color": plot_color,
                                      "symbol": marker_symbol
                                  },
                                  line={
-                                     "width": 5,
+                                     "width": 1,
                                      "color": plot_color
                                  },
                                  showlegend=show_legend),

@@ -1,0 +1,58 @@
+system: "NasaCuriosity"
+low_complexity_area: false
+alignment_alg: 'NDW_Affine'
+# orca_path: <your_orca_executable_path>
+
+paths:
+  input:
+    main: "resources/input/nasa_smap_msl/"
+    dt: ""
+    dt_files:
+      - "157_UCR_TkeepMARS_working_butter.csv"
+      - "157_UCR_TkeepMARS_working_butter.csv"
+      - "157_UCR_TkeepMARS_working_butter.csv"
+      - "157_UCR_TkeepMARS_working_butter.csv"
+      - "157_UCR_TkeepMARS_working_butter.csv"
+      - "157_UCR_TkeepMARS_working_kalman.csv"
+      - "157_UCR_TkeepMARS_working_kalman.csv"
+      - "157_UCR_TkeepMARS_working_kalman.csv"
+      - "157_UCR_TkeepMARS_working_kalman.csv"
+      - "157_UCR_TkeepMARS_working_kalman.csv"
+    pt: ""
+    pt_files:
+      - "157_UCR_Anomaly_TkeepFirstMARS_3500_5365_5380.csv"
+      - "159_UCR_Anomaly_TkeepSecondMARS_3500_9330_9340.csv"
+      - "160_UCR_Anomaly_TkeepThirdMARS_3500_4711_4809.csv"
+      - "158_UCR_Anomaly_TkeepForthMARS_3500_5988_6085.csv"
+      - "156_UCR_Anomaly_TkeepFifthMARS_3500_5988_6085.csv"
+      - "157_UCR_Anomaly_TkeepFirstMARS_3500_5365_5380.csv"
+      - "159_UCR_Anomaly_TkeepSecondMARS_3500_9330_9340.csv"
+      - "160_UCR_Anomaly_TkeepThirdMARS_3500_4711_4809.csv"
+      - "158_UCR_Anomaly_TkeepForthMARS_3500_5988_6085.csv"
+      - "156_UCR_Anomaly_TkeepFifthMARS_3500_5988_6085.csv"
+  output: "resources/output/nasa_curiosity/"
+
+labels:
+  timestamp_label: "timestep(t)"
+  params:
+    - "measurement"
+  param_interest: "measurement"
+
+ranges:
+  mad:
+    measurement:
+      start: 0.20
+      step: 0.05
+      end: 0.50
+  low:
+    start: 50
+    step: 2
+    end: 51
+  init_gap:
+    start: -1.0
+    step: 0.5
+    end: -0.6
+  cont_gap:
+    start: -0.1
+    step: 0.1
+    end: -0.09

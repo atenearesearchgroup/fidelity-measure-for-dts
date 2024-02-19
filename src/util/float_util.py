@@ -52,3 +52,10 @@ def get_input_values_list(*args):
     for elements in itertools.product(*args):
         combinations.append(elements)
     return combinations
+
+
+def parse_float(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return value

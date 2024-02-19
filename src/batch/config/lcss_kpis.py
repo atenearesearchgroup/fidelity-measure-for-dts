@@ -20,9 +20,9 @@ from batch.config.alg_config import AlgorithmConfiguration
 
 class LongestCommonSubsequenceKPIsConfig(AlgorithmConfiguration):
     """
-    A class that generates alignment batches for the adaptation of Longest Common Subsequence (LCSS) [1]
-    algorithm for aligning sequences of KPI values, as proposed in [2]. It takes the batch configuration
-    from a YAML file, including input ranges and configuration parameters.
+    A class that generates alignment batches for the adaptation of Longest Common Subsequence (LCSS)
+    [1] algorithm for aligning sequences of KPI values, as proposed in [2]. It takes the batch
+    configuration from a YAML file, including input ranges and configuration parameters.
 
     References:
         [1] David Maier (1978). "The Complexity of Some Problems on Subsequences and
