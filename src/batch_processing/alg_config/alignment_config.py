@@ -9,6 +9,7 @@ from batch_processing.algorithm_factory import AlignmentAlgorithmFactory
 from batch_processing.analysis_factory import AnalysisFactory
 from result_analysis.alignment_graphic.graphic_factory import GraphicFactory
 from systems import Lift, SystemBase
+from systems.incubator import Incubator
 from util.dic_util import nested_set
 from util.file_util import generate_filename
 
@@ -74,7 +75,14 @@ class AlignmentConfiguration:
         headers and the System object for the alignment.
         """
         system_name = self._config.get('system', 'System')
-        self._system = Lift() if system_name == 'Lift' else SystemBase()
+        systems = {
+            'Lift': Lift,
+            'Incubator': Incubator
+        }
+        if system_name in systems:
+            self._system = systems[system_name]()
+        else:
+            self._system = SystemBase()
 
         self._lca = self._config.get('low_complexity_area', False)
 
