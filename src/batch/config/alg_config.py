@@ -11,6 +11,7 @@ import os
 import util.file_util as fu
 from metrics.metrics_factory import AnalysisFactory
 from systems import Lift, SystemBase
+from systems.incubator import Incubator
 
 
 class AlgorithmConfiguration:
@@ -77,7 +78,14 @@ class AlgorithmConfiguration:
         headers and the System object for the alignment.
         """
         system_name = self.config.get('system', 'System')
-        self._system = Lift() if system_name == 'Lift' else SystemBase()
+        systems = {
+            'Lift': Lift,
+            'Incubator': Incubator
+        }
+        if system_name in systems:
+            self._system = systems[system_name]()
+        else:
+            self._system = SystemBase()
 
         self.lca = self.config.get('low_complexity_area', False)
 
