@@ -28,8 +28,8 @@ class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
           48(3), 443-453.
     """
 
-    def __init__(self, dt_trace: list,
-                 pt_trace: list,
+    def __init__(self, dt_trace: pd.DataFrame,
+                 pt_trace: pd.DataFrame,
                  system: SystemBase,
                  timestamp_label: str = "timestamp(s)",
                  init_gap: float = -0.2,
@@ -38,14 +38,17 @@ class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
                  low: float = None):
         # Traces to align
         self._continue_gap = cont_gap
-        self._dt_trace = dt_trace
-        self._pt_trace = pt_trace
+        self._dt_trace = dt_trace.to_numpy()
+        self._pt_trace = pt_trace.to_numpy()
+        self._keys = pt_trace.columns.values.astype(str)
         # System information
         self._system = system
         # Configuration
         self._timestamp_label = timestamp_label
         self._init_gap = init_gap
-        self._mad = mad
+        # Keep order for later
+        self._mad = np.fromiter((mad[key] if key != timestamp_label else 0
+                                 for key in self._keys), float)
         # Alignment table to calculate alignment
         self._table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1, 2))
         self._low = low
@@ -57,12 +60,12 @@ class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
         """
         dt_size = len(self._table) - 1
         pt_size = len(self._table[0, :, :]) - 1
-        keys = self._pt_trace[0].keys()
+        len_snapshot = self._pt_trace.shape[1]
         rows = []
 
         # Add headers to file
-        headers = ["dt-" + k for k in keys]
-        headers.extend(["pt-" + k for k in keys])
+        headers = ["dt-" + k for k in self._keys]
+        headers.extend(["pt-" + k for k in self._keys])
         headers.append("operation")
 
         while dt_size > 0 or pt_size > 0:
@@ -70,9 +73,9 @@ class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
             if pt_size > 0:
                 if self._table[dt_size, pt_size, 0] == 1:  # Insertion
                     aux = []
-                    for key in keys:
+                    for i in range(len_snapshot):
                         row.append("-")
-                        aux.append(self._pt_trace[pt_size - 1][key])  # - 1
+                        aux.append(self._pt_trace[pt_size - 1, i])  # - 1
 
                     row.extend(aux)
                     row.append("Insertion")
@@ -83,9 +86,9 @@ class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
             if dt_size > 0 and pt_size > 0:
                 if self._table[dt_size, pt_size, 0] > 1:  # Match or mismatch
                     aux = []
-                    for key in keys:
-                        row.append(self._dt_trace[dt_size - 1][key])
-                        aux.append(self._pt_trace[pt_size - 1][key])
+                    for i in range(len_snapshot):
+                        row.append(self._dt_trace[dt_size - 1, i])
+                        aux.append(self._pt_trace[pt_size - 1, i])
                     row.extend(aux)
                     if self._table[dt_size, pt_size, 0] > 2:
                         row.append("Match")
@@ -97,8 +100,8 @@ class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
                     continue
 
             aux = []  # Must be a deletion
-            for key in keys:
-                row.append(self._dt_trace[dt_size - 1][key])  # - 1
+            for i in range(len_snapshot):
+                row.append(self._dt_trace[dt_size - 1, i])  # - 1
                 aux.append("-")
             row.extend(aux)
             row.append("Deletion")

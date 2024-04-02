@@ -62,8 +62,8 @@ class BatchAlignments:
                     alg = AlignmentAlgorithmFactory. \
                         get_alignment_algorithm(self._config.alignment_algorithm,
                                                 **self._config.get_config_params(
-                                                    pt_trace.to_dict('records'),
-                                                    dt_trace.to_dict('records'),
+                                                    pt_trace,
+                                                    dt_trace,
                                                     current_config))
 
                     alignment_df = alg.calculate_alignment()

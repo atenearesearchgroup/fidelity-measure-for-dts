@@ -1,6 +1,9 @@
 import itertools
 
+from numba import jit
 
+
+@jit(nopython=True)
 def max_tolerance(v1: float, v2: float, v3: float, equals_value: float,
                   tolerance: float = 0.0001) -> (float, int):
     """Comparison of three floats considering a certain tolerance.
@@ -24,6 +27,7 @@ def max_tolerance(v1: float, v2: float, v3: float, equals_value: float,
     return max_value, max_index
 
 
+@jit(nopython=True)
 def min_tolerance(v1: float, v2: float, v3: float,
                   tolerance: float = 0.0001) -> (float, int):
     """Comparison of three floats considering a certain tolerance.

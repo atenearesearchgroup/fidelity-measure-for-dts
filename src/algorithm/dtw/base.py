@@ -8,6 +8,7 @@ Abstract class for the implementation of the Dynamic Time Warping variants.
 from abc import ABC, abstractmethod
 
 import numpy as np
+import pandas as pd
 
 from algorithm.ialgorithm import IAlignmentAlgorithm
 
@@ -25,10 +26,10 @@ class DynamicTimeWarpingBase(ABC, IAlignmentAlgorithm):
         67 (5): 1147–76
     """
 
-    def __init__(self, dt_trace: dict,
-                 pt_trace: dict):
-        self._dt_trace = dt_trace
-        self._pt_trace = pt_trace
+    def __init__(self, dt_trace: pd.DataFrame,
+                 pt_trace: pd.DataFrame):
+        self._dt_trace = dt_trace.to_dict('records')
+        self._pt_trace = pt_trace.to_dict('records')
 
         self._n_dt_trace = len(dt_trace) + 1
         self._m_pt_trace = len(pt_trace) + 1

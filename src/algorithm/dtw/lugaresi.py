@@ -33,8 +33,8 @@ class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):
         Ind. 150: 103942 (2023)
     """
 
-    def __init__(self, dt_trace: dict,
-                 pt_trace: dict,
+    def __init__(self, dt_trace: pd.DataFrame,
+                 pt_trace: pd.DataFrame,
                  param_interest: str):
         super().__init__(dt_trace, pt_trace)
         self._dt_trace = [x[param_interest] for x in self._dt_trace]

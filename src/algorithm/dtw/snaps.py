@@ -27,8 +27,8 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
         67 (5): 1147–76
     """
 
-    def __init__(self, dt_trace: dict,
-                 pt_trace: dict,
+    def __init__(self, dt_trace: pd.DataFrame,
+                 pt_trace: pd.DataFrame,
                  system: SystemBase,
                  timestamp_label: str = 'timestamp(s)'):
         super().__init__(dt_trace, pt_trace)

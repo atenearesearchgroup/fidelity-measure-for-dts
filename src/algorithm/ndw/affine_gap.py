@@ -8,6 +8,8 @@ gap penalties.
 from abc import ABC
 
 import numpy as np
+import pandas as pd
+from numba import jit
 
 from algorithm.ndw.base import NeedlemanWunschBase
 from systems.system import SystemBase
@@ -31,10 +33,9 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
           similarities in the amino acid sequence of two proteins. Journal of Molecular Biology,
           48(3), 443-453.
     """
-    MIN = -float("inf")
 
-    def __init__(self, dt_trace: list,
-                 pt_trace: list,
+    def __init__(self, dt_trace: pd.DataFrame,
+                 pt_trace: pd.DataFrame,
                  system: SystemBase,
                  timestamp_label: str = "timestamp(s)",
                  init_gap: float = -0.2,
@@ -48,46 +49,8 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
 
         # Dynamic programming tables
         # +1 to consider the alignment with the empty string
-        self._insert_table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1, 1))
-        self._deletion_table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1, 1))
-
-    def _init_deletion(self, i, j):
-        """
-        Returns the score that corresponds to cells of the first row and column of
-        the deletion table
-        """
-        if i > 0 and j == 0:
-            return self.MIN
-        if j > 0:
-            return self._init_gap + (self._continue_gap * j)
-        return 0
-
-    def _init_insertion(self, i, j):
-        """
-        Returns the score that corresponds to cells of the first row and column of
-        the insertion table
-        """
-        if j > 0 and i == 0:
-            return self.MIN
-        if i > 0:
-            return self._init_gap + (self._continue_gap * i)
-        return 0
-
-    def _init_match(self, i, j):
-        """
-        Initializes a cell of the table that tracks the matched pairs of the alignment.
-        It is used to initialize the first row and column of this table.
-        """
-        # if j == 0 and i == 0:
-        #   self._table[i, j, 0] = 0
-        #   self._table[i, j, 1] = 0 # Deletion
-        # else:
-        if j == 0 and not i == 0:
-            # self._table[i, j, 0] = 0  # Deletion
-            self._table[i, j, 1] = self._init_gap + (self._continue_gap * i)
-        elif i == 0 and not j == 0:
-            self._table[i, j, 0] = 1  # Insertion
-            self._table[i, j, 1] = self._init_gap + (self._continue_gap * j)
+        self._insertion_table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1))
+        self._deletion_table = np.zeros((len(dt_trace) + 1, len(pt_trace) + 1))
 
     def calculate_matrix(self) -> np.ndarray:
         """
@@ -99,28 +62,14 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
         mismatch : 2
         match : 3
         """
-        dt_index, pt_index, _ = self._table.shape
+        _initialize_matrices(self._table, self._deletion_table, self._insertion_table,
+                             self._init_gap, self._continue_gap)
 
-        for j in range(0, pt_index):
-            for i in range(0, dt_index):
-                self._init_match(i, j)
-
-        self._deletion_table = np.array(
-            [[self._init_deletion(i, j) for j in range(0, pt_index)] for i in range(0, dt_index)])
-        self._insert_table = np.array(
-            [[self._init_insertion(i, j) for j in range(0, pt_index)] for i in range(0, dt_index)])
-
-        for j in range(1, pt_index):
-            for i in range(1, dt_index):
-                self._deletion_table[i][j] = \
-                    max((self._init_gap + self._continue_gap + self._table[i - 1][j][1]),
-                        (self._continue_gap + self._deletion_table[i - 1][j]), )
-                self._insert_table[i][j] = \
-                    max((self._init_gap + self._continue_gap + self._table[i][j - 1][1]),
-                        (self._continue_gap + self._insert_table[i][j - 1]))
-
+        for j in range(1, self._table.shape[0]):
+            for i in range(1, self._table.shape[1]):
                 equals_value = self._system.snap_equals(self._dt_trace[i - 1],
                                                         self._pt_trace[j - 1],
+                                                        self._keys,
                                                         self._mad,
                                                         self._timestamp_label,
                                                         self._low)
@@ -128,7 +77,7 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
                 sub = self._table[i - 1, j - 1, 1] + equals_value
 
                 max_value, max_index = max_tolerance(sub,
-                                                     self._insert_table[i][j],
+                                                     self._insertion_table[i][j],
                                                      self._deletion_table[i][j],
                                                      equals_value)
 
@@ -137,3 +86,77 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
                 # Match : 3 / Mismatch : 2 / Insertion : 1 / Deletion : 0
 
         return self._table
+
+
+@jit(nopython=True)
+def _init_deletion(table: np.array, init_gap: float, continue_gap: float, i: int, j: int):
+    """
+    Returns the score that corresponds to cells of the first row and column of
+    the deletion table
+    """
+    if i > 0 and j == 0:
+        table[i, j] = -np.inf
+    if j > 0:
+        table[i, j] = init_gap + (continue_gap * j)
+    table[i, j] = 0
+
+
+@jit(nopython=True)
+def _init_insertion(table: np.array, init_gap: float, continue_gap: float, i: int, j: int):
+    """
+    Returns the score that corresponds to cells of the first row and column of
+    the insertion table
+    """
+    if j > 0 and i == 0:
+        table[i, j] = -np.inf
+    if i > 0:
+        table[i, j] = init_gap + (continue_gap * i)
+    table[i, j] = 0
+
+
+@jit(nopython=True)
+def _init_match(table: np.array, init_gap: float, continue_gap: float, i: int, j: int):
+    """
+    Initializes a cell of the table that tracks the matched pairs of the alignments.
+    It is used to initialize the first row and column of this table.
+    """
+    # if j == 0 and i == 0:
+    #   self._table[i, j, 0] = 0
+    #   self._table[i, j, 1] = 0 # Deletion
+    # else:
+    if j == 0 and not i == 0:
+        # self._table[i, j, 0] = 0  # Deletion
+        table[i, j, 1] = init_gap + continue_gap * i
+    elif i == 0 and not j == 0:
+        table[i, j, 0] = 1  # Insertion
+        table[i, j, 1] = init_gap + continue_gap * j
+
+
+@jit(nopython=True)
+def _initialize_matrices(table: np.array, deletion_table: np.array, insertion_table: np.array,
+                         init_gap: float, continue_gap: float):
+    """
+    Calculates the values of the Dynamic Programming Matrix and stores them in self._table.
+
+    Coding for the matrix
+    deletion : 0
+    insertion : 1
+    mismatch : 2
+    match : 3
+    """
+    dt_index, pt_index, _ = table.shape
+
+    for j in range(0, pt_index):
+        for i in range(0, dt_index):
+            _init_match(table, init_gap, continue_gap, i, j)
+            _init_deletion(deletion_table, init_gap, continue_gap, i, j)
+            _init_insertion(insertion_table, init_gap, continue_gap, i, j)
+
+    for j in range(1, pt_index):
+        for i in range(1, dt_index):
+            deletion_table[i, j] = \
+                max((init_gap + continue_gap + table[i - 1, j, 1]),
+                    (continue_gap + deletion_table[i - 1, j]))
+            insertion_table[i, j] = \
+                max((init_gap + continue_gap + table[i, j - 1, 1]),
+                    (continue_gap + insertion_table[i, j - 1]))
