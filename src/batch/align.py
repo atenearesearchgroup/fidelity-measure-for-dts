@@ -73,7 +73,7 @@ class BatchAlignments:
 
                     print(f"--- SCENARIO: {scenario} ---")
                     print(f"---{generate_filename(current_config)}"
-                          f" : {process_time :.2f} seconds ---")
+                          f" : {ex_time :.2f} seconds : {process_time :.2f} seconds ---")
 
                     if not alignment_df.empty:
                         alignment_df.to_csv(alignment_filepath, index=False,

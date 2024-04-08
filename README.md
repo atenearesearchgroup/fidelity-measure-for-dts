@@ -60,102 +60,22 @@ To install all the required packages:
 
 ## Repository structure
 
-```
-├── /src
-│   ├── align_traces.py
-│   ├── algorithm
-│   │   ├── alignment_algorithm.py
-│   │   ├── dtw
-│   │   │   ├── dynamic_time_warping_base.py
-│   │   │   ├── dynamic_time_warping_lug.py
-│   │   │   └── dynamic_time_warping_snaps.py
-│   │   ├── lcss
-│   │   │   ├── longes_common_subsequence_events.py
-│   │   │   ├── longes_common_subsequence_kpi.py
-│   │   │   └── longest_common_subsequence_base.py
-│   │   └── ndw
-│   │   │   ├── needleman_wunsch_affine_gap.py
-│   │   │   ├── needleman_wunsch_base.py
-│   │   │   └── needleman_wunsch_tolerance.py
-│   ├── batch_processing
-│   │   ├── alg_config
-│   │   │   ├── alignment_config.py
-│   │   │   ├── dtw_lug_config.py
-│   │   │   ├── dtw_snaps_config.py
-│   │   │   ├── lcss_events_config.py
-│   │   │   ├── lcss_kpis_config.py
-│   │   │   └── ndw_config.py
-│   │   ├── algorithm_factory.py
-│   │   ├── analysis_factory.py
-│   │   └── config_factory.py
-│   ├── metrics
-│   │   ├── alignment_base.py
-│   │   ├── dtw
-│   │   │   └── dtw_alignment.py
-│   │   ├── lcss
-│   │   │   └── lcss_alignment.py
-│   │   └── ndw
-│   │       ├── ndw_alignment.py
-│   │       └── ndw_alignment_lca.py
-│   ├── /systems
-│   │   ├── lift.py
-│   │   └── system.py
-│   ├── /evaluation
-│   │   ├── /incubator
-│   │   │   ├── incubator_gap_tuning.ipynb
-│   │   │   └── incubator_variability_analysis.ipynb    
-│   │   ├── /lift
-│   │   │   ├── lift_comparison_analysis.ipynb
-│   │   │   ├── lift_gap_tuning.ipynb
-│   │   │   └── lift_variability_analysis.ipynb  
-│   │   └── /braccio
-│   │       ├── braccio_gap_tuning.yaml
-│   │       └── braccio_fidelity_analysis.yaml
-│   ├── /config_files
-│   ├── /result_analysis
-│   │   ├── alignment_graphic
-│   │   │   ├── alignment_graphic.py
-│   │   │   ├── dtw_alignment_graphic.py
-│   │   │   ├── graphic_factory.py
-│   │   │   └── ndw_alignment_graphic.py
-│   │   ├── gap_tunning.py
-│   │   └── statistical_graphics.py
-│   ├── /packages
-│   ├── /util
-├── /resources
-│   ├── /input
-│   └── /output
-├── docs
-│   ├── Technical_Report_Elevator.pdf
-│   ├── Technical_Report_General_Concepts.pdf
-│   ├── Technical_Report_Incubator.pdf
-│   ├── Technical_Report_NXT_Car.pdf
-│   └── Technical_Report_Robotic_Arm.pdf
-├── CITATION.cff
-├── LICENSE
-├── README.md
-└── requirements.txt
-```
-
 Breakdown of the repository structure:
 
 - /src:
-    - /algorithm: Implementations of our Needleman-Wunsch adaptation, and the adaptations from [1]
+    - /algorithm: implementations of our Needleman-Wunsch adaptation, and the adaptations from [1]
       of Dynamic Time Warping and Longest Common Subsequence.
-    - /metrics: Metrics to measure fidelity based on the results of the alignment algorithms.
-    - /batch_processing: auxiliary classes to perform the analysis and alignments automatically.
-    - /systems
-        - System.py: general class that defines the **Comparison Function** between snapshots and
-          the **Low Complexity
-          Area** condition.
-        - Lift.py: it extends System.py redefining the **Low Complexity Area** condition.
-    - /evaluation: it includes the Jupyter Notebooks to reproduce all the analysis performed in
+    - /metrics: metrics to measure fidelity based on the results of the alignment algorithms.
+    - /batch: auxiliary classes to perform the analysis and alignments automatically.
+    - /systems: classes that define the **Comparison Function** between snapshots and the **Low
+      Complexity Area** condition.
+    - /evaluation: it includes the Jupyter Notebooks to reproduce some of the analysis performed in
       the [Technical Reports](/docs).
     - /config_files: YAML configuration file to execute all the alignments included in
       the [Technical Reports](/docs).
     - /result analysis: auxiliary classes for data analysis.
 
-    - /resources: raw traces for the alignments.
+    - /resources: raw traces and output alignments.
     - align_traces.py: main file to perform alignments. Instructions on how to use it
       in [Usage and examples](#usage-and-examples).
 

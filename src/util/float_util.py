@@ -1,5 +1,6 @@
 import itertools
 
+import numpy as np
 from numba import jit
 
 
@@ -50,7 +51,6 @@ def min_tolerance(v1: float, v2: float, v3: float,
         min_index = 3
     return min_value, min_index
 
-
 def get_input_values_list(*args):
     combinations = []
     for elements in itertools.product(*args):
@@ -63,3 +63,7 @@ def parse_float(value):
         return float(value)
     except (TypeError, ValueError):
         return value
+
+
+def is_numerical(values):
+    return np.fromiter((isinstance(v, (float, int)) for v in values), dtype=bool)

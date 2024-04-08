@@ -31,6 +31,7 @@ class NeedlemanWunschConfiguration(AlgorithmConfiguration):
     LOW = 'low'
     INIT_GAP = 'init_gap'
     CONT_GAP = 'cont_gap'
+    LCA = 'lca'
 
     def __init__(self, current_directory, args, config):
         super().__init__(current_directory, args, config)
@@ -98,5 +99,6 @@ class NeedlemanWunschConfiguration(AlgorithmConfiguration):
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
             AlgorithmConfiguration.SYSTEM: self._system,
-            AlgorithmConfiguration.TIMESTAMP_LABEL: self.timestamp_label
+            AlgorithmConfiguration.TIMESTAMP_LABEL: self.timestamp_label,
+            NeedlemanWunschConfiguration.LCA: self.lca,
         }

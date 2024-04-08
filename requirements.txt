@@ -1,5 +1,5 @@
 numpy==1.24.3
-pandas==2.0.2
+pandas==2.2.1
 scipy==1.10.1
 matplotlib==3.7.1
 seaborn==0.12.2
@@ -7,7 +7,7 @@ setuptools==67.8.0
 plotly==5.15.0
 kaleido==0.2.1
 argparse==1.4.0
-numba~=0.57.0
+numba==0.59.1
 PyYAML~=6.0
 scikit-learn==1.2.2
 statsmodels==0.14.0
