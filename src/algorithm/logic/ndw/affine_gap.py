@@ -11,9 +11,9 @@ import numpy as np
 import pandas as pd
 from numba import jit
 
-from algorithm.ndw.base import NeedlemanWunschBase
+from algorithm.logic.ndw.base import NeedlemanWunschBase
 from systems.system import SystemBase
-from util.float_util import max_tolerance
+from util.float import max_tolerance
 
 MIN = -float("inf")
 
@@ -90,8 +90,8 @@ class NeedlemanWunschAffineGap(NeedlemanWunschBase, ABC):
                 sub = self._table[i - 1, j - 1, 1] + equals_value
 
                 max_value, max_index = max_tolerance(sub,
-                                                     self._insertion_table[i][j],
-                                                     self._deletion_table[i][j],
+                                                     self._insertion_table[i, j],
+                                                     self._deletion_table[i, j],
                                                      equals_value)
 
                 self._table[i, j, 1] = max_value

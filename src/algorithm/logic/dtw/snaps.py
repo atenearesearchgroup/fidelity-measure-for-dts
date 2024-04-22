@@ -8,9 +8,9 @@ Implementation of Dynamic Time Warping adapted to enable the alignment of snapsh
 import numpy as np
 import pandas as pd
 
-from algorithm.dtw.base import DynamicTimeWarpingBase
+from algorithm.logic.dtw.base import DynamicTimeWarpingBase
 from systems import SystemBase
-from util.float_util import min_tolerance
+from util.float import min_tolerance
 
 
 class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
@@ -81,16 +81,16 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
                 continue
 
             # Table meaning: {diagonal : 1, i-1 : 2, j-1 : 3}
-            if self._decisions[dt_size][pt_size] == 1:  # diagonal
+            if self._decisions[dt_size, pt_size] == 1:  # diagonal
                 rows.insert(0, self._create_row(dt_size - 1, pt_size - 1, keys))
                 dt_size -= 1
                 pt_size -= 1
                 continue
-            if self._decisions[dt_size][pt_size] == 2:  # i-1
+            if self._decisions[dt_size, pt_size] == 2:  # i-1
                 rows.insert(0, self._create_row(dt_size - 1, pt_size, keys))
                 dt_size -= 1
                 continue
-            if self._decisions[dt_size][pt_size] == 3:  # j-1
+            if self._decisions[dt_size, pt_size] == 3:  # j-1
                 rows.insert(0, self._create_row(dt_size, pt_size - 1, keys))
                 pt_size -= 1
                 continue
@@ -102,8 +102,8 @@ class DynamicTimeWarpingSnaps(DynamicTimeWarpingBase):
         aux = []
         row = []
         for key in keys:
-            row.append(self._dt_trace[dt_index][key])
-            aux.append(self._pt_trace[pt_index][key])
+            row.append(self._dt_trace[dt_index, key])
+            aux.append(self._pt_trace[pt_index, key])
 
         row.extend(aux)
         return row

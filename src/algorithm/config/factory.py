@@ -10,12 +10,13 @@ import os
 import plotly
 import yaml
 
-from batch.config.alg_config import AlgorithmConfiguration
-from batch.config.dtw_lug import DynamicTimeWarpingLugaresiConfig
-from batch.config.dtw_snaps import DynamicTimeWarpingSnapsConfig
-from batch.config.lcss_events import LongestCommonSubsequenceEventsConfig
-from batch.config.lcss_kpis import LongestCommonSubsequenceKPIsConfig
-from batch.config.ndw import NeedlemanWunschConfiguration
+from algorithm.config.alg_config import AlgorithmConfiguration
+from algorithm.config.dtw.dtw_lug import DynamicTimeWarpingLugaresiConfig
+from algorithm.config.dtw.dtw_snaps import DynamicTimeWarpingSnapsConfig
+from algorithm.config.lcss.lcss_events import LongestCommonSubsequenceEventsConfig
+from algorithm.config.lcss.lcss_kpis import LongestCommonSubsequenceKPIsConfig
+from algorithm.config.ndw.ndw import NeedlemanWunschConfiguration
+from algorithm.config.wrapper.hyperparams import HyperparamsConfiguration
 
 
 class ConfigFactory:
@@ -25,16 +26,14 @@ class ConfigFactory:
     """
 
     @staticmethod
-    def get_batch_configuration(current_directory, args) -> AlgorithmConfiguration:
+    def get_algorithm_configuration(args) -> AlgorithmConfiguration:
         """
         Factory method that returns an instance of the corresponding AlgorithmConfiguration
         subclass to perform an alignment.
-        :param current_directory: The working directory of the project. To locate the config files
         and export results.
         :param args: The argparse object with the user input.
         :return: The corresponding AlgorithmConfiguration instance
         """
-        config = ConfigFactory._load_configuration(current_directory, args)
         algorithms = {
             'NDW_Affine': NeedlemanWunschConfiguration,
             'NDW_Tolerance': NeedlemanWunschConfiguration,
@@ -43,34 +42,44 @@ class ConfigFactory:
             'LCSS_KPIs': LongestCommonSubsequenceKPIsConfig,
             'LCSS_Events': LongestCommonSubsequenceEventsConfig
         }
-        algorithm = config['alignment_alg']
-        if algorithm in algorithms:
-            return algorithms[algorithm](current_directory, args, config)
+        config = ConfigFactory._load_configuration(args)
+        algorithm = config.get('alignment_alg')
+        if algorithm and algorithm in algorithms:
+            alg_config = algorithms[algorithm](args, config)
+            if HyperparamsConfiguration.HYPERPARAMETERS in config:
+                alg_config = HyperparamsConfiguration(alg_config)
+            return alg_config
         raise ValueError(f"Invalid input algorithm name {algorithm}.")
 
     @staticmethod
-    def _load_configuration(curr_dir: str, input_args):
+    def _load_configuration(args):
         """
         Initialize the configuration parameters for the alignment and, if necessary, set
         the path to the Orca executable for processing the output alignments using Orca.
 
-        :param curr_dir: Filepath to the algor
-        :param input_args: An argparse.Namespace object containing command-line arguments.
+        :param args: An argparse.Namespace object containing command-line arguments.
         """
-        if input_args.config[0] == '/':
-            input_args = input_args[1:]
-
-        config_file_path = os.path.join(curr_dir, 'config_files', input_args.config)
+        args = ConfigFactory._remove_initial_path_bar(args)
         try:
+            config_file_path = os.path.join(args.current_directory, 'config_files', args.config)
             with open(config_file_path, 'r', encoding='utf-8') as file:
                 config = yaml.safe_load(file)
 
-            if input_args.figures and input_args.engine == "orca":
-                plotly.io.orca.config.executable = config.get('orca_path', None)
-
+            ConfigFactory._set_orca_executable_path(args, config)
         except FileNotFoundError as exc:
             raise FileNotFoundError(f"Configuration file '{config_file_path}' not found.") from exc
         except yaml.YAMLError as exc:
             raise ValueError("Invalid YAML format in the configuration file.") from exc
 
         return config
+
+    @staticmethod
+    def _set_orca_executable_path(args, config):
+        if args.figures and args.engine == "orca":
+            plotly.io.orca.config.executable = config.get('orca_path', None)
+
+    @staticmethod
+    def _remove_initial_path_bar(args):
+        if args.config[0] == '/':
+            args.config = args.config[1:]
+        return args

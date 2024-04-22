@@ -15,7 +15,7 @@ References:
 """
 import numpy as np
 
-from batch.config.alg_config import AlgorithmConfiguration
+from algorithm.config.alg_config import AlgorithmConfiguration
 
 
 class LongestCommonSubsequenceEventsConfig(AlgorithmConfiguration):
@@ -34,14 +34,14 @@ class LongestCommonSubsequenceEventsConfig(AlgorithmConfiguration):
     DELTA = 'delta'
 
     def __init__(self, current_directory, args, config):
-        super().__init__(current_directory, args, config)
+        super().__init__(args, config)
 
         ranges = self.config['ranges']
 
         self._delta = np.arange(
-            ranges['delta']['start'],
-            ranges['delta']['end'],
-            ranges['delta']['step']
+            ranges['delta', 'start'],
+            ranges['delta', 'end'],
+            ranges['delta', 'step']
         )
 
     def get_hyperparameters_labels(self) -> list:
@@ -70,5 +70,5 @@ class LongestCommonSubsequenceEventsConfig(AlgorithmConfiguration):
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
             AlgorithmConfiguration.TIMESTAMP_LABEL: self.timestamp_label,
-            AlgorithmConfiguration.PARAM_INTEREST: self._param_interest
+            AlgorithmConfiguration.PARAM_INTEREST: self.param_interest
         }

@@ -1,8 +1,8 @@
 """
-lcss.events
+lcss.kpis
 ~~~~~~~~~~~~~~~~
 
-Implementation of Longest Common Subsequence (LCS) [1] algorithm for aligning sequences of events,
+Implementation of Longest Common Subsequence (LCS) [1] algorithm for aligning sequences of KPIs,
 as proposed in [2].
 
 References:
@@ -12,13 +12,14 @@ References:
     Online validation of digital twins for manufacturing systems. Comput.
     Ind. 150: 103942 (2023)
 """
-from algorithm.lcss.base import LongestCommonSubsequenceBase
+
+from algorithm.logic.lcss.base import LongestCommonSubsequenceBase
 
 
-class LongestCommonSubsequenceEvents(LongestCommonSubsequenceBase):
+class LongestCommonSubsequenceKPI(LongestCommonSubsequenceBase):
     """
-    LongestCommonSubsequenceEvents implements a variation of the Longest Common Subsequence (LCS)[1]
-    algorithm for aligning sequences of events, as proposed in [2].
+    LongestCommonSubsequenceKPI implements a variation of the Longest Common Subsequence (LCS)[1]
+    algorithm for aligning sequences of KPI values, as proposed in [2].
 
     The longest common subsequence (LCS) is the longest subsequence common to all sequences in a set
     of sequences (often just two sequences).
@@ -34,16 +35,14 @@ class LongestCommonSubsequenceEvents(LongestCommonSubsequenceBase):
     def __init__(self, dt_trace: list,
                  pt_trace: list,
                  param_interest: str,
-                 delta: float,
-                 timestamp_label: str = 'timestamp(s)'):
+                 epsilon: float):
         super().__init__(dt_trace, pt_trace, param_interest)
-        self._delta = delta
-        self._timestamp_label = timestamp_label
+        self._epsilon = epsilon
 
     def equals_condition(self, dt_snap, pt_snap) -> bool:
         """
-        Returns whether the snapshots dt_snap and pt_snap are equal or not: they must be the
-        same event and the time difference between them must be below self._delta.
+        Returns whether the snapshots dt_snap and pt_snap are equal or not: the difference between
+        their values must be below a threshold named epsilon.
         """
-        return dt_snap[self._param_interest] == pt_snap[self._param_interest] and \
-            abs(dt_snap[self._timestamp_label] - pt_snap[self._timestamp_label]) <= self._delta
+        return abs(dt_snap[self._param_interest] - pt_snap[self._param_interest]) \
+            <= self._epsilon

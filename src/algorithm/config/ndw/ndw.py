@@ -11,9 +11,9 @@ References:
       similarities in the amino acid sequence of two proteins. Journal of Molecular Biology,
       48(3), 443-453.
 """
-import numpy as np
 
-from batch.config.alg_config import AlgorithmConfiguration
+from algorithm.config.alg_config import AlgorithmConfiguration
+from util.dict_util import get_range
 
 
 class NeedlemanWunschConfiguration(AlgorithmConfiguration):
@@ -33,8 +33,8 @@ class NeedlemanWunschConfiguration(AlgorithmConfiguration):
     CONT_GAP = 'cont_gap'
     LCA = 'lca'
 
-    def __init__(self, current_directory, args, config):
-        super().__init__(current_directory, args, config)
+    def __init__(self, args, config):
+        super().__init__(args, config)
 
         # INPUT PARAMETERS
         ranges = self.config['ranges']
@@ -44,31 +44,14 @@ class NeedlemanWunschConfiguration(AlgorithmConfiguration):
         mad = ranges['mad']
         for p in self.params:
             if p in mad:
-                self._mad[p] = np.arange(
-                    mad[p]['start'],
-                    mad[p]['end'],
-                    mad[p]['step']
-                )
+                self._mad[p] = get_range(mad[p])
 
         # Calculate Weight for Low complexity areas
-        self._low = np.arange(
-            ranges['low']['start'],
-            ranges['low']['end'],
-            ranges['low']['step']
-        )
+        self._low = get_range(ranges[self.LOW])
 
         # Calculate Weights for Affine Gap
-        self._init_gap = np.arange(
-            ranges['init_gap']['start'],
-            ranges['init_gap']['end'],
-            ranges['init_gap']['step']
-        )
-
-        self._cont_gap = np.arange(
-            ranges['cont_gap']['start'],
-            ranges['cont_gap']['end'],
-            ranges['cont_gap']['step']
-        )
+        self._init_gap = get_range(ranges[self.INIT_GAP])
+        self._cont_gap = get_range(ranges[self.CONT_GAP])
 
     def get_hyperparameters_labels(self) -> list:
         """
@@ -98,7 +81,7 @@ class NeedlemanWunschConfiguration(AlgorithmConfiguration):
         """
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
-            AlgorithmConfiguration.SYSTEM: self._system,
+            AlgorithmConfiguration.SYSTEM: self.system,
             AlgorithmConfiguration.TIMESTAMP_LABEL: self.timestamp_label,
-            NeedlemanWunschConfiguration.LCA: self.lca,
+            self.LCA: self.lca,
         }

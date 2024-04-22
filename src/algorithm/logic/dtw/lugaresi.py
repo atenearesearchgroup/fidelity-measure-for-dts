@@ -13,7 +13,7 @@ References:
 import numpy as np
 import pandas as pd
 
-from algorithm.dtw.base import DynamicTimeWarpingBase
+from algorithm.logic.dtw.base import DynamicTimeWarpingBase
 
 
 class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):

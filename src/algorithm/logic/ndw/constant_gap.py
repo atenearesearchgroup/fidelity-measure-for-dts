@@ -11,8 +11,8 @@ from abc import ABC
 import numpy as np
 from numba import jit
 
-import util.float_util as fu
-from algorithm.ndw.base import NeedlemanWunschBase
+import util.float as fu
+from algorithm.logic.ndw.base import NeedlemanWunschBase
 
 
 class NeedlemanWunschConstantGap(NeedlemanWunschBase, ABC):

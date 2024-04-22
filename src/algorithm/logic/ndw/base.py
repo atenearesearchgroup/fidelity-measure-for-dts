@@ -9,9 +9,9 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
-from algorithm.ialgorithm import IAlignmentAlgorithm
+from algorithm.logic.ialgorithm import IAlignmentAlgorithm
 from systems.system import SystemBase
-from util.float_util import is_numerical
+from util.float import is_numerical
 
 
 class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
@@ -182,7 +182,7 @@ class NeedlemanWunschBase(ABC, IAlignmentAlgorithm):
         if self._lca:
             for i in range(len(trace)):
                 for j, k in enumerate(self._keys):
-                    low[i, j] = self._system.is_low_complexity(k, trace[i][j])
+                    low[i, j] = self._system.is_low_complexity(k, trace[i, j])
 
         return low
 

@@ -15,7 +15,7 @@ References:
 """
 import numpy as np
 
-from batch.config.alg_config import AlgorithmConfiguration
+from algorithm.config.alg_config import AlgorithmConfiguration
 
 
 class LongestCommonSubsequenceKPIsConfig(AlgorithmConfiguration):
@@ -34,14 +34,14 @@ class LongestCommonSubsequenceKPIsConfig(AlgorithmConfiguration):
     EPSILON = 'epsilon'
 
     def __init__(self, current_directory, args, config):
-        super().__init__(current_directory, args, config)
+        super().__init__(args, config)
 
         ranges = self.config['ranges']
 
         self._epsilon = np.arange(
-            ranges['epsilon']['start'],
-            ranges['epsilon']['end'],
-            ranges['epsilon']['step']
+            ranges['epsilon', 'start'],
+            ranges['epsilon', 'end'],
+            ranges['epsilon', 'step']
         )
 
     def get_hyperparameters_labels(self) -> list:
@@ -69,5 +69,5 @@ class LongestCommonSubsequenceKPIsConfig(AlgorithmConfiguration):
         """
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
-            AlgorithmConfiguration.PARAM_INTEREST: self._param_interest
+            AlgorithmConfiguration.PARAM_INTEREST: self.param_interest
         }

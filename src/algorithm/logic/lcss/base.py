@@ -9,7 +9,7 @@ from abc import abstractmethod, ABC
 import numpy as np
 import pandas as pd
 
-from algorithm.ialgorithm import IAlignmentAlgorithm
+from algorithm.logic.ialgorithm import IAlignmentAlgorithm
 
 
 class LongestCommonSubsequenceBase(ABC, IAlignmentAlgorithm):
@@ -46,11 +46,11 @@ class LongestCommonSubsequenceBase(ABC, IAlignmentAlgorithm):
             for j in range(self._m_pt_trace):
                 if self.equals_condition(self._dt_trace[i], self._pt_trace[j]):
                     if i == 0 or j == 0:
-                        self._table[i][j] = 1
+                        self._table[i, j] = 1
                     else:
-                        self._table[i][j] = self._table[i - 1][j - 1] + 1
+                        self._table[i, j] = self._table[i - 1, j - 1] + 1
                 else:
-                    self._table[i][j] = np.max([self._table[i - 1][j], self._table[i][j - 1]])
+                    self._table[i, j] = np.max([self._table[i - 1, j], self._table[i, j - 1]])
 
     def calculate_alignment(self) -> pd.DataFrame:
         """
@@ -66,7 +66,7 @@ class LongestCommonSubsequenceBase(ABC, IAlignmentAlgorithm):
         The resulting score of the algorithm, i.e., the length of the Longest Common Subsequence
         between the traces.
         """
-        return self._table[-1][-1] if self._table.size > 0 else 0
+        return self._table[-1, -1] if self._table.size > 0 else 0
 
     @abstractmethod
     def equals_condition(self, dt_snap, pt_snap) -> bool:

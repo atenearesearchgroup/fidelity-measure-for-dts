@@ -11,7 +11,7 @@ References:
     Online validation of digital twins for manufacturing systems. Comput.
     Ind. 150: 103942 (2023)
 """
-from batch.config.alg_config import AlgorithmConfiguration
+from algorithm.config.alg_config import AlgorithmConfiguration
 
 
 class DynamicTimeWarpingLugaresiConfig(AlgorithmConfiguration):
@@ -39,5 +39,5 @@ class DynamicTimeWarpingLugaresiConfig(AlgorithmConfiguration):
         """
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
-            AlgorithmConfiguration.PARAM_INTEREST: self._param_interest
+            AlgorithmConfiguration.PARAM_INTEREST: self.param_interest
         }

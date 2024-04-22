@@ -7,14 +7,15 @@ configuration parameters for sequence alignment algorithms.
 """
 import itertools
 import os
+from abc import ABC, abstractmethod
 
-import util.file_util as fu
+import util.file as fu
 from metrics.metrics_factory import AnalysisFactory
 from systems import Lift, SystemBase
 from systems.incubator import Incubator
 
 
-class AlgorithmConfiguration:
+class AlgorithmConfiguration(ABC):
     """
     This class generates alignment batches from a YAML file based on input ranges and configuration
     parameters for sequence alignment.
@@ -30,18 +31,18 @@ class AlgorithmConfiguration:
     PARAM_INTEREST = 'param_interest'
     TIMESTAMP_LABEL = 'timestamp_label'
 
-    def __init__(self, current_directory, args, config):
-        self.current_directory = current_directory
-        self.figures = args.figures
-        self.engine = args.engine
+    def __init__(self, args, config):
         self.config = config
+        self._parse_args(args)
         self._set_file_paths()
         self._initialize_analysis_labels()
         self._initialize_system()
-        self._create_output_directories()
 
-        # Set iterator pointer value
-        self._iterator = 0
+    def _parse_args(self, args):
+        self.current_directory = args.current_directory
+        self.align_files = args.align_files
+        self.figures = args.figures
+        self.engine = args.engine
 
     def _set_file_paths(self):
         """
@@ -51,15 +52,16 @@ class AlgorithmConfiguration:
         inputs = paths['input']
 
         # FILE PATHS
-        self._input_directory = os.path.join(self.current_directory, inputs['main'])
+        input_directory = os.path.join(self.current_directory, inputs['main'])
         self.output_directory = os.path.join(self.current_directory, paths['output'])
+        os.makedirs(self.output_directory, exist_ok=True)
 
         # DIGITAL TWIN
-        self.dt_path = os.path.join(self._input_directory, inputs['dt'])
-        self.dt_file = inputs['dt_files']
+        self.dt_path = os.path.join(input_directory, inputs['dt'])
+        self.dt_files = inputs['dt_files']
 
         # PHYSICAL TWIN
-        self.pt_path = os.path.join(self._input_directory, inputs['pt'])
+        self.pt_path = os.path.join(input_directory, inputs['pt'])
         self.pt_files = inputs['pt_files']
 
     def _initialize_analysis_labels(self):
@@ -69,8 +71,9 @@ class AlgorithmConfiguration:
         labels = self.config['labels']
 
         self.timestamp_label = labels.get('timestamp_label', 'timestamp(s)')
-        self._param_interest = labels['param_interest']
+        self.param_interest = labels['param_interest']
         self.params = labels['params']
+        self.group_by = labels.get('group_by', [])
 
     def _initialize_system(self):
         """
@@ -83,25 +86,16 @@ class AlgorithmConfiguration:
             'Incubator': Incubator
         }
         if system_name in systems:
-            self._system = systems[system_name]()
+            self.system = systems[system_name]()
         else:
-            self._system = SystemBase()
+            self.system = SystemBase()
 
         self.lca = self.config.get('low_complexity_area', False)
 
         self.alignment_algorithm = self.config['alignment_alg']
-        self._methods = fu.get_property_methods(AnalysisFactory.get_class
-                                                (self.alignment_algorithm, self.lca))
+        self.methods = fu.get_property_methods(AnalysisFactory.get_class
+                                               (self.alignment_algorithm, self.lca))
 
-    def _create_output_directories(self):
-        """
-        Create directories for storing individual result statistics and batch statistics.
-        """
-        self.output_results_directory = os.path.join(self.output_directory, 'results')
-        directories = [self.output_directory, self.output_results_directory]
-
-        for directory in directories:
-            os.makedirs(directory, exist_ok=True)
 
     def get_hyperparameters_combinations(self):
         """
@@ -110,47 +104,14 @@ class AlgorithmConfiguration:
         """
         return list(itertools.product(*self.get_hyperparameters_ranges()))
 
-    def get_alignment_metrics(self, alignment_df, pt_trace, dt_trace, input_parameters, score):
-        """
-        This method returns a dictionary containing the alignment input parameters and
-        corresponding alignment metrics.
-
-        :param alignment_df: Dataframe that contains the resulting alignment
-        :param pt_trace: The Physical Twin trace
-        :param dt_trace: The Digital Twin trace
-        :param input_parameters: dictionary that contains the algorithm configuration parameters
-        :param score: algorithm resulting score
-        :return:
-        """
-        alignment_results = AnalysisFactory.create_instance \
-            (self.alignment_algorithm, self.lca, alignment=alignment_df,
-             dt_trace=dt_trace, pt_trace=pt_trace, system=self._system,
-             selected_params=self.params, score=score, timestamp_label=self.timestamp_label)
-
-        statistical_values = fu.get_property_values(alignment_results, self._methods)
-        return {**fu.flatten_dictionary(input_parameters),
-                **fu.flatten_dictionary(statistical_values)}
-
-    def get_scenario(self, dt_file, pt_file):
-        """
-        Generate a unique filename by combining fileA and fileB in the format: <fileAfileB>
-        and adding the param_interest
-
-        :param dt_file: The filename for fileA.
-        :param pt_file: The filename for fileB.
-        :return: The combined unique filename.
-        """
-        return f"{self.alignment_algorithm}-" \
-               f"{'LCA_' if self.lca else ''}" \
-               f"{os.path.splitext(dt_file)[0] + os.path.splitext(pt_file)[0]}" \
-               f"-{self._param_interest.replace('/', '')}"
-
+    @abstractmethod
     def get_hyperparameters_labels(self) -> list:
         """
         :return: A list of the hyperparameter labels for the corresponding algorithm.
         """
         return []
 
+    @abstractmethod
     def get_hyperparameters_ranges(self) -> list:
         """
         :return: A list of the hyperparameter ranges for the corresponding algorithm.

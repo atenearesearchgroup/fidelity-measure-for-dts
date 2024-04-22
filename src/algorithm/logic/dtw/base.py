@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
-from algorithm.ialgorithm import IAlignmentAlgorithm
+from algorithm.logic.ialgorithm import IAlignmentAlgorithm
 
 
 class DynamicTimeWarpingBase(ABC, IAlignmentAlgorithm):

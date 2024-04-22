@@ -6,7 +6,7 @@ A class that generates alignment batches for the adaptation of Dynamic Time Warp
 enable the alignment of snapshot sequences. It takes the batch configuration from a YAML file,
 including input ranges and configuration parameters.
 """
-from batch.config.alg_config import AlgorithmConfiguration
+from algorithm.config.alg_config import AlgorithmConfiguration
 
 
 class DynamicTimeWarpingSnapsConfig(AlgorithmConfiguration):
@@ -29,6 +29,6 @@ class DynamicTimeWarpingSnapsConfig(AlgorithmConfiguration):
         """
         return {
             **super().get_config_params(pt_trace, dt_trace, current_config),
-            AlgorithmConfiguration.SYSTEM: self._system,
+            AlgorithmConfiguration.SYSTEM: self.system,
             AlgorithmConfiguration.TIMESTAMP_LABEL: self.timestamp_label
         }
