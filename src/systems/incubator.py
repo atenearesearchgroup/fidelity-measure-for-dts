@@ -6,4 +6,4 @@ class Incubator(SystemBase):
         return 27 < abs(value) < 29 if key == "temperature(degrees)" else False
 
     def filter_low_complexity(self, snapshot=None):
-        return 27 < abs(snapshot["temperature(degrees)"][0]) < 29
+        return 27 < abs(snapshot["temperature(degrees)", 0]) < 29

@@ -103,7 +103,7 @@ class SystemBase(ABC):
         :return: The filtered dataframe. Otherwise, False, indicating that no filtering is done.
         :rtype: bool
         """
-        return False
+        return df.apply(lambda x: False, axis=1)
 
 
 @jit(nopython=True)
