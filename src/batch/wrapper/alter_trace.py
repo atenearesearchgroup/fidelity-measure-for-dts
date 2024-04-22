@@ -11,10 +11,6 @@ class AlterTraceAlignmentWraper(AlignmentMode, ABC):
                               (self.__class__, mode.__class__),
                               {})
         self.__dict__ = mode.__dict__
-        self._mode = mode
-
-    def __getattr__(self, name):
-        return getattr(self._mode, name)
 
     def _set_random_seed(self, seed: int = 333):
         random.seed(seed)
@@ -24,7 +20,7 @@ class AlterTraceAlignmentWraper(AlignmentMode, ABC):
                                                                self._scenario.dt_trace,
                                                                self._config.params)
         self._execution.params_dict.update(position)
-        self._mode.execute_inner_alignments()
+        self.execute_inner_alignments()
 
     @abstractmethod
     def _alter_trace(self, current_config, trace, params=None):
