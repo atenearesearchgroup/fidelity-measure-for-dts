@@ -5,7 +5,7 @@ from _plotly_utils.colors import sample_colorscale
 from plotly.graph_objs import Figure
 from plotly.subplots import make_subplots
 
-import util.file_util as fu
+import util.file as fu
 
 # RELEVANT STRINGS
 MAD = 'mad_'
