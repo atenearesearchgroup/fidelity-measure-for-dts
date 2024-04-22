@@ -4,13 +4,13 @@ algorithm.factory
 
 Factory class for creating instances of alignment algorithms.
 """
-from algorithm.dtw.lugaresi import DynamicTimeWarpingLugaresi
-from algorithm.dtw.snaps import DynamicTimeWarpingSnaps
-from algorithm.lcss.events import LongestCommonSubsequenceEvents
-from algorithm.lcss.kpis import LongestCommonSubsequenceKPI
-from algorithm.ndw.affine_gap import NeedlemanWunschAffineGap
-from algorithm.ndw.constant_gap import NeedlemanWunschConstantGap
-from .ialgorithm import IAlignmentAlgorithm
+from algorithm.logic.dtw.lugaresi import DynamicTimeWarpingLugaresi
+from algorithm.logic.dtw.snaps import DynamicTimeWarpingSnaps
+from algorithm.logic.ialgorithm import IAlignmentAlgorithm
+from algorithm.logic.lcss.events import LongestCommonSubsequenceEvents
+from algorithm.logic.lcss.kpis import LongestCommonSubsequenceKPI
+from algorithm.logic.ndw.affine_gap import NeedlemanWunschAffineGap
+from algorithm.logic.ndw.constant_gap import NeedlemanWunschConstantGap
 
 
 class AlignmentAlgorithmFactory:
