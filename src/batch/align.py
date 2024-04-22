@@ -11,12 +11,11 @@ import time
 
 import pandas as pd
 
-import util.file_util as fu
-from algorithm.factory import AlignmentAlgorithmFactory
-from batch.config.alg_config import AlgorithmConfiguration
+import util.file as fu
+from algorithm.config.alg_config import AlgorithmConfiguration
+from algorithm.logic.factory import AlignmentAlgorithmFactory
 from result_analysis.alignment_graphic.graphic_factory import GraphicFactory
-from util.dic_util import nested_set
-from util.file_util import generate_filename
+from util.dict_util import dict_to_str, nested_set
 
 
 class BatchAlignments:
@@ -39,11 +38,11 @@ class BatchAlignments:
         """
         for i, starting_pattern in enumerate(self._config.pt_files):
             for pt_file in fu.list_directory_files(self._config.pt_path, '.csv', starting_pattern):
-                scenario = self._config.get_scenario(self._config.dt_file[i], pt_file)
+                scenario = self._config.get_scenario(self._config.dt_files[i], pt_file)
                 global_results_filename = scenario + '.csv'
 
                 # DT and PT traces in dict with only the parameters of interest
-                dt_trace = pd.read_csv(self._config.dt_path + self._config.dt_file[i]) \
+                dt_trace = pd.read_csv(self._config.dt_path + self._config.dt_files[i]) \
                     .filter(items=[self._config.timestamp_label, *self._config.params])
                 pt_trace = pd.read_csv(self._config.pt_path + pt_file) \
                     .filter(items=[self._config.timestamp_label, *self._config.params])
@@ -54,7 +53,7 @@ class BatchAlignments:
 
                     alignment_filepath = os.path. \
                         join(self._config.output_directory,
-                             f"{scenario}-{generate_filename(current_config)}.csv")
+                             f"{scenario}-{dict_to_str(current_config)}.csv")
 
                     start_ex_time = time.time()
                     start_proc_time = time.process_time()
@@ -72,7 +71,7 @@ class BatchAlignments:
                     ex_time = time.time() - start_ex_time
 
                     print(f"--- SCENARIO: {scenario} ---")
-                    print(f"---{generate_filename(current_config)}"
+                    print(f"---{dict_to_str(current_config)}"
                           f" : {ex_time :.2f} seconds : {process_time :.2f} seconds ---")
 
                     if not alignment_df.empty:
