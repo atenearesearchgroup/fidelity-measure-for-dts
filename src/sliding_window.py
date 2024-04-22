@@ -2,7 +2,7 @@ import argparse
 import os
 from multiprocessing import Process
 
-from batch.factory import ConfigFactory
+from algorithm.config.factory import ConfigFactory
 from window.alignment_dispatcher import SlidingWindowProcessor
 from window.raw_trace_storer import RawTraceStorer
 
@@ -10,11 +10,13 @@ from window.raw_trace_storer import RawTraceStorer
 def start_processor(config_path, alignment_config):
     alignment_dispatcher = SlidingWindowProcessor(alignment_config, config_path)
     raw_traces_processor = RawTraceStorer(config_path)
-    # Start separate threads for consuming messages from each producer
+
     raw_traces_process = Process(target=raw_traces_processor.consume_messages)
     alignment_process = Process(target=alignment_dispatcher.consume_messages)
+
     raw_traces_process.start()
     alignment_process.start()
+
     raw_traces_process.join()
     alignment_process.join()
 
@@ -35,5 +37,5 @@ if __name__ == "__main__":
 
     curr_dir = os.path.join(os.getcwd(), "")
     config_dir = os.path.join(curr_dir, 'window', 'remote_drivers', 'remote_config.yaml')
-    alignment_config = ConfigFactory.get_batch_configuration(curr_dir, args)
+    alignment_config = ConfigFactory.get_algorithm_configuration(args)
     start_processor(config_dir, alignment_config)

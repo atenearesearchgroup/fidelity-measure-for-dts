@@ -2,7 +2,7 @@ import argparse
 import multiprocessing
 import os
 
-from batch.factory import ConfigFactory
+from algorithm.config.factory import ConfigFactory
 from window.twin_producer import TwinCSVDriver
 
 PHYSICAL_TWIN = 'physical_twin'
@@ -35,14 +35,14 @@ if __name__ == "__main__":
     args.config = os.path.join('window', 'nasa_mars.yaml')
 
     current_directory = os.path.join(os.getcwd(), "")
-    alignment_config = ConfigFactory.get_batch_configuration(current_directory, args)
+    alignment_config = ConfigFactory.get_algorithm_configuration(args)
 
     pt_process = start_producer(current_directory,
                                 alignment_config.pt_path + alignment_config.pt_files[0],
                                 PHYSICAL_TWIN)
 
     dt_process = start_producer(current_directory,
-                                alignment_config.dt_path + alignment_config.dt_file[0],
+                                alignment_config.dt_path + alignment_config.dt_files[0],
                                 DIGITAL_TWIN)
 
     pt_process.join()

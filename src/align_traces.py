@@ -1,23 +1,55 @@
 import argparse
 import os
 
-from batch_processing.batch_align import BatchAlignments
-from batch_processing.config_factory import ConfigFactory
+from batch.factory import BatchFactory
 
-if __name__ == "__main__":
+
+def build_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--figures",
                         help="It processes the alignment and generates figures as image files",
-                        action='store_true')
+                        default=True)
+    parser.add_argument("--align_files",
+                        help="Generate the .csv files with the resulting alignments",
+                        default=True)
     parser.add_argument("--engine",
                         help="Engine to process output pdf figures "
                              "(orca or kaleido). By default, kaleido.",
                         default='kaleido')
     parser.add_argument("--config", help="Config file name stored in the /src/config folder")
+    return parser.parse_args()
 
-    args = parser.parse_args()
 
-    current_directory = os.path.join(os.getcwd(), "")
-    alignment_config = ConfigFactory.get_batch_configuration(current_directory, args)
-    batch_alignment = BatchAlignments(alignment_config)
+def parse_arguments():
+    args = build_parser()
+    args.current_directory = os.path.join(os.getcwd(), "")
+    return args
+
+
+def execute_batch_config(args):
+    batch_alignment = BatchFactory.get_batch_configuration(args)
     batch_alignment.execute_alignments()
+
+
+def main():
+    args = parse_arguments()
+
+    # Set default values to test from IDE
+    args.engine = 'kaleido'
+    args.figures = False
+
+    subfolder = 'variants_comparison'
+    configs = [
+        'lift_affine_variant.yaml',
+        'lift_base_variant.yaml',
+        'lift_lcaw_variant.yaml',
+        'lift_lcaw_affine_variant.yaml'
+    ]
+
+    for config_file in configs:
+        args.config = os.path.join(subfolder, config_file)
+        execute_batch_config(args)
+
+
+if __name__ == "__main__":
+    main()

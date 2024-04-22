@@ -50,5 +50,5 @@ class MongoManager:
         You need to initialize a client in each subprocess to enable parallelization.
         """
         client = MongoClient()
-        alignment_column = client['alignments-db']['alignments']
+        alignment_column = client['alignments-db', 'alignments']
         return alignment_column

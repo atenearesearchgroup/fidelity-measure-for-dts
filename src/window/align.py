@@ -9,9 +9,9 @@ import time
 
 import pandas as pd
 
-from algorithm.factory import AlignmentAlgorithmFactory
-from batch.config.alg_config import AlgorithmConfiguration
-from util.dic_util import nested_set
+from algorithm.config.alg_config import AlgorithmConfiguration
+from algorithm.logic.factory import AlignmentAlgorithmFactory
+from util.dict_util import nested_set
 
 
 class WindowAlignments:

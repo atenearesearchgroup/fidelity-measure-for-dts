@@ -17,7 +17,7 @@ import datetime as dt
 import multiprocessing
 from ast import literal_eval
 
-from batch.config.alg_config import AlgorithmConfiguration
+from algorithm.config.alg_config import AlgorithmConfiguration
 from window.align import WindowAlignments
 from window.remote_drivers.mongo import MongoManager
 from window.trace_consumer import TraceConsumer
@@ -36,8 +36,9 @@ class SlidingWindowProcessor(TraceConsumer):
 
     It repeats this process while it keeps receiving snapshots.
     """
-    WINDOW_SIZE = 'window_size'
-    TIMESTEP = 'timestep'
+    SLIDING_WINDOW = 'sliding_window'
+    INTERVAL_DURATION = 'interval_duration'
+    INTERVAL_PERIOD = 'interval_period'
 
     def __init__(self,
                  alg_conf: AlgorithmConfiguration,
@@ -47,8 +48,8 @@ class SlidingWindowProcessor(TraceConsumer):
 
         self._dt_trace, self._pt_trace = [], []
 
-        self._window_size = self._config[self.WINDOW_SIZE]
-        self._timestep = self._config[self.TIMESTEP]
+        self._interval_duration = self._config[self.SLIDING_WINDOW, self.INTERVAL_DURATION]
+        self._interval_period = self._config[self.SLIDING_WINDOW, self.INTERVAL_PERIOD]
 
         self._conf = alg_conf
         self._window_alignment = WindowAlignments(alg_conf)
@@ -88,8 +89,8 @@ class SlidingWindowProcessor(TraceConsumer):
         window alignment.
         """
         return (
-                len(self._pt_trace) >= self._window_size
-                and len(self._dt_trace) >= self._window_size
+                len(self._pt_trace) >= self._interval_duration
+                and len(self._dt_trace) >= self._interval_duration
         )
 
     def _align(self):
@@ -104,17 +105,16 @@ class SlidingWindowProcessor(TraceConsumer):
         align_process = multiprocessing.Process(target=self._store_alignment,
                                                 args=(window_dt, window_pt,))
         align_process.start()
-        self._store_alignment(window_dt, window_pt)
         print('alignment started')
 
-        self._dt_trace = self._dt_trace[self._timestep:]
-        self._pt_trace = self._pt_trace[self._timestep:]
+        self._dt_trace = self._dt_trace[self._interval_period:]
+        self._pt_trace = self._pt_trace[self._interval_period:]
 
     def get_window(self, trace):
         """
         It takes from a trace, the set of snapshots that will be processed as the next window.
         """
-        return trace[: self._window_size]
+        return trace[: self._interval_duration]
 
     def _store_alignment(self, window_dt, window_pt):
         """
@@ -128,7 +128,7 @@ class SlidingWindowProcessor(TraceConsumer):
         MongoManager.insert_window_in_alignment(self._alignment_id, alignment_df)
         self._influx_manager.create_point(self._influx_bucket, 'Stats',
                                           statistics_df.to_dict('records')[0],
-                                          window_pt[len(window_pt) - 1][self._timestamp_label])
+                                          window_pt[len(window_pt) - 1, self._timestamp_label])
 
     def create_alignment_dict(self):
         """
@@ -145,7 +145,7 @@ class SlidingWindowProcessor(TraceConsumer):
         for index, hyperparam in enumerate(self._conf.get_hyperparameters_ranges()):
             # To process windows, we only take into account the "start" value
             # in the configuration file, that is why we use hyperparam[0]
-            alignment_object['alg_hyperparams'][self._conf.get_hyperparameters_labels()[index]] = \
+            alignment_object['alg_hyperparams', self._conf.get_hyperparameters_labels()[index]] = \
                 float(hyperparam[0])
 
         return alignment_object

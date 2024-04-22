@@ -6,7 +6,7 @@ Class with auxiliary methods to store buckets and Points into InfluxDB.
 """
 from influxdb_client import InfluxDBClient, Point
 
-from util.float_util import parse_float
+from util.float import parse_float
 
 
 class InfluxManager:

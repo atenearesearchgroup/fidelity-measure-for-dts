@@ -38,7 +38,7 @@ class TwinCSVDriver:
         with open(config_path, 'r', encoding='utf-8') as config_file:
             config = yaml.safe_load(config_file)
 
-        self._host = config[TraceConsumer.RABBITMQ][TraceConsumer.HOST]
+        self._host = config[TraceConsumer.RABBITMQ, TraceConsumer.HOST]
         self._timestamp_label = config[TraceConsumer.TIMESTAMP_LABEL]
         self._routing_key = routing_key
         self._data = pd.read_csv(csv_filepath).to_dict('records')
@@ -67,10 +67,10 @@ class TwinCSVDriver:
             # Measure the timestep between snapshots
             if index <= 0:
                 # First timestamp
-                timestamp = float(self._data[index][self._timestamp_label])
+                timestamp = float(self._data[index, self._timestamp_label])
             else:
-                timestamp = float(self._data[index][self._timestamp_label]) \
-                            - float(self._data[index - 1][self._timestamp_label])
+                timestamp = float(self._data[index, self._timestamp_label]) \
+                            - float(self._data[index - 1, self._timestamp_label])
 
             absolute_time = init_timestamp + timedelta(0, self._data[index][self._timestamp_label])
             message_data = self._data[index].copy()

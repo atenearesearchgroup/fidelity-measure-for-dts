@@ -1,6 +1,9 @@
 timestamp_label: 'timestep(t)'
-window_size: 100
-timestep: 20
+
+# Sliding Window configuration
+sliding_window:
+  interval_period: 20
+  interval_duration: 100
 
 # RabbitMQ configuration
 rabbitmq:
