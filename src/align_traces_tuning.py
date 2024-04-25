@@ -1,20 +1,20 @@
+import faulthandler
 import os
 
 import yaml
 
 from align_traces import parse_arguments, execute_batch_config
 from batch.mode.window import WindowAlignmentMode as w
-from batch.wrapper.anomaly import AnomalyWrapper as an
-from batch.wrapper.delay import DelayWrapper as delay
+from batch.modifiers.delay import DelayWrapper as delay
 
 
 def get_hyper_config(alter_type, len_anomaly):
     return {alter_type: len_anomaly,
             w.INTERVAL_PERIOD: {'start': int(len_anomaly / 5), 'step': int(len_anomaly / 5),
-                                'end': len_anomaly},
+                                'end': len_anomaly + 1},
             w.INTERVAL_DURATION: {'start': int((len_anomaly * 2) / 5),
                                   'step': int((len_anomaly * 2) / 5),
-                                  'end': len_anomaly * 2}}
+                                  'end': len_anomaly * 2 + 1}}
 
 
 def get_yaml_filepath(args, config_folder):
@@ -52,7 +52,9 @@ def main():
     ]
 
     len_anomalies = [10, 25, 50, 75, 100, 175, 250, 325, 400]
-    for alter_type in [an.LEN_ANOMALY, delay.LEN_DELAY]:
+    for alter_type in [
+        # an.LEN_ANOMALY,
+        delay.LEN_DELAY]:
         for len_anomaly in len_anomalies:
             hyperparameters = get_hyper_config(alter_type, len_anomaly)
 
@@ -68,4 +70,5 @@ def main():
 
 
 if __name__ == "__main__":
+    faulthandler.enable()
     main()

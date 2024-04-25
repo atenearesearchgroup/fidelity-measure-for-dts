@@ -86,7 +86,7 @@ class Execution():
                f"{extra}" \
                f"{extension}"
 
-    def get_scenario_filename(self, extension='csv'):
+    def get_scenario_filename(self, extension='.csv'):
         return f"{dict_to_str(self._group_by_dict)}__" \
                f"{dict_to_str(self.params_dict)}" \
                f"{extension}"

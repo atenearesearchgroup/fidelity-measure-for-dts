@@ -7,7 +7,6 @@ from algorithm.config.alg_config import AlgorithmConfiguration
 from algorithm.logic.factory import AlignmentAlgorithmFactory
 from batch.scenario import Scenario
 from result_analysis.alignment_graphic.graphic_factory import GraphicFactory
-from util.dict_util import dict_to_str
 from util.timing import timing
 
 pio.kaleido.scope.mathjax = None
@@ -15,11 +14,14 @@ pio.kaleido.scope.mathjax = None
 
 class AlignmentMode(ABC):
 
-    def __init__(self, config: AlgorithmConfiguration, trace_modifiers: list = []):
-        self._trace_modifiers = trace_modifiers
+    def __init__(self, config: AlgorithmConfiguration):
         self._config = config
         self._scenario = None
         self._execution = None
+        self._trace_modifiers = []
+
+    def add_trace_modifier(self, modifier):
+        self._trace_modifiers.append(modifier)
 
     def execute_alignments(self):
         """
@@ -33,6 +35,11 @@ class AlignmentMode(ABC):
 
                 for curr_config_tuple in self._config.get_hyperparameters_combinations():
                     self._execution = self._scenario.create_execution(curr_config_tuple)
+
+                    for alter in self._trace_modifiers:
+                        modifier_position = alter.alter_trace(self._execution, self._config)
+                        self._execution.params_dict.update(modifier_position)
+
                     self.execute_inner_alignments()
 
     def _execute_algorithm(self, dt_trace_w, pt_trace_w):
@@ -49,7 +56,7 @@ class AlignmentMode(ABC):
         alg, alignment_df, time_dict = _perform_alignment(self._execution.alg_current_config,
                                                           dt_trace_w, pt_trace_w)
         print(f"--- SCENARIO: {self._scenario.get_name()} ---")
-        print(f"---{dict_to_str(self._execution.alg_current_config)}"
+        print(f"---{self._execution.get_scenario_filename(extension='')}"
               f" : {time_dict['clock_time'] :.2f} seconds"
               f" : {time_dict['process_time'] :.2f} seconds ---")
         return alg, alignment_df, time_dict
@@ -82,3 +89,6 @@ class AlignmentMode(ABC):
     @abstractmethod
     def execute_inner_alignments(self):
         pass
+
+    def _get_traces(self):
+        return self._execution.dt_trace, self._execution.pt_trace

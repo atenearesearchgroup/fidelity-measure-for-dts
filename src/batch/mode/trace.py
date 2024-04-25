@@ -6,8 +6,8 @@ from batch.mode.imode import AlignmentMode
 
 class TraceAlignmentMode(AlignmentMode):
 
-    def __init__(self, config: AlgorithmConfiguration, trace_modifiers: list = []):
-        super().__init__(config, trace_modifiers)
+    def __init__(self, config: AlgorithmConfiguration):
+        super().__init__(config)
         self._create_metrics_folder()
 
     def execute_inner_alignments(self):

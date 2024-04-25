@@ -2,8 +2,8 @@ from algorithm.config.factory import ConfigFactory
 from batch.mode.imode import AlignmentMode
 from batch.mode.trace import TraceAlignmentMode
 from batch.mode.window import WindowAlignmentMode
-from batch.wrapper.anomaly import AnomalyWrapper
-from batch.wrapper.delay import DelayWrapper
+from batch.modifiers.anomaly import AnomalyWrapper
+from batch.modifiers.delay import DelayWrapper
 
 
 class BatchFactory:
@@ -16,8 +16,8 @@ class BatchFactory:
         else:
             batch_alignment = TraceAlignmentMode(alignment_config)
         if AnomalyWrapper.LEN_ANOMALY in labels:
-            batch_alignment = AnomalyWrapper(batch_alignment)
+            batch_alignment.add_trace_modifier(AnomalyWrapper())
         if DelayWrapper.LEN_DELAY in labels:
-            batch_alignment = DelayWrapper(batch_alignment)
+            batch_alignment.add_trace_modifier(DelayWrapper())
 
         return batch_alignment
