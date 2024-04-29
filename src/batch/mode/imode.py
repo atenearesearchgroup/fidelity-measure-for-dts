@@ -36,11 +36,13 @@ class AlignmentMode(ABC):
                 for curr_config_tuple in self._config.get_hyperparameters_combinations():
                     self._execution = self._scenario.create_execution(curr_config_tuple)
 
-                    for alter in self._trace_modifiers:
-                        modifier_position = alter.alter_trace(self._execution, self._config)
-                        self._execution.params_dict.update(modifier_position)
-
+                    self.apply_trace_modifiers()
                     self.execute_inner_alignments()
+
+    def apply_trace_modifiers(self):
+        for alter in self._trace_modifiers:
+            modifier_position = alter.alter_trace(self._execution, self._config)
+            self._execution.params_dict.update(modifier_position)
 
     def _execute_algorithm(self, dt_trace_w, pt_trace_w):
         @timing
