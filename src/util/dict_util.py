@@ -41,7 +41,7 @@ def dict_to_str(parameter_values):
     :return str: The generated filename.
     """
     param_strings = []
-    for key, value in parameter_values.items():
+    for key, value in sorted(parameter_values.items()):
         if isinstance(value, int):
             param_strings.append(f"{key[:2]}_{value}")
         elif isinstance(value, float):
