@@ -5,6 +5,7 @@ import yaml
 
 from align_traces import parse_arguments, execute_batch_config
 from batch.mode.window import WindowAlignmentMode as w
+from batch.modifiers.anomaly import AnomalyWrapper as an
 from batch.modifiers.delay import DelayWrapper as delay
 
 
@@ -24,7 +25,7 @@ def get_yaml_filepath(args, config_folder):
 def replace_params(hyperparameters, yaml_file):
     with open(yaml_file, 'r') as input_yaml:
         data = yaml.load(input_yaml, Loader=yaml.FullLoader)
-        data['hyperparameters'].update(hyperparameters)
+        data['hyperparameters'] = hyperparameters
     return data
 
 
@@ -51,10 +52,12 @@ def main():
         # 'lift_lcaw_affine_variant.yaml'
     ]
 
-    len_anomalies = [10, 25, 50, 75, 100, 175, 250, 325, 400]
+    len_anomalies = [
+        10, 25, 50, 75, 100, 175, 250, 325, 400]
     for alter_type in [
-        # an.LEN_ANOMALY,
-        delay.LEN_DELAY]:
+        an.LEN_ANOMALY,
+        delay.LEN_DELAY
+    ]:
         for len_anomaly in len_anomalies:
             hyperparameters = get_hyper_config(alter_type, len_anomaly)
 
