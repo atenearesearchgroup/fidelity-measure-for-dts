@@ -13,7 +13,7 @@ def generate_window_statistics(dt_trace, pt_trace, alignment_stats_df, param_int
                                timestamp_label, mad):
     max_value = max(alignment_stats_df[FRECHET].max(), mad)
 
-    window_ts = dt_trace.loc[alignment_stats_df['w_start']][timestamp_label]
+    window_ts = dt_trace.loc[alignment_stats_df['w_end']][timestamp_label]
     plots = {f'DT {param_interest}': (dt_trace[timestamp_label], dt_trace[param_interest], []),
              f'PT {param_interest}': (pt_trace[timestamp_label], pt_trace[param_interest], []),
              '% MS': (window_ts, alignment_stats_df[MATCHED_SNAPSHOTS], [0, 100]),
