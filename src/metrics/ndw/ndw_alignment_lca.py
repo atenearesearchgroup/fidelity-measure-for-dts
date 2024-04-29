@@ -57,13 +57,15 @@ class NeedlemanWunschAlignmentMetricsLCA(NeedlemanWunschAlignmentMetrics):
             self.percentage_mismatched_snapshots_lca
 
     def _get_relevant_snapshots(self, snaps, condition_snaps=None):
-        snap_filter = ~self._system.filter_low_complexity(
-            snaps[self._selected_params])
-        if condition_snaps is not None:
-            snap_filter = snap_filter | ~self._system.filter_low_complexity(
-                condition_snaps[self._selected_params])
-        relevant_snapshots = snaps.loc[snap_filter, self._selected_params]
-        return relevant_snapshots
+        if not snaps.empty:
+            snap_filter = ~self._system.filter_low_complexity(
+                snaps[self._selected_params])
+            if condition_snaps is not None:
+                snap_filter = snap_filter | ~self._system.filter_low_complexity(
+                    condition_snaps[self._selected_params])
+            relevant_snapshots = snaps.loc[snap_filter, self._selected_params]
+            return relevant_snapshots
+        return pd.DataFrame()
 
     @property
     def frechet_lca(self) -> dict:
