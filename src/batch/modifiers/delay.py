@@ -4,25 +4,25 @@ from batch.modifiers.alter_trace import AlterTraceAlignmentWraper
 
 
 class DelayWrapper(AlterTraceAlignmentWraper):
-    LEN_DELAY = 'len_delay'
+    LEN_DELAY = 'delay_len'
 
-    def alter_trace(self, execution, config):
-        len_delay = execution.alg_current_config[self.LEN_DELAY]
-        execution.alg_current_config.pop(self.LEN_DELAY)
+    def __init__(self):
+        super().__init__(self.LEN_DELAY)
 
+    def _alter_trace(self, len_modification, execution, config):
         len_values = execution.dt_trace.shape[0]
-        upper_threshold = len_delay if len_values < len_delay else len_values - len_delay
+        upper_threshold = len_modification if len_values < len_modification else len_values - len_modification
+
         position = random.randrange(0, upper_threshold)
 
         result = execution.dt_trace.copy()
-        for i in range(len_delay):
-            noise = random.uniform(-0.015, 0.015)
-            result.iloc[position + i, 1] \
-                = execution.dt_trace.iloc[position, 1] + noise
+        for p in config.params:
+            for i in range(len_modification):
+                noise = random.uniform(-0.015, 0.015)
+                result.loc[position + i, p] \
+                    = execution.dt_trace.loc[position, p] + noise
 
-        result.iloc[position + len_delay:len_values, 1] = \
-            execution.dt_trace.iloc[position + 1:len_values - len_delay + 1, 1]
+            result.loc[position + len_modification:len_values, p] = \
+                execution.dt_trace.loc[position + 1:len_values - len_modification + 1, p]
 
-        start = execution.dt_trace[config.timestamp_label][position]
-        end = execution.dt_trace[config.timestamp_label][position + len_delay]
-        return {'delay': f'({start},{end})'}
+        return position, result
