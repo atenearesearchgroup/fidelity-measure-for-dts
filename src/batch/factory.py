@@ -15,9 +15,9 @@ class BatchFactory:
             batch_alignment = WindowAlignmentMode(alignment_config)
         else:
             batch_alignment = TraceAlignmentMode(alignment_config)
-        if AnomalyWrapper.LEN_ANOMALY in labels:
+        if f'{AnomalyWrapper.ANOMALY}_len' in labels:
             batch_alignment.add_trace_modifier(AnomalyWrapper())
-        if DelayWrapper.LEN_DELAY in labels:
+        if f'{DelayWrapper.DELAY}_len' in labels:
             batch_alignment.add_trace_modifier(DelayWrapper())
 
         return batch_alignment

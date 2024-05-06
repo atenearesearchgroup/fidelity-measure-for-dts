@@ -4,25 +4,26 @@ from batch.modifiers.alter_trace import AlterTraceAlignmentWraper
 
 
 class DelayWrapper(AlterTraceAlignmentWraper):
-    LEN_DELAY = 'delay_len'
+    DELAY = 'delay'
 
     def __init__(self):
-        super().__init__(self.LEN_DELAY)
+        super().__init__(self.DELAY)
 
-    def _alter_trace(self, len_modification, execution, config):
+    def _alter_trace(self, len_modification, execution, config, pos_modification):
         len_values = execution.dt_trace.shape[0]
-        upper_threshold = len_modification if len_values < len_modification else len_values - len_modification
 
-        position = random.randrange(0, upper_threshold)
+        if pos_modification < 0:
+            upper_threshold = len_modification if len_values < len_modification else len_values - len_modification
+            pos_modification = random.randrange(0, upper_threshold)
 
         result = execution.dt_trace.copy()
         for p in config.params:
             for i in range(len_modification):
                 noise = random.uniform(-0.015, 0.015)
-                result.loc[position + i, p] \
-                    = execution.dt_trace.loc[position, p] + noise
+                result.loc[pos_modification + i, p] \
+                    = execution.dt_trace.loc[pos_modification, p] + noise
 
-            result.loc[position + len_modification:len_values, p] = \
-                execution.dt_trace.loc[position + 1:len_values - len_modification + 1, p]
+            result.loc[pos_modification + len_modification:len_values, p] = \
+                execution.dt_trace.loc[pos_modification + 1:len_values - len_modification + 1, p]
 
-        return position, result
+        return pos_modification, result
