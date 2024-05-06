@@ -17,3 +17,8 @@ def clean_df(df: pd.DataFrame):
     cleaned_df = cleaned_df.reset_index()
 
     return cleaned_df
+
+
+def is_subset(subset, superset):
+    comparison = subset.merge(superset).isin(subset.reset_index(drop=True))
+    return comparison.all().all() if not comparison.empty else False
