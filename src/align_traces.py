@@ -12,6 +12,9 @@ def build_parser():
     parser.add_argument("--align_files",
                         help="Generate the .csv files with the resulting alignments",
                         default=True)
+    parser.add_argument("--window-figures",
+                        help="It provides an overview figure of all the windows.",
+                        default=False)
     parser.add_argument("--engine",
                         help="Engine to process output pdf figures "
                              "(orca or kaleido). By default, kaleido.",

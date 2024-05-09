@@ -41,6 +41,7 @@ class AlgorithmConfiguration(ABC):
     def _parse_args(self, args):
         self.current_directory = args.current_directory
         self.align_files = args.align_files
+        self.window_figures = args.window_figures
         self.figures = args.figures
         self.engine = args.engine
 
