@@ -50,15 +50,17 @@ class WindowAlignmentMode(AlignmentMode):
             if w_range.shape[0] > 0:
                 self._execution.export_metrics(self._get_metrics_filepath('.csv'))
 
-                fig = generate_window_statistics(self._execution.dt_trace,
-                                                 self._execution.pt_trace,
-                                                 self._execution.results,
-                                                 self._config.param_interest,
-                                                 self._config.timestamp_label,
-                                                 self._execution.alg_current_config['mad'][
-                                                     self._config.param_interest])
-                fig.write_image(self._get_metrics_filepath('.pdf'), format="pdf",
-                                engine=self._config.engine)
+                if self._config.window_figures:
+                    fig = generate_window_statistics(self._execution.dt_trace,
+                                                     self._execution.pt_trace,
+                                                     self._execution.results,
+                                                     self._config.param_interest,
+                                                     self._config.timestamp_label,
+                                                     self._execution.alg_current_config['mad'][
+                                                         self._config.param_interest])
+
+                    fig.write_image(self._get_metrics_filepath('.pdf'), format="pdf",
+                                    engine=self._config.engine)
         else:
             print(f"Config already computed: {self._get_metrics_filepath('')}")
 
@@ -91,4 +93,4 @@ class WindowAlignmentMode(AlignmentMode):
 
     def _get_subtrace(self, w_end, dt_trace, pt_trace):
         w_start = w_end - self._interval_duration
-        return dt_trace.loc[w_start:w_end], pt_trace.loc[w_start:w_end]
+        return dt_trace.iloc[w_start:w_end], pt_trace.iloc[w_start:w_end]
