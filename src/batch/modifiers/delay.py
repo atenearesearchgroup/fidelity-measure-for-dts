@@ -17,13 +17,13 @@ class DelayWrapper(AlterTraceAlignmentWraper):
             pos_modification = random.randrange(0, upper_threshold)
 
         result = execution.dt_trace.copy()
-        for p in config.params:
+        for param_i, p in enumerate(config.params, 1):
             for i in range(len_modification):
                 noise = random.uniform(-0.015, 0.015)
-                result.loc[pos_modification + i, p] \
-                    = execution.dt_trace.loc[pos_modification, p] + noise
+                result.iloc[pos_modification + i, param_i] \
+                    = execution.dt_trace.iloc[pos_modification, param_i] + noise
 
-            result.loc[pos_modification + len_modification:len_values, p] = \
-                execution.dt_trace.loc[pos_modification + 1:len_values - len_modification + 1, p]
+            result.iloc[pos_modification + len_modification:len_values - 1, param_i] = \
+                execution.dt_trace.iloc[pos_modification + 1:len_values - len_modification, param_i]
 
         return pos_modification, result
