@@ -1,6 +1,6 @@
 from plotly.graph_objs import Figure
 
-from result_analysis.alignment_graphic.alignment_graphic import AlignmentGraphics
+from graphics.alignment.ialignment_graphic import AlignmentGraphics
 
 
 class NeedlemanWunschAlignmentGraphics(AlignmentGraphics):

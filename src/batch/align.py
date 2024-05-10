@@ -14,7 +14,7 @@ import pandas as pd
 import util.file as fu
 from algorithm.config.alg_config import AlgorithmConfiguration
 from algorithm.logic.factory import AlignmentAlgorithmFactory
-from result_analysis.alignment_graphic.graphic_factory import GraphicFactory
+from graphics.alignment.factory import GraphicFactory
 from util.dict_util import dict_to_str, nested_set
 
 

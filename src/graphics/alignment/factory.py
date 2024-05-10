@@ -1,6 +1,6 @@
-from result_analysis.alignment_graphic.dtw_alignment_graphic import \
+from graphics.alignment.dtw import \
     DynamicTimeWarpingAlignmentGraphics
-from result_analysis.alignment_graphic.ndw_alignment_graphic import NeedlemanWunschAlignmentGraphics
+from graphics.alignment.ndw import NeedlemanWunschAlignmentGraphics
 
 
 class GraphicFactory:

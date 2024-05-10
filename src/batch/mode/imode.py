@@ -6,7 +6,7 @@ import util.file as fu
 from algorithm.config.alg_config import AlgorithmConfiguration
 from algorithm.logic.factory import AlignmentAlgorithmFactory
 from batch.scenario import Scenario
-from result_analysis.alignment_graphic.graphic_factory import GraphicFactory
+from graphics.alignment.factory import GraphicFactory
 from util.timing import timing
 
 pio.kaleido.scope.mathjax = None
