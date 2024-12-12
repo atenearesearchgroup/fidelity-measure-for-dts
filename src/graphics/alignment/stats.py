@@ -24,7 +24,7 @@ P2P_EUCLIDEAN_AXIS = 'ED'
 MAD_AXIS = 'MAD'
 
 # FONT OPTIONS
-FONT_SIZE = 24
+FONT_SIZE = 20
 
 
 def generate_parallel_behavior_graphic(x_axis_var: str,
@@ -43,7 +43,8 @@ def generate_parallel_behavior_graphic(x_axis_var: str,
     :param y_axis_var: variable to set in y_axis
     :return:
     """
-    colors = sample_colorscale('Sunset', [0.70, 0.20])
+    start, end, n = 0.20, 0.70, len(traces_labels)
+    colors = sample_colorscale('Sunset', np.linspace(start, end, n))
     fig = make_subplots(rows=len(traces_labels),
                         cols=1,
                         shared_xaxes=True,
