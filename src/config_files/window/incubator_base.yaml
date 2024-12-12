@@ -1,0 +1,31 @@
+alignment_alg: NDW_Affine
+hyperparameters:
+  delay_len: 10
+  duration: 20
+  period: 5
+labels:
+  group_by:
+    - period
+    - duration
+  param_interest: temperature(degrees)
+  params:
+    - temperature(degrees)
+  timestamp_label: timestamp(s)
+low_complexity_area: false
+paths:
+  input:
+    dt: physical_twin/
+    dt_files:
+      - exp2_ht20_hg30_Real.csv
+    main: resources/input/incubator/
+    pt: physical_twin/
+    pt_files:
+      - exp2_ht20_hg30_Real.csv
+  output: resources/output/incubator/window/delay-perfect-10
+ranges:
+  cont_gap: -0.1
+  init_gap: -1.0
+  low: 200
+  mad:
+    temperature(degrees): 0.1
+system: Incubator
