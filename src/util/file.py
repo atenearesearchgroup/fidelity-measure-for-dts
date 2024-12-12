@@ -37,7 +37,7 @@ def get_property_values(obj, methods):
     return values
 
 
-def generate_sublist(label_params: list, include_params: list):
+def generate_sublist_ranges(label_params: list, include_params: list):
     result = []
     for params in include_params:
         result.extend(label_params[params[0]:params[1] + 1])
@@ -45,4 +45,9 @@ def generate_sublist(label_params: list, include_params: list):
     return result
 
 
+def generate_sublist_values(label_params: list, include_params: list):
+    result = []
+    for param in include_params:
+        result.append(label_params[param])
 
+    return result
