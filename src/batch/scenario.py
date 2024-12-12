@@ -36,7 +36,7 @@ class Scenario():
                f"{'LCA_' if self.alg_config.lca else ''}" \
                f"{os.path.splitext(self._dt_file)[0]}" \
                f"{os.path.splitext(self._pt_file)[0]}" \
-               f"-{self.alg_config.param_interest.replace('/', '')}" \
+               f"-{self.alg_config.param_interest.replace('/', '')[:4]}" \
                f"{extension}"
 
     def _filter_csv(self, filepath):

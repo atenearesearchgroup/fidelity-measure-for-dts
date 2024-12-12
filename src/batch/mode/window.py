@@ -4,7 +4,7 @@ import numpy as np
 
 from algorithm.config.alg_config import AlgorithmConfiguration
 from batch.mode.imode import AlignmentMode
-from result_analysis.window.graphics import generate_window_statistics
+from hyperparam_tuning.window.graphics import generate_window_statistics
 
 
 class WindowAlignmentMode(AlignmentMode):
@@ -60,6 +60,7 @@ class WindowAlignmentMode(AlignmentMode):
                                                          self._config.param_interest])
 
                     fig.write_image(self._get_metrics_filepath('.pdf'), format="pdf",
+                                    height=1000, width=800,
                                     engine=self._config.engine)
         else:
             print(f"Config already computed: {self._get_metrics_filepath('')}")

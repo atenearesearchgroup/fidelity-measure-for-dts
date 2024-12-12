@@ -7,11 +7,11 @@ class AlterTraceAlignmentWraper(ABC):
     def __init__(self, class_key: str):
         self.key = class_key
 
-    def _set_random_seed(self, seed: int = 333):
+    def _set_random_seed(self, seed: int = 3333):
         random.seed(seed)
 
     def alter_trace(self, execution, config):
-        self._set_random_seed()
+        # self._set_random_seed()
         len_modification = self._remove_key(execution, self.len_key)
         pos_modification = self._remove_key(execution, self.pos_key)
 

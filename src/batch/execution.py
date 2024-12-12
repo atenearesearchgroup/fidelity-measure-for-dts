@@ -80,7 +80,7 @@ class Execution():
         return dict_to_str(self.alg_current_config)
 
     def get_filename(self, extra='', scenario=False, extension='.csv'):
-        return f"{self._scenario.get_name().join('-') if scenario else ''}" \
+        return f"{self._scenario.get_name() if scenario else ''}" \
                f"{dict_to_str(self.params_dict)}" \
                f"{'-' if extra else ''}" \
                f"{extra}" \

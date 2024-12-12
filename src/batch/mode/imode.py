@@ -76,8 +76,9 @@ class AlignmentMode(ABC):
                                              dt_trace, pt_trace,
                                              **{'params_of_interest': self._config.params,
                                                 'timestamp_label': self._config.timestamp_label})
-            height = 800 if len(self._config.params) == 1 else 3000
-            fig.write_image(output_filepath.replace(".csv", ".pdf"), format="pdf", width=4000,
+            height = 600 if len(self._config.params) == 1 else 950
+            width = 1400 if len(self._config.params) == 1 else 1400
+            fig.write_image(output_filepath.replace(".csv", ".pdf"), format="pdf", width=width,
                             height=height,
                             engine=self._config.engine)
 
