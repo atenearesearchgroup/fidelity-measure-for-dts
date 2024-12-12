@@ -5,17 +5,17 @@ import yaml
 
 from align_traces import parse_arguments, execute_batch_config
 from batch.mode.window import WindowAlignmentMode as w
-from batch.modifiers.anomaly import AnomalyWrapper as an
-from batch.modifiers.delay import DelayWrapper as delay
 
 
-def get_hyper_config(alter_type, len_anomaly):
-    return {alter_type: len_anomaly,
-            w.INTERVAL_PERIOD: {'start': int(len_anomaly / 5), 'step': int(len_anomaly / 5),
-                                'end': len_anomaly + 1},
-            w.INTERVAL_DURATION: {'start': int((len_anomaly * 2) / 5),
-                                  'step': int((len_anomaly * 2) / 5),
-                                  'end': len_anomaly * 2 + 1}}
+def get_hyper_config(alter_type, len_anomaly, duration, period, position=None):
+    result = {
+        f'{alter_type}_len': len_anomaly,
+        w.INTERVAL_DURATION: duration,
+        w.INTERVAL_PERIOD: period,
+    }
+    if position is not None:
+        result[f'{alter_type}_pos'] = position
+    return result
 
 
 def get_yaml_filepath(args, config_folder):
@@ -40,36 +40,49 @@ def main():
 
     # Set default values to test from IDE
     args.engine = 'kaleido'
-    args.figures = False
-    args.align_files = False
+    args.figures = True
+    args.align_files = True
+    args.window_figures = True
 
     config_folder = 'config_files'
     subfolder = 'window'
     configs = [
         'lift_affine_variant.yaml',
-        # 'lift_base_variant.yaml',
-        # 'lift_lcaw_variant.yaml',
-        # 'lift_lcaw_affine_variant.yaml'
+        # 'incubator_comparison.yaml',
+        # 'incubator_base.yaml'
     ]
 
     len_anomalies = [
-        10, 25, 50, 75, 100, 175, 250, 325, 400]
-    for alter_type in [
-        an.LEN_ANOMALY,
-        delay.LEN_DELAY
-    ]:
-        for len_anomaly in len_anomalies:
-            hyperparameters = get_hyper_config(alter_type, len_anomaly)
+        # 10,
+        # 10,
+        # 25,
+        # 75, 100
+        # , 150, 250, 325, 400
+    ]
+    len_durs = [
+        # 5, *range(10, 150, 10)
+    ]
+    # range(2, 28, 2)
+    len_pers = len_durs
+    # range(2, 6, 2)
+    # for i in range(5):
+    # for alter_type in [
+    #     # an.ANOMALY,
+    #     #de.DELAY
+    # ]:
+    #     for len_anomaly in len_anomalies:
+    #         for len_per in len_pers:
+    #             for len_dur in len_durs:
+    #
 
-            for config_file in configs:
-                args.config = os.path.join(subfolder, config_file)
+    hyperparameters = {}
+    for config_file in configs:
+        args.config = os.path.join(subfolder, config_file)
 
-                yaml_file = get_yaml_filepath(args, config_folder)
-                data = replace_params(hyperparameters, yaml_file)
-                write_yaml(data, yaml_file)
-
-                print(f'## Starting executions with anomaly length {len_anomaly}')
-                execute_batch_config(args)
+        yaml_file = get_yaml_filepath(args, config_folder)
+        # data = replace_params(hyperparameters, yaml_file)
+        # write_yaml(data, yaml_file)
+        execute_batch_config(args)
 
 
 if __name__ == "__main__":
