@@ -7,8 +7,9 @@ import statsmodels.api as sm
 
 def get_change_point(df: pd.DataFrame, ordering_params: list, variables: list, number_of_changes: int = 1):
     # Order the dataframe by params
-    for param in ordering_params:
-        df = df.sort_values(param)
+    # for param in ordering_params:
+    #     df = df.sort_values(param)
+    df = df.sort_values(by=ordering_params)
 
     # Separate the input variables and the output variables
     signals = []
