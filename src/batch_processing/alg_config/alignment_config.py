@@ -3,6 +3,7 @@ import os
 import time
 
 import pandas as pd
+import psutil
 
 import util.file_util as fu
 from batch_processing.algorithm_factory import AlignmentAlgorithmFactory
@@ -123,6 +124,9 @@ class AlignmentConfiguration:
                              f"{scenario}-{generate_filename(current_config)}.csv")
 
                     # TODO: Decorator to measure time for all algorithms in calculate alignment
+                    process = psutil.Process().memory_info()
+                    mem_usage_bf = process.rss / (1024 * 1024)
+
                     start_ex_time = time.time()
                     start_proc_time = time.process_time()
 
@@ -138,9 +142,13 @@ class AlignmentConfiguration:
                     process_time = time.process_time() - start_proc_time
                     ex_time = time.time() - start_ex_time
 
+                    process = psutil.Process().memory_full_info()
+                    mem_usage = process.rss / (1024 * 1024)
+
                     print(f"--- SCENARIO: {scenario} ---")
                     print(f"---{generate_filename(current_config)}"
-                          f" : {process_time :.2f} seconds ---")
+                          f" : {process_time :.2f} seconds ---"
+                          f" {mem_usage} : dif {mem_usage - mem_usage_bf} MB ---")
 
                     if not alignment_df.empty:
                         alignment_df.to_csv(alignment_filepath, index=False,
@@ -169,6 +177,8 @@ class AlignmentConfiguration:
                                                                        alg.score),
                                          'execution_time': ex_time,
                                          'process_time': process_time,
+                                         'mem_usage': mem_usage,
+                                         'mem_dif': mem_usage - mem_usage_bf,
                                          'trace_length': max(len(dt_trace), len(pt_trace))}
 
                     statistical_results_df = pd.concat(
