@@ -13,7 +13,7 @@ def compose_max_file(scenario_filepath: str, max_repetitions: float) -> pd.DataF
                        1 if max_repetitions % original_rows > 0 else 0
 
     previous = original_rows - 1
-    for i in range(2, increment_number):
+    for i in range(2, increment_number+1):
         for j, row in enumerate(original_info):
             new_row = row.copy()
             new_row[0] = str(float(new_info[previous][0]) + float(row[0]))
@@ -26,8 +26,8 @@ def compose_max_file(scenario_filepath: str, max_repetitions: float) -> pd.DataF
 
 
 def main():
-    # input_files = ['Bajada_4_3_2_1_0_1_2_3_4-events.csv', 'Bajada_4_3_2_1_0_1_2_3_4_01-events.csv']
-    input_files = ['dt-events.csv', 'pt-events.csv']
+    input_files = ['Bajada-events.csv', 'Bajada_01-events.csv']
+    # input_files = ['dt-events.csv', 'pt-events.csv']
     base_output_path = './output_directory/'
     os.makedirs(base_output_path, exist_ok=True)
 
@@ -41,7 +41,7 @@ def main():
     for file in input_files:
         max_df = compose_max_file(file, total_rows)
         for i in (first + medium + later):
-            max_df.head(i).to_csv(f"{base_output_path}{file.split('.')[0]}_subset_{i}.csv",
+            max_df.head(i).to_csv(f"{base_output_path}{file.split('.')[0]}_s_{i}.csv",
                                   index=False)
 
 
