@@ -20,8 +20,9 @@ class DynamicTimeWarpingLugaresi(DynamicTimeWarpingBase):
 
     def _normalize_traces(self):
         max_value = max((max(self._dt_trace), max(self._pt_trace)))
-        self._dt_trace[:] = [value / max_value for value in self._dt_trace]
-        self._pt_trace[:] = [value / max_value for value in self._pt_trace]
+        if max_value != 0:
+            self._dt_trace[:] = [value / max_value for value in self._dt_trace]
+            self._pt_trace[:] = [value / max_value for value in self._pt_trace]
 
     def calculate_matrix(self):
         # Table initialization
