@@ -1,0 +1,2 @@
+delta,normalized_score,score,execution_time,process_time,mem_usage,mem_dif,trace_length
+6.0,0.0291,291.0,502.18985986709595,502.178449171,1017.8359375,768.12890625,10000
