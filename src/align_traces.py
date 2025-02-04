@@ -39,14 +39,11 @@ def main():
 
     # Set default values to test from IDE
     args.engine = 'kaleido'
-    args.figures = False
+    args.figures = True
 
-    subfolder = 'variants_comparison'
+    subfolder = 'window'
     configs = [
-        'lift_affine_variant.yaml',
-        'lift_base_variant.yaml',
-        'lift_lcaw_variant.yaml',
-        'lift_lcaw_affine_variant.yaml'
+        'smart_building.yaml',
     ]
 
     for config_file in configs:
