@@ -75,7 +75,8 @@ class AlignmentMode(ABC):
             fig = GraphicFactory.get_graphic(self._config.alignment_algorithm, alignment_df,
                                              dt_trace, pt_trace,
                                              **{'params_of_interest': self._config.params,
-                                                'timestamp_label': self._config.timestamp_label})
+                                                'timestamp_label': self._config.timestamp_label,
+                                                'visualization_indent': self._config.visualization_indent})
             height = 600 if len(self._config.params) == 1 else 950
             width = 1400 if len(self._config.params) == 1 else 1400
             fig.write_image(output_filepath.replace(".csv", ".pdf"), format="pdf", width=width,

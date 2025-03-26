@@ -36,6 +36,7 @@ class AlgorithmConfiguration(ABC):
         self._parse_args(args)
         self._set_file_paths()
         self._initialize_analysis_labels()
+        self._initialize_visualization()
         self._initialize_system()
 
     def _parse_args(self, args):
@@ -75,6 +76,12 @@ class AlgorithmConfiguration(ABC):
         self.param_interest = labels['param_interest']
         self.params = labels['params']
         self.group_by = labels.get('group_by', [])
+
+    def _initialize_visualization(self):
+        """
+        Access the YAML-parsed information and set visualization properties.
+        """
+        self.visualization_indent = self.config['visualization'].get('indent', 5)
 
     def _initialize_system(self):
         """

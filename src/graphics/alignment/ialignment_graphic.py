@@ -16,7 +16,8 @@ class AlignmentGraphics:
                  dt_trace: pd.DataFrame,
                  pt_trace: pd.DataFrame,
                  params_of_interest: list,
-                 timestamp_label: str):
+                 timestamp_label: str,
+                 visualization_indent: int):
         self._params_of_interest = params_of_interest
         self._timestamp_label = timestamp_label
 
@@ -24,7 +25,7 @@ class AlignmentGraphics:
         self._dt_trace = clean_df(dt_trace)
         self._pt_trace = clean_df(pt_trace)
 
-        self._visualization_indent = 50
+        self._visualization_indent = visualization_indent
 
     def generate_alignment_graphic(self):
         colors = sample_colorscale('Sunset', [0.20, 0.70])
@@ -64,20 +65,20 @@ class AlignmentGraphics:
         fig.update_xaxes(showline=True, linewidth=1, linecolor='gray', ticksuffix=" ",
                          title_standoff=2)
 
-        fig.update_layout(
-            # xaxis_range=[0, 64],  # x axis range
-            template='plotly_white',
-            font=dict(
-                size=self.FONT_SIZE),  # Figure font
-            legend=dict(  # Legend position
-                yanchor="top",
-                y=1.00,
-                xanchor="left",
-                x=0.01,
-                bordercolor='white',  # Set the border color
-                borderwidth=3,  # Set the border width
-            ),
-            margin=dict(t=7, l=7, r=7, b=7))
+        # fig.update_layout(
+        #     # xaxis_range=[0, 64],  # x axis range
+        #     template='plotly_white',
+        #     font=dict(
+        #         size=self.FONT_SIZE),  # Figure font
+        #     legend=dict(  # Legend position
+        #         yanchor="top",
+        #         y=1.00,
+        #         xanchor="left",
+        #         x=0.01,
+        #         bordercolor='white',  # Set the border color
+        #         borderwidth=3,  # Set the border width
+        #     ),
+        #     margin=dict(t=7, l=7, r=7, b=7))
 
         return fig
 
@@ -103,7 +104,7 @@ class AlignmentGraphics:
                                  mode='lines+markers',
                                  name=plot_label,
                                  marker={
-                                     "size": 1,
+                                     "size": 2,
                                      "line_width": 0.05,
                                      "color": plot_color,
                                      "symbol": marker_symbol
