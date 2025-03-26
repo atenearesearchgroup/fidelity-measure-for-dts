@@ -1,0 +1,67 @@
+system: "SmartBuilding"
+low_complexity_area: false
+alignment_alg: 'NDW_Affine'
+# orca_path: <your_orca_executable_path>
+
+paths:
+  input:
+    main: "resources/input/smart_building/"
+    dt: ""
+    dt_files:
+      - "mrg_consumption_0110_3011_dt_inter.csv"
+      - "mrg_consumption_0111_3011_dt_inter.csv"
+      - "mrg_consumption_0110_3011_dt.csv"
+      - "mrg_consumption_0111_3011_dt.csv"
+      #      - "mrg_consumption_1308_2708_dt.csv"
+      #- "mrg_consumption_temperatures_0108_1508_dt.csv"
+    pt: ""
+    pt_files:
+      - "mrg_consumption_0110_3011_pt_inter.csv"
+      - "mrg_consumption_0111_3011_pt_inter.csv"
+      - "mrg_consumption_0110_3011_pt.csv"
+      - "mrg_consumption_0111_3011_pt.csv"
+      #      - "mrg_consumption_1308_2708_pt.csv"
+      #- "mrg_consumption_temperatures_0108_1508_pt.csv"
+  output: "resources/output/smart_building/"
+
+labels:
+  #  group_by:
+  #    - period
+  #    - duration
+  #    - low
+  timestamp_label: "timestamp(s)"
+  params:
+    - "ventilation"
+    - "cooling"
+  #    - "illumination"
+  #    - "total"
+  param_interest: "ventilation"
+
+visualization:
+  indent: 20
+
+#hyperparameters:
+#  duration: 20
+#  period: 1
+
+ranges:
+  mad:
+    ventilation:
+      start: 0.15
+      step: 0.05
+      end: 0.50
+    cooling:
+      start: 0.15
+      step: 0.05
+      end: 0.50
+  #    illumination:
+  #      start: 0.15
+  #      step: 0.05
+  #      end: 0.50
+  #    total:
+  #      start: 0.15
+  #      step: 0.05
+  #      end: 0.50
+  low: 50
+  init_gap: -1.0
+  cont_gap: -0.1
